@@ -1,0 +1,222 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">
+        <i class="fas fa-calendar-alt me-2"></i>
+        Mes Plans d'Échelonnement
+      </h2>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4" *ngIf="!loading">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-list me-2"></i>
+            Total Plans
+          </h5>
+          <h3>{{ installmentStats.totalPlans || 0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-play me-2"></i>
+            Plans Actifs
+          </h5>
+          <h3>{{ installmentStats.activePlans || 0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-check me-2"></i>
+            Plans Terminés
+          </h5>
+          <h3>{{ installmentStats.completedPlans || 0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-clock me-2"></i>
+            Restant à Payer
+          </h5>
+          <h3>{{ installmentStats.totalAmountRemaining || 0 | currency:'EUR' }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+
+  <!-- Installment Plans List -->
+  <div *ngIf="!loading" class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-credit-card me-2"></i>
+            Détails des Plans
+          </h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="installmentPlans.length === 0" class="text-center py-4">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Aucun plan d'échelonnement trouvé.</p>
+            <a routerLink="/formations" class="btn btn-primary">
+              <i class="fas fa-graduation-cap me-2"></i>
+              Découvrir les Formations
+            </a>
+          </div>
+
+          <div *ngIf="installmentPlans.length > 0" class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Formation</th>
+                  <th>Montant Total</th>
+                  <th>Échéances</th>
+                  <th>Montant/Échéance</th>
+                  <th>Prochaine Échéance</th>
+                  <th>Statut</th>
+                  <th>Progression</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let plan of installmentPlans">
+                  <td>
+                    <strong>Formation #{{ plan.formationId }}</strong>
+                    <br>
+                    <small class="text-muted">Plan #{{ plan.id }}</small>
+                  </td>
+                  <td>
+                    <strong>{{ plan.totalPayable | currency:'EUR' }}</strong>
+                    <br>
+                    <small class="text-muted">Intérêts: {{ plan.totalInterest | currency:'EUR' }}</small>
+                  </td>
+                  <td>{{ plan.numberOfInstallments }}</td>
+                  <td>{{ plan.installmentAmount | currency:'EUR' }}</td>
+                  <td>
+                    <span *ngIf="plan.nextPaymentDate; else noNextPayment">
+                      {{ plan.nextPaymentDate | date:'dd/MM/yyyy' }}
+                    </span>
+                    <ng-template #noNextPayment>
+                      <span class="text-muted">-</span>
+                    </ng-template>
+                  </td>
+                  <td>
+                    <span class="badge" [class]="getStatusBadgeClass(plan.status)">
+                      {{ getStatusText(plan.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="progress" style="width: 80px;">
+                      <div class="progress-bar"
+                           [style.width.%]="calculateProgress(plan)"
+                           [class]="plan.status === 'COMPLETED' ? 'bg-success' : 'bg-primary'">
+                        {{ calculateProgress(plan) | number:'1.0-0' }}%
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <button class="btn btn-sm btn-outline-primary"
+                              (click)="viewPlanPayments(plan)"
+                              title="Voir les paiements">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-success"
+                              *ngIf="plan.status === 'ACTIVE'"
+                              (click)="makePayment(plan.id, 1)"
+                              title="Effectuer un paiement">
+                        <i class="fas fa-credit-card"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger"
+                              *ngIf="plan.status === 'ACTIVE'"
+                              (click)="cancelPlan(plan.id)"
+                              title="Annuler le plan">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payments Modal -->
+<div class="modal fade" [class.show]="showPaymentsModal" [style.display]="showPaymentsModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-list me-2"></i>
+          Paiements du Plan #{{ selectedPlan?.id }}
+        </h5>
+        <button type="button" class="btn-close" (click)="closePaymentsModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="planPayments.length === 0" class="text-center py-4">
+          <p class="text-muted">Aucun paiement trouvé pour ce plan.</p>
+        </div>
+        <div *ngIf="planPayments.length > 0" class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Échéance</th>
+                <th>Montant</th>
+                <th>Échéance</th>
+                <th>Statut</th>
+                <th>Date de Paiement</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let payment of planPayments">
+                <td>{{ payment.installmentNumber }}</td>
+                <td>{{ payment.amount | currency:'EUR' }}</td>
+                <td>{{ payment.dueDate | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <span class="badge" [class]="getStatusBadgeClass(payment.status)">
+                    {{ getStatusText(payment.status) }}
+                  </span>
+                </td>
+                <td>
+                  <span *ngIf="payment.paidDate; else notPaid">
+                    {{ payment.paidDate | date:'dd/MM/yyyy' }}
+                  </span>
+                  <ng-template #notPaid>
+                    <span class="text-muted">-</span>
+                  </ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closePaymentsModal()">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade show" *ngIf="showPaymentsModal"></div>

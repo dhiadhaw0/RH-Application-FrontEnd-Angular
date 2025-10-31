@@ -115,6 +115,11 @@ import { TransactionsComponent } from './components/wallet/transactions/transact
 import { InvestmentDashboardComponent } from './components/investments/investment-dashboard/investment-dashboard.component';
 import { InvestmentFundListComponent } from './components/investments/investment-fund-list/investment-fund-list.component';
 import { InvestmentCreateComponent } from './components/investments/investment-create/investment-create.component';
+import { InstallmentPlansComponent } from './components/installments/installment-plans/installment-plans.component';
+import { InstallmentCalculatorComponent } from './components/installments/installment-calculator/installment-calculator.component';
+import { MarketplaceDashboardComponent } from './components/marketplace/marketplace-dashboard/marketplace-dashboard.component';
+import { MarketplaceOffersComponent } from './components/marketplace/marketplace-offers/marketplace-offers.component';
+import { MarketplaceCreateOfferComponent } from './components/marketplace/marketplace-create-offer/marketplace-create-offer.component';
 
 @NgModule({
   declarations: [
@@ -133,6 +138,11 @@ import { InvestmentCreateComponent } from './components/investments/investment-c
     InvestmentDashboardComponent,
     InvestmentFundListComponent,
     InvestmentCreateComponent,
+    InstallmentPlansComponent,
+    InstallmentCalculatorComponent,
+    MarketplaceDashboardComponent,
+    MarketplaceOffersComponent,
+    MarketplaceCreateOfferComponent,
   ],
   imports: [
     BrowserModule,

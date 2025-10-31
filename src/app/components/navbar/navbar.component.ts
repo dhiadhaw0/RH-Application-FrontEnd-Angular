@@ -45,6 +45,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showCareerDropdown = false;
   showUserDropdown = false;
   showInvestmentsDropdown = false;
+  showMarketplaceDropdown = false;
   chatbotOpen = false;
   searchQuery = '';
   searchActive = false;
@@ -141,6 +142,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showCareerDropdown = false;
     this.showUserDropdown = false;
     this.showInvestmentsDropdown = false;
+    this.showMarketplaceDropdown = false;
   }
 
   toggleLearningDropdown(): void {
@@ -164,6 +166,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showLearningDropdown = false;
     this.showMentorshipDropdown = false;
     this.showCertificationsDropdown = false;
+    this.showMarketplaceDropdown = false;
+  }
+
+  toggleMarketplaceDropdown(): void {
+    this.showMarketplaceDropdown = !this.showMarketplaceDropdown;
+    this.showCareerDropdown = false;
+    this.showLearningDropdown = false;
+    this.showMentorshipDropdown = false;
+    this.showCertificationsDropdown = false;
+    this.showInvestmentsDropdown = false;
   }
 
   closeMobileMenu(): void {

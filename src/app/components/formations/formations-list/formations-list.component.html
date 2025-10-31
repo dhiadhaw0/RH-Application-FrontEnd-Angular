@@ -224,6 +224,16 @@
               <i class="fas fa-gift"></i>
               <span>100% Gratuit</span>
             </div>
+
+            <!-- Installment Option -->
+            <div class="installment-option" *ngIf="formation.prix && formation.prix > 100">
+              <button class="btn btn-sm btn-outline-info installment-btn"
+                      (click)="showInstallmentCalculator(formation)"
+                      title="Paiement en plusieurs fois">
+                <i class="fas fa-calendar-alt me-1"></i>
+                <span>Échelonner</span>
+              </button>
+            </div>
           </div>
         </div>
 

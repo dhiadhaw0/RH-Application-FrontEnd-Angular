@@ -724,6 +724,28 @@
               font-size: 0.9em;
             }
           }
+
+          // Installment Option
+          .installment-option {
+            margin-top: 10px;
+            text-align: center;
+
+            .installment-btn {
+              pointer-events: auto !important;
+              z-index: 10;
+              position: relative;
+              transition: all 0.2s ease;
+
+              &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3);
+              }
+
+              &:active {
+                transform: translateY(0);
+              }
+            }
+          }
         }
       }
 
@@ -854,6 +876,13 @@
 
       &:hover .card-hover-overlay {
         opacity: 1;
+      }
+
+      // Disable hover animations for installment button
+      .installment-btn {
+        pointer-events: auto !important;
+        z-index: 10;
+        position: relative;
       }
     }
 

@@ -1,0 +1,254 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">
+        <i class="fas fa-plus me-2"></i>
+        Créer une Nouvelle Offre
+      </h2>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+
+  <!-- Create Offer Form -->
+  <div *ngIf="!loading" class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Détails de l'Offre</h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="offerForm" (ngSubmit)="onSubmit()">
+
+            <!-- Title -->
+            <div class="mb-3">
+              <label for="title" class="form-label">Titre de l'Offre <span class="text-danger">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                id="title"
+                formControlName="title"
+                [class.is-invalid]="isFieldInvalid('title')"
+                placeholder="Ex: Session de mentorat en développement web">
+              <div class="invalid-feedback">{{ getFieldError('title') }}</div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+              <textarea
+                class="form-control"
+                id="description"
+                rows="4"
+                formControlName="description"
+                [class.is-invalid]="isFieldInvalid('description')"
+                placeholder="Décrivez votre offre en détail..."></textarea>
+              <div class="invalid-feedback">{{ getFieldError('description') }}</div>
+            </div>
+
+            <!-- Offer Type -->
+            <div class="mb-3">
+              <label for="offerType" class="form-label">Type de Service <span class="text-danger">*</span></label>
+              <select
+                class="form-select"
+                id="offerType"
+                formControlName="offerType"
+                [class.is-invalid]="isFieldInvalid('offerType')">
+                <option value="">Sélectionnez un type</option>
+                <option *ngFor="let type of offerTypes" [value]="type.value">
+                  {{ type.label }}
+                </option>
+              </select>
+              <div class="invalid-feedback">{{ getFieldError('offerType') }}</div>
+            </div>
+
+            <!-- Credits Required -->
+            <div class="mb-3">
+              <label for="creditsRequired" class="form-label">Prix en Crédits <span class="text-danger">*</span></label>
+              <input
+                type="number"
+                class="form-control"
+                id="creditsRequired"
+                formControlName="creditsRequired"
+                [class.is-invalid]="isFieldInvalid('creditsRequired')"
+                placeholder="100"
+                min="1"
+                max="10000">
+              <div class="invalid-feedback">{{ getFieldError('creditsRequired') }}</div>
+              <small class="form-text text-muted">Nombre de crédits de compétences requis pour cette offre</small>
+            </div>
+
+            <!-- Max Participants -->
+            <div class="mb-3">
+              <label for="maxParticipants" class="form-label">Nombre Maximum de Participants</label>
+              <input
+                type="number"
+                class="form-control"
+                id="maxParticipants"
+                formControlName="maxParticipants"
+                [class.is-invalid]="isFieldInvalid('maxParticipants')"
+                placeholder="1"
+                min="1"
+                max="50">
+              <div class="invalid-feedback">{{ getFieldError('maxParticipants') }}</div>
+            </div>
+
+            <!-- Duration -->
+            <div class="mb-3">
+              <label for="durationHours" class="form-label">Durée (en heures)</label>
+              <input
+                type="number"
+                class="form-control"
+                id="durationHours"
+                formControlName="durationHours"
+                [class.is-invalid]="isFieldInvalid('durationHours')"
+                placeholder="2"
+                min="0.5"
+                step="0.5">
+              <div class="invalid-feedback">{{ getFieldError('durationHours') }}</div>
+            </div>
+
+            <!-- Skills -->
+            <div class="mb-3">
+              <label class="form-label">Compétences Requises <span class="text-danger">*</span></label>
+              <div formArrayName="skills">
+                <div *ngFor="let skill of skills.controls; let i = index" class="input-group mb-2">
+                  <input
+                    type="text"
+                    class="form-control"
+                    [formControlName]="i"
+                    placeholder="Ex: JavaScript, React, Node.js">
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    (click)="removeSkill(i)"
+                    [disabled]="skills.length <= 1">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline-primary btn-sm" (click)="addSkill()">
+                <i class="fas fa-plus me-2"></i>
+                Ajouter une compétence
+              </button>
+            </div>
+
+            <!-- Requirements -->
+            <div class="mb-3">
+              <label class="form-label">Prérequis <span class="text-danger">*</span></label>
+              <div formArrayName="requirements">
+                <div *ngFor="let req of requirements.controls; let i = index" class="input-group mb-2">
+                  <input
+                    type="text"
+                    class="form-control"
+                    [formControlName]="i"
+                    placeholder="Ex: Connaissances de base en programmation">
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    (click)="removeRequirement(i)"
+                    [disabled]="requirements.length <= 1">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline-primary btn-sm" (click)="addRequirement()">
+                <i class="fas fa-plus me-2"></i>
+                Ajouter un prérequis
+              </button>
+            </div>
+
+            <!-- Tags -->
+            <div class="mb-3">
+              <label class="form-label">Tags (optionnel)</label>
+              <div formArrayName="tags">
+                <div *ngFor="let tag of tags.controls; let i = index" class="input-group mb-2">
+                  <input
+                    type="text"
+                    class="form-control"
+                    [formControlName]="i"
+                    placeholder="Ex: débutant, avancé, web">
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    (click)="removeTag(i)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline-primary btn-sm" (click)="addTag()">
+                <i class="fas fa-plus me-2"></i>
+                Ajouter un tag
+              </button>
+            </div>
+
+            <!-- Expiration Date -->
+            <div class="mb-3">
+              <label for="expiresAt" class="form-label">Date d'Expiration (optionnel)</label>
+              <input
+                type="datetime-local"
+                class="form-control"
+                id="expiresAt"
+                formControlName="expiresAt">
+              <small class="form-text text-muted">Laissez vide pour une offre sans expiration</small>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary" (click)="cancel()">
+                <i class="fas fa-times me-2"></i>
+                Annuler
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="submitting || offerForm.invalid">
+                <i class="fas fa-save me-2"></i>
+                {{ submitting ? 'Création...' : 'Créer l\'Offre' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Section -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            Conseils pour créer une bonne offre
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>✅ À faire</h6>
+              <ul class="list-unstyled">
+                <li><i class="fas fa-check text-success me-2"></i> Titre clair et descriptif</li>
+                <li><i class="fas fa-check text-success me-2"></i> Description détaillée des services</li>
+                <li><i class="fas fa-check text-success me-2"></i> Prix en crédits réaliste</li>
+                <li><i class="fas fa-check text-success me-2"></i> Compétences et prérequis précis</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6>❌ À éviter</h6>
+              <ul class="list-unstyled">
+                <li><i class="fas fa-times text-danger me-2"></i> Prix trop élevé ou trop bas</li>
+                <li><i class="fas fa-times text-danger me-2"></i> Description vague</li>
+                <li><i class="fas fa-times text-danger me-2"></i> Conditions non réalistes</li>
+                <li><i class="fas fa-times text-danger me-2"></i> Informations de contact personnelles</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,193 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">
+        <i class="fas fa-store me-2"></i>
+        Marketplace des Crédits de Compétences
+      </h2>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+
+  <!-- Filters and Search -->
+  <div *ngIf="!loading" class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row g-3">
+            <!-- Type Filter -->
+            <div class="col-md-3">
+              <label class="form-label">Type de Service</label>
+              <select class="form-select" [(ngModel)]="selectedType" (change)="onTypeChange()">
+                <option *ngFor="let type of offerTypes" [value]="type.value">
+                  {{ type.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Search -->
+            <div class="col-md-4">
+              <label class="form-label">Rechercher</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="searchQuery"
+                (input)="onSearchChange()"
+                placeholder="Titre ou description...">
+            </div>
+
+            <!-- Sort -->
+            <div class="col-md-3">
+              <label class="form-label">Trier par</label>
+              <select class="form-select" [(ngModel)]="sortBy" (change)="onSortChange()">
+                <option *ngFor="let sort of sortOptions" [value]="sort.value">
+                  {{ sort.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Credit Balance -->
+            <div class="col-md-2">
+              <label class="form-label">Vos Crédits</label>
+              <div class="alert alert-info py-2 mb-0">
+                <strong>{{ creditBalance.availableCredits || 0 }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offers Grid -->
+  <div *ngIf="!loading" class="row">
+    <div *ngFor="let offer of filteredOffers" class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-start">
+            <h6 class="card-title mb-0">{{ offer.title }}</h6>
+            <span class="badge" [class]="getStatusBadgeClass(offer.status)">
+              {{ offer.status }}
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-text text-muted">{{ offer.description }}</p>
+
+          <div class="row text-center mb-3">
+            <div class="col-6">
+              <small class="text-muted">Prix</small>
+              <div class="fw-bold text-primary">{{ offer.creditsRequired }} crédits</div>
+            </div>
+            <div class="col-6">
+              <small class="text-muted">Note</small>
+              <div>{{ getRatingStars(offer.rating) }} ({{ offer.reviewCount }})</div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <small class="text-muted">Type:</small>
+            <span class="badge bg-light text-dark ms-2">{{ formatOfferType(offer.offerType) }}</span>
+          </div>
+
+          <div class="mb-3">
+            <small class="text-muted">Vendeur:</small>
+            <span class="ms-2">{{ offer.sellerName }}</span>
+          </div>
+
+          <div *ngIf="offer.skills && offer.skills.length > 0" class="mb-3">
+            <small class="text-muted">Compétences:</small>
+            <div class="mt-1">
+              <span *ngFor="let skill of offer.skills.slice(0, 3)" class="badge bg-secondary me-1 mb-1">
+                {{ skill }}
+              </span>
+              <span *ngIf="offer.skills.length > 3" class="text-muted">+{{ offer.skills.length - 3 }} autres</span>
+            </div>
+          </div>
+
+          <div *ngIf="offer.durationHours" class="mb-3">
+            <small class="text-muted">Durée:</small>
+            <span class="ms-2">{{ offer.durationHours }}h</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button
+            class="btn btn-primary w-100"
+            [disabled]="!canPurchaseOffer(offer)"
+            (click)="purchaseOffer(offer)">
+            <i class="fas fa-shopping-cart me-2"></i>
+            Acheter ({{ offer.creditsRequired }} crédits)
+          </button>
+          <small *ngIf="!canPurchaseOffer(offer)" class="text-danger d-block mt-1">
+            <i class="fas fa-exclamation-triangle me-1"></i>
+            Crédits insuffisants ou offre personnelle
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Results -->
+  <div *ngIf="!loading && filteredOffers.length === 0" class="row">
+    <div class="col-12">
+      <div class="text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">Aucune offre trouvée</h4>
+        <p class="text-muted">Essayez de modifier vos critères de recherche.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Transactions -->
+  <div *ngIf="!loading && userTransactions.length > 0" class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-history me-2"></i>
+            Mes Transactions Récentes
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>Crédits</th>
+                  <th>Statut</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let transaction of userTransactions">
+                  <td>
+                    <span class="badge"
+                          [class]="transaction.type === 'PURCHASE' ? 'bg-danger' : 'bg-success'">
+                      {{ transaction.type === 'PURCHASE' ? 'Achat' : 'Vente' }}
+                    </span>
+                  </td>
+                  <td>{{ transaction.description || 'Transaction Marketplace' }}</td>
+                  <td [class]="transaction.type === 'PURCHASE' ? 'text-danger' : 'text-success'">
+                    {{ transaction.type === 'PURCHASE' ? '-' : '+' }}{{ transaction.creditsAmount }}
+                  </td>
+                  <td>
+                    <span [class]="getTransactionStatusClass(transaction.status)">
+                      {{ transaction.status }}
+                    </span>
+                  </td>
+                  <td>{{ transaction.transactionDate | date:'short' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

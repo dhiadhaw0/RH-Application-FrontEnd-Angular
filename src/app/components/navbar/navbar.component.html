@@ -287,6 +287,37 @@
               <i class="fas fa-plus"></i>
               Investir
             </a>
+            <div class="dropdown-divider"></div>
+            <a routerLink="/installments" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-calendar-alt"></i>
+              Paiements échelonnés
+            </a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle" (click)="toggleMarketplaceDropdown()">
+            <i class="fas fa-store"></i>
+            <span>Marketplace</span>
+            <i class="fas fa-chevron-down dropdown-icon" [class.rotated]="showMarketplaceDropdown"></i>
+          </button>
+          <div class="dropdown-menu" [class.show]="showMarketplaceDropdown">
+            <a routerLink="/marketplace" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-tachometer-alt"></i>
+              Tableau de bord
+            </a>
+            <a routerLink="/marketplace/offers" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-list"></i>
+              Offres disponibles
+            </a>
+            <a routerLink="/marketplace/create-offer" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-plus"></i>
+              Créer une offre
+            </a>
+            <div class="dropdown-divider"></div>
+            <a routerLink="/skill-credits" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-coins"></i>
+              Mes crédits
+            </a>
           </div>
         </li>
       </ul>

@@ -1,0 +1,179 @@
+<div class="installment-calculator-modal">
+  <div class="modal-header">
+    <h5 class="modal-title">
+      <i class="fas fa-calculator me-2"></i>
+      Calculateur de Paiement Échelonné
+    </h5>
+    <button type="button" class="btn-close" (click)="resetCalculator()"></button>
+  </div>
+
+  <div class="modal-body">
+    <!-- Formation Info -->
+    <div class="formation-info-card">
+      <div class="formation-header">
+        <h6>{{ formationTitle }}</h6>
+        <div class="formation-price">
+          <span class="original-price">{{ totalAmount | currency:'EUR':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1: Eligibility Check -->
+    <div *ngIf="step === 'eligibility'" class="step-content">
+      <div class="eligibility-check">
+        <h6>Vérification d'éligibilité</h6>
+        <div *ngIf="loading" class="text-center">
+          <app-loading-spinner></app-loading-spinner>
+          <p>Vérification de votre éligibilité...</p>
+        </div>
+
+        <div *ngIf="!loading && eligibility" class="eligibility-result">
+          <div *ngIf="eligibility.isEligible" class="eligible">
+            <i class="fas fa-check-circle text-success"></i>
+            <h6>Éligible au paiement échelonné !</h6>
+            <ul class="eligibility-details">
+              <li>Acompte minimum: {{ eligibility.minDownPayment | currency:'EUR' }}</li>
+              <li>Échéances max: {{ eligibility.maxInstallments }}</li>
+              <li>Crédits requis: {{ eligibility.requiredSkillCredits }}</li>
+            </ul>
+            <button class="btn btn-primary" (click)="step = 'calculator'">
+              Continuer <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+          </div>
+
+          <div *ngIf="!eligibility.isEligible" class="not-eligible">
+            <i class="fas fa-times-circle text-danger"></i>
+            <h6>Non éligible pour le moment</h6>
+            <ul class="ineligibility-reasons">
+              <li *ngFor="let reason of eligibility.reasons">{{ reason }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Calculator -->
+    <div *ngIf="step === 'calculator'" class="step-content">
+      <div class="calculator-form">
+        <h6>Configurez votre plan d'échelonnement</h6>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Acompte</label>
+            <div class="input-group">
+              <input type="number"
+                     class="form-control"
+                     [(ngModel)]="downPayment"
+                     (input)="onDownPaymentChange()"
+                     [min]="getMinDownPayment()"
+                     [max]="totalAmount"
+                     placeholder="Montant de l'acompte">
+              <span class="input-group-text">€</span>
+            </div>
+            <small class="form-text">Minimum: {{ getMinDownPayment() | currency:'EUR' }}</small>
+          </div>
+
+          <div class="form-group">
+            <label>Nombre d'échéances</label>
+            <select class="form-select"
+                    [(ngModel)]="numberOfInstallments"
+                    (change)="onInstallmentsChange()">
+              <option *ngFor="let option of installmentOptions"
+                      [value]="option"
+                      [disabled]="option > getMaxInstallments()">
+                {{ option }} échéances
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Fréquence</label>
+            <select class="form-select"
+                    [(ngModel)]="frequency"
+                    (change)="onFrequencyChange()">
+              <option *ngFor="let option of frequencyOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Calculation Results -->
+        <div *ngIf="installmentAmount > 0" class="calculation-results">
+          <div class="result-card">
+            <h6>Résumé de votre plan</h6>
+            <div class="result-grid">
+              <div class="result-item">
+                <span class="label">Acompte</span>
+                <span class="value">{{ downPayment | currency:'EUR' }}</span>
+              </div>
+              <div class="result-item">
+                <span class="label">Échéance</span>
+                <span class="value">{{ installmentAmount | currency:'EUR' }}</span>
+              </div>
+              <div class="result-item">
+                <span class="label">Intérêts totaux</span>
+                <span class="value">{{ totalInterest | currency:'EUR' }}</span>
+              </div>
+              <div class="result-item total">
+                <span class="label">Total à payer</span>
+                <span class="value">{{ totalPayable | currency:'EUR' }}</span>
+              </div>
+            </div>
+
+            <!-- Payment Schedule Preview -->
+            <div class="schedule-preview">
+              <h6>Échéancier (aperçu)</h6>
+              <div class="schedule-list">
+                <div *ngFor="let payment of schedule.slice(0, 3); let i = index"
+                     class="schedule-item">
+                  <span class="payment-number">Échéance {{ i + 1 }}</span>
+                  <span class="payment-date">{{ payment.dueDate | date:'dd/MM/yyyy' }}</span>
+                  <span class="payment-amount">{{ payment.amount | currency:'EUR' }}</span>
+                </div>
+                <div *ngIf="schedule.length > 3" class="schedule-more">
+                  ... et {{ schedule.length - 3 }} autres échéances
+                </div>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button class="btn btn-outline-secondary" (click)="resetCalculator()">
+                <i class="fas fa-arrow-left me-2"></i>
+                Retour
+              </button>
+              <button class="btn btn-success"
+                      (click)="createInstallmentPlan()"
+                      [disabled]="loading">
+                <i class="fas fa-check me-2"></i>
+                Créer le plan
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Confirmation -->
+    <div *ngIf="step === 'confirmation'" class="step-content">
+      <div class="confirmation-message">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h6>Plan d'échelonnement créé avec succès !</h6>
+        <p>Votre plan de paiement a été configuré. Vous recevrez bientôt un email de confirmation avec tous les détails.</p>
+
+        <div class="confirmation-actions">
+          <button class="btn btn-primary" routerLink="/installments">
+            <i class="fas fa-list me-2"></i>
+            Voir mes plans
+          </button>
+          <button class="btn btn-outline-primary" (click)="resetCalculator()">
+            <i class="fas fa-plus me-2"></i>
+            Nouveau calcul
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

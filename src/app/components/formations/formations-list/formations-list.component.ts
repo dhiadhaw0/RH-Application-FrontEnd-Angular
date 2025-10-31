@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { FormationService } from '../../../services/formation.service';
 import { Formation, TypeFormation, StatutFormation } from '../../../models/formation.model';
+import { InstallmentCalculatorComponent } from '../../installments/installment-calculator/installment-calculator.component';
 
 @Component({
   selector: 'app-formations-list',
@@ -388,5 +389,16 @@ export class FormationsListComponent implements OnInit {
     this.searchTerm = '';
     this.sortBy = 'title';
     this.filterFormations();
+  }
+
+  showInstallmentCalculator(formation: Formation): void {
+    // Navigate to installment calculator with formation data
+    this.router.navigate(['/installments/calculator'], {
+      queryParams: {
+        formationId: formation.idFormation,
+        formationTitle: formation.title,
+        totalAmount: formation.prix
+      }
+    });
   }
 }

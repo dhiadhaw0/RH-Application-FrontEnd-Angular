@@ -87,6 +87,15 @@ import { InvestmentDashboardComponent } from './components/investments/investmen
 import { InvestmentFundListComponent } from './components/investments/investment-fund-list/investment-fund-list.component';
 import { InvestmentCreateComponent } from './components/investments/investment-create/investment-create.component';
 
+// Marketplace Components
+import { MarketplaceDashboardComponent } from './components/marketplace/marketplace-dashboard/marketplace-dashboard.component';
+import { MarketplaceOffersComponent } from './components/marketplace/marketplace-offers/marketplace-offers.component';
+import { MarketplaceCreateOfferComponent } from './components/marketplace/marketplace-create-offer/marketplace-create-offer.component';
+
+// Installment Components
+import { InstallmentPlansComponent } from './components/installments/installment-plans/installment-plans.component';
+import { InstallmentCalculatorComponent } from './components/installments/installment-calculator/installment-calculator.component';
+
 // Fintech Components
 import { InvoiceCreateComponent } from './components/fintech/invoice-create/invoice-create.component';
 import { InvoiceListComponent } from './components/fintech/invoice-list/invoice-list.component';
@@ -199,6 +208,16 @@ const routes: Routes = [
   { path: 'investments/dashboard', component: InvestmentDashboardComponent, data: { animation: 'InvestmentDashboard' } },
   { path: 'investments/funds', component: InvestmentFundListComponent, data: { animation: 'InvestmentFundList' } },
   { path: 'investments/create', component: InvestmentCreateComponent, data: { animation: 'InvestmentCreate' } },
+  
+  // Marketplace Routes
+  { path: 'marketplace', component: MarketplaceDashboardComponent, data: { animation: 'MarketplaceDashboard' } },
+  { path: 'marketplace/dashboard', component: MarketplaceDashboardComponent, data: { animation: 'MarketplaceDashboard' } },
+  { path: 'marketplace/offers', component: MarketplaceOffersComponent, data: { animation: 'MarketplaceOffers' } },
+  { path: 'marketplace/create-offer', component: MarketplaceCreateOfferComponent, data: { animation: 'MarketplaceCreateOffer' } },
+  
+  // Installment Routes
+  { path: 'installments', component: InstallmentPlansComponent, data: { animation: 'InstallmentPlans' } },
+  { path: 'installments/calculator', component: InstallmentCalculatorComponent, data: { animation: 'InstallmentCalculator' } },
   
   { path: '**', redirectTo: '' }
 ];
