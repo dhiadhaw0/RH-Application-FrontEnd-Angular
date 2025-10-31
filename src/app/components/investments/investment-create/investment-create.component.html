@@ -1,0 +1,167 @@
+<div class="investment-create-container">
+  <div class="create-header">
+    <div class="header-icon">
+      <i class="fas fa-rocket"></i>
+    </div>
+    <h1 class="header-title">
+      <span>Lancer Votre Investissement</span>
+    </h1>
+    <p class="header-subtitle">
+      Transformez vos compétences en opportunités financières avec nos fonds d'investissement innovants
+    </p>
+  </div>
+
+  <div class="create-form-card">
+    <div class="form-header">
+      <div class="form-title">
+        <i class="fas fa-hand-holding-usd me-2"></i>
+        Configuration de l'Investissement
+      </div>
+      <p class="form-description">
+        Choisissez votre fonds et définissez le montant pour commencer à générer des rendements
+      </p>
+    </div>
+
+    <div class="form-body">
+          <!-- Loading Spinner -->
+          <div *ngIf="loading" class="text-center my-4">
+            <app-loading-spinner></app-loading-spinner>
+          </div>
+
+          <form *ngIf="!loading" [formGroup]="investmentForm" (ngSubmit)="onSubmit()">
+            <!-- Fund Selection -->
+            <div class="mb-3">
+              <label for="fundId" class="form-label">Sélectionner un Fonds</label>
+              <select id="fundId"
+                      class="form-select"
+                      formControlName="fundId"
+                      (change)="onFundChange()"
+                      [class.is-invalid]="investmentForm.get('fundId')?.invalid && investmentForm.get('fundId')?.touched">
+                <option value="">Choisir un fonds...</option>
+                <option *ngFor="let fund of availableFunds" [value]="fund.id">
+                  {{ fund.name }} - {{ getFundTypeLabel(fund.type) }}
+                </option>
+              </select>
+              <div class="invalid-feedback">
+                Veuillez sélectionner un fonds.
+              </div>
+            </div>
+
+            <!-- Fund Details -->
+            <div *ngIf="selectedFund" class="mb-3 p-3 bg-light rounded">
+              <h6>Détails du Fonds</h6>
+              <p class="mb-2"><strong>Description:</strong> {{ selectedFund.description }}</p>
+              <div class="row">
+                <div class="col-6">
+                  <small class="text-muted">Performance</small>
+                  <div [class]="selectedFund.performanceRate > 0 ? 'text-success' : selectedFund.performanceRate < 0 ? 'text-danger' : 'text-muted'">
+                    {{ selectedFund.performanceRate | percent:'1.1-1' }}
+                  </div>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted">Min. Investissement</small>
+                  <div>{{ selectedFund.minInvestment }} crédits</div>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-6">
+                  <small class="text-muted">Verrouillage</small>
+                  <div>{{ selectedFund.lockPeriodMonths }} mois</div>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted">Crédits Investis</small>
+                  <div>{{ selectedFund.totalCreditsInvested | number }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Credit Balance Info -->
+            <div class="mb-3 p-3 bg-info bg-opacity-10 rounded">
+              <div class="d-flex justify-content-between align-items-center">
+                <span><strong>Crédits Disponibles:</strong></span>
+                <span class="badge bg-info">{{ creditBalance.availableCredits || 0 }}</span>
+              </div>
+            </div>
+
+            <!-- Investment Amount -->
+            <div class="mb-3">
+              <label for="creditsAmount" class="form-label">Montant à Investir (Crédits)</label>
+              <input type="number"
+                     id="creditsAmount"
+                     class="form-control"
+                     formControlName="creditsAmount"
+                     [class.is-invalid]="investmentForm.get('creditsAmount')?.invalid && investmentForm.get('creditsAmount')?.touched"
+                     min="1"
+                     [max]="creditBalance.availableCredits || 0">
+              <div class="invalid-feedback">
+                <div *ngIf="investmentForm.get('creditsAmount')?.errors?.['required']">
+                  Le montant est requis.
+                </div>
+                <div *ngIf="investmentForm.get('creditsAmount')?.errors?.['min']">
+                  Le montant minimum est de 1 crédit.
+                </div>
+              </div>
+              <small class="form-text text-muted">
+                Minimum: {{ selectedFund?.minInvestment || 0 }} crédits |
+                Maximum: {{ creditBalance.availableCredits || 0 }} crédits
+              </small>
+            </div>
+
+            <!-- Investment Summary -->
+            <div *ngIf="investmentForm.valid && selectedFund" class="mb-3 p-3 bg-success bg-opacity-10 rounded">
+              <h6>Résumé de l'Investissement</h6>
+              <div class="row">
+                <div class="col-6">
+                  <small class="text-muted">Montant Investi</small>
+                  <div>{{ investmentForm.value.creditsAmount }} crédits</div>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted">Performance Attendue</small>
+                  <div [class]="selectedFund.performanceRate > 0 ? 'text-success' : 'text-muted'">
+                    {{ selectedFund.performanceRate | percent:'1.1-1' }}
+                  </div>
+                </div>
+              </div>
+              <div class="mt-2">
+                <small class="text-muted">Rendement Potentiel Annuel</small>
+                <div class="fw-bold">
+                  {{ (investmentForm.value.creditsAmount * selectedFund.performanceRate / 100) | number:'1.0-0' }} crédits
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid">
+              <button type="submit"
+                      class="btn btn-primary btn-lg"
+                      [disabled]="!investmentForm.valid || !canInvest() || submitting">
+                <i class="fas fa-hand-holding-usd me-2" *ngIf="!submitting"></i>
+                <span *ngIf="submitting">
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Investissement en cours...
+                </span>
+                <span *ngIf="!submitting">Confirmer l'Investissement</span>
+              </button>
+            </div>
+          </form>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit"
+              class="btn btn-primary"
+              [disabled]="!investmentForm.valid || !canInvest() || submitting"
+              (click)="onSubmit()">
+        <i class="fas fa-rocket me-2" *ngIf="!submitting"></i>
+        <span *ngIf="submitting">
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Lancement en cours...
+        </span>
+        <span *ngIf="!submitting">🚀 Lancer l'Investissement</span>
+      </button>
+      <button type="button" class="btn btn-outline-secondary" routerLink="/investments/dashboard">
+        <i class="fas fa-arrow-left me-2"></i>
+        Retour au Dashboard
+      </button>
+    </div>
+  </div>
+</div>

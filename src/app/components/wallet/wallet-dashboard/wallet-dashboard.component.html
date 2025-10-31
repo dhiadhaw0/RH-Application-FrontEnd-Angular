@@ -2,7 +2,11 @@
   <!-- Header -->
   <div class="dashboard-header">
     <div class="header-content">
-      <h1><i class="fas fa-wallet"></i> Digital Wallet</h1>
+      <div class="header-icon">
+        <i class="fas fa-wallet"></i>
+      </div>
+      <h1>Portefeuille Digital</h1>
+      <p class="header-subtitle">Gérez vos finances et investissements en toute sécurité</p>
       <div class="wallet-selector" *ngIf="wallets.length > 1">
         <select [(ngModel)]="currentWallet" (change)="selectWallet(currentWallet)">
           <option *ngFor="let wallet of wallets" [ngValue]="wallet">
@@ -69,6 +73,66 @@
         <div *ngIf="recentTransactions.length === 0" class="no-transactions">
           <i class="fas fa-receipt"></i>
           <p>No transactions yet</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Investment Section -->
+    <div class="investment-section">
+      <div class="investment-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h4>Investissements Compétences</h4>
+          <p class="card-subtitle">Générez des rendements grâce à vos compétences</p>
+          <button class="btn btn-sm btn-outline-primary" (click)="navigateToInvestments()">
+            <i class="fas fa-cog me-1"></i>
+            Gérer
+          </button>
+        </div>
+        <div class="investment-summary">
+          <div class="investment-stats">
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="fas fa-coins"></i>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Total Investi</span>
+                <span class="stat-value">{{ formatCurrency(investmentStats.totalInvested || 0, 'USD') }}</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="fas fa-chart-area"></i>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Valeur Actuelle</span>
+                <span class="stat-value">{{ formatCurrency(investmentStats.currentValue || 0, 'USD') }}</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="fas fa-percentage"></i>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Performance</span>
+                <span class="stat-value" [class]="getPerformanceColor(investmentStats.performanceRate || 0)">
+                  {{ (investmentStats.performanceRate || 0) | percent:'1.1-1' }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="investment-actions">
+            <button class="btn btn-success" (click)="quickInvest()">
+              <i class="fas fa-rocket me-2"></i>
+              <span>Investir Rapidement</span>
+            </button>
+            <button class="btn btn-outline-info" (click)="viewInvestmentFunds()">
+              <i class="fas fa-eye me-2"></i>
+              <span>Voir les Fonds</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

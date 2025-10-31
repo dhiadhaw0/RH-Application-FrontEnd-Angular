@@ -82,6 +82,11 @@ import { ForumAnonymousToggleComponent } from './components/forum/forum-anonymou
 import { ChatbotComponent } from './components/chatbot/chatbot.component';
 import { SkillCreditShowcaseComponent } from './components/skill-credits/skill-credit-showcase/skill-credit-showcase.component';
 
+// Investment Components
+import { InvestmentDashboardComponent } from './components/investments/investment-dashboard/investment-dashboard.component';
+import { InvestmentFundListComponent } from './components/investments/investment-fund-list/investment-fund-list.component';
+import { InvestmentCreateComponent } from './components/investments/investment-create/investment-create.component';
+
 // Fintech Components
 import { InvoiceCreateComponent } from './components/fintech/invoice-create/invoice-create.component';
 import { InvoiceListComponent } from './components/fintech/invoice-list/invoice-list.component';
@@ -189,7 +194,12 @@ const routes: Routes = [
 
   // Skill Credit Routes
   { path: 'skill-credits', component: SkillCreditShowcaseComponent, data: { animation: 'SkillCreditShowcase' } },
-
+  
+  // Investment Routes
+  { path: 'investments/dashboard', component: InvestmentDashboardComponent, data: { animation: 'InvestmentDashboard' } },
+  { path: 'investments/funds', component: InvestmentFundListComponent, data: { animation: 'InvestmentFundList' } },
+  { path: 'investments/create', component: InvestmentCreateComponent, data: { animation: 'InvestmentCreate' } },
+  
   { path: '**', redirectTo: '' }
 ];
 

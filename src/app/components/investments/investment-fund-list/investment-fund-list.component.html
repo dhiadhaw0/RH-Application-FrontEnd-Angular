@@ -1,0 +1,124 @@
+<div class="funds-header">
+  <div class="header-content">
+    <h1>
+      <i class="fas fa-chart-line"></i>
+      <span>Découvrez Nos Fonds</span>
+    </h1>
+    <p>
+      Explorez une sélection de fonds d'investissement basés sur les compétences et générez des rendements collectifs
+    </p>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="funds-controls">
+    <div class="filter-section">
+      <div class="filter-card">
+        <div class="filter-icon">
+          <i class="fas fa-filter"></i>
+        </div>
+        <div class="filter-content">
+          <label class="filter-label">Filtrer par Catégorie</label>
+          <select class="filter-select"
+                  [(ngModel)]="selectedType"
+                  (change)="filterFunds()">
+            <option *ngFor="let type of fundTypes" [value]="type.value">
+              {{ type.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-section">
+      <a routerLink="/investments/create" class="create-fund-btn">
+        <i class="fas fa-plus"></i>
+        <span>Lancer un Fonds</span>
+      </a>
+    </div>
+  </div>
+
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+
+  <!-- Funds Grid -->
+  <div *ngIf="!loading" class="funds-grid">
+    <div *ngFor="let fund of filteredFunds" class="fund-card">
+      <div class="fund-header">
+        <div class="fund-badge" [class]="getStatusBadgeClass(fund.status)">
+          {{ fund.status === 'ACTIVE' ? 'ACTIF' : fund.status }}
+        </div>
+        <div class="fund-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="fund-name">{{ fund.name }}</div>
+        <div class="fund-type">{{ getFundTypeLabel(fund.type) }}</div>
+      </div>
+
+      <div class="fund-body">
+        <p class="fund-description">{{ fund.description }}</p>
+
+        <div class="fund-stats">
+          <div class="stat-item">
+            <div class="stat-label">Performance</div>
+            <div class="stat-value" [class]="getPerformanceColor(fund.performanceRate)">
+              {{ fund.performanceRate | percent:'1.1-1' }}
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-label">Total Investi</div>
+            <div class="stat-value highlight">
+              {{ fund.totalCreditsInvested | number }}
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-label">Min. Invest.</div>
+            <div class="stat-value neutral">
+              {{ fund.minInvestment }}
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-label">Verrouillage</div>
+            <div class="stat-value neutral">
+              {{ fund.lockPeriodMonths }}M
+            </div>
+          </div>
+        </div>
+
+        <div class="fund-actions">
+          <a [routerLink]="['/investments/create']"
+             [queryParams]="{ fundId: fund.id }"
+             class="btn btn-primary"
+             [class.disabled]="fund.status !== 'ACTIVE'">
+            <i class="fas fa-rocket me-2"></i>
+            <span>Investir Maintenant</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredFunds.length === 0" class="text-center py-5">
+    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+    <h4 class="text-muted">Aucun fonds trouvé</h4>
+    <p class="text-muted">
+      {{ selectedType === 'ALL' ? 'Il n\'y a actuellement aucun fonds d\'investissement disponible.' : 'Aucun fonds ne correspond à votre filtre.' }}
+    </p>
+    <button *ngIf="selectedType !== 'ALL'"
+            class="btn btn-outline-primary me-2"
+            (click)="selectedType = 'ALL'; filterFunds()">
+      Voir tous les fonds
+    </button>
+    <a routerLink="/investments/create" class="btn btn-primary">
+      <i class="fas fa-plus me-2"></i>
+      Créer le premier fonds
+    </a>
+  </div>
+</div>

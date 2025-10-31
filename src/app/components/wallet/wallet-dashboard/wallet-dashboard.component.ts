@@ -27,6 +27,7 @@ export class WalletDashboardComponent implements OnInit {
   recentTransactions: Transaction[] = [];
   paymentMethods: PaymentMethod[] = [];
   activeSubscriptions: Subscription[] = [];
+  investmentStats: any = {};
   isLoading = false;
   currentUser: any;
 
@@ -170,6 +171,25 @@ export class WalletDashboardComponent implements OnInit {
 
   navigateToSubscriptions(): void {
     this.router.navigate(['/wallet/subscriptions']);
+  }
+
+  navigateToInvestments(): void {
+    this.router.navigate(['/investments/dashboard']);
+  }
+
+  quickInvest(): void {
+    // Navigate to quick investment page or open modal
+    this.router.navigate(['/investments/create']);
+  }
+
+  viewInvestmentFunds(): void {
+    this.router.navigate(['/investments/funds']);
+  }
+
+  getPerformanceColor(rate: number): string {
+    if (rate > 0) return 'text-success';
+    if (rate < 0) return 'text-danger';
+    return 'text-muted';
   }
 
   getTransactionIcon(type: TransactionType): string {

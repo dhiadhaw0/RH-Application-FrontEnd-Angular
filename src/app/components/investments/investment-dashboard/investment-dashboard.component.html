@@ -1,0 +1,183 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">
+        <i class="fas fa-chart-line me-2"></i>
+        Tableau de Bord des Investissements
+      </h2>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+
+  <!-- Stats Cards -->
+  <div *ngIf="!loading" class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-coins me-2"></i>
+            Crédits Disponibles
+          </h5>
+          <h3>{{ creditBalance.availableCredits || 0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-chart-line me-2"></i>
+            Total Investi
+          </h5>
+          <h3>{{ calculateTotalInvested() }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-trophy me-2"></i>
+            Rendements Totaux
+          </h5>
+          <h3 [class]="getPerformanceColor(calculateTotalReturns())">
+            {{ calculateTotalReturns() | number:'1.0-0' }}
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-percentage me-2"></i>
+            Performance Moyenne
+          </h5>
+          <h3 [class]="getPerformanceColor(investmentStats.performanceRate || 0)">
+            {{ (investmentStats.performanceRate || 0) | percent:'1.1-1' }}
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Investments -->
+  <div *ngIf="!loading" class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-portfolio me-2"></i>
+            Mes Investissements
+          </h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="userInvestments.length === 0" class="text-center py-4">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Aucun investissement trouvé. Commencez par investir dans un fonds !</p>
+            <a routerLink="/investments/funds" class="btn btn-primary">
+              <i class="fas fa-plus me-2"></i>
+              Découvrir les Fonds
+            </a>
+          </div>
+          <div *ngIf="userInvestments.length > 0" class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Fonds</th>
+                  <th>Crédits Investis</th>
+                  <th>Valeur Actuelle</th>
+                  <th>Rendements</th>
+                  <th>Performance</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let investment of userInvestments">
+                  <td>{{ getFundName(investment.fundId) }}</td>
+                  <td>{{ investment.investedCredits }}</td>
+                  <td>{{ investment.currentValue }}</td>
+                  <td [class]="getPerformanceColor(investment.returnsGenerated)">
+                    {{ investment.returnsGenerated | number:'1.0-0' }}
+                  </td>
+                  <td [class]="getPerformanceColor(calculateInvestmentPerformance(investment))">
+                    {{ calculateInvestmentPerformance(investment) | percent:'1.1-1' }}
+                  </td>
+                  <td>
+                    <span class="badge"
+                          [class]="investment.status === 'ACTIVE' ? 'bg-success' : 'bg-secondary'">
+                      {{ investment.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <button *ngIf="investment.status === 'ACTIVE'"
+                            class="btn btn-sm btn-outline-danger"
+                            (click)="withdrawInvestment(investment.id)">
+                      <i class="fas fa-minus me-1"></i>
+                      Retirer
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Available Funds -->
+  <div *ngIf="!loading" class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-fund me-2"></i>
+            Fonds Disponibles
+          </h5>
+          <a routerLink="/investments/create" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-2"></i>
+            Nouveau Fonds
+          </a>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div *ngFor="let fund of availableFunds" class="col-md-6 col-lg-4 mb-3">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h6 class="card-title">{{ fund.name }}</h6>
+                  <p class="card-text text-muted">{{ fund.description }}</p>
+                  <div class="row text-center">
+                    <div class="col-6">
+                      <small class="text-muted">Performance</small>
+                      <div [class]="getPerformanceColor(fund.performanceRate)">
+                        {{ fund.performanceRate | percent:'1.1-1' }}
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <small class="text-muted">Min. Invest.</small>
+                      <div>{{ fund.minInvestment }}</div>
+                    </div>
+                  </div>
+                  <div class="mt-3">
+                    <a [routerLink]="['/investments/create']"
+                       [queryParams]="{ fundId: fund.id }"
+                       class="btn btn-outline-primary btn-sm w-100">
+                      <i class="fas fa-hand-holding-usd me-2"></i>
+                      Investir
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

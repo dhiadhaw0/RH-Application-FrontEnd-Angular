@@ -112,6 +112,9 @@ import { WalletDashboardComponent } from './components/wallet/wallet-dashboard/w
 import { PaymentMethodsComponent } from './components/wallet/payment-methods/payment-methods.component';
 import { SubscriptionsComponent } from './components/wallet/subscriptions/subscriptions.component';
 import { TransactionsComponent } from './components/wallet/transactions/transactions.component';
+import { InvestmentDashboardComponent } from './components/investments/investment-dashboard/investment-dashboard.component';
+import { InvestmentFundListComponent } from './components/investments/investment-fund-list/investment-fund-list.component';
+import { InvestmentCreateComponent } from './components/investments/investment-create/investment-create.component';
 
 @NgModule({
   declarations: [
@@ -127,6 +130,9 @@ import { TransactionsComponent } from './components/wallet/transactions/transact
     PaymentMethodsComponent,
     SubscriptionsComponent,
     TransactionsComponent,
+    InvestmentDashboardComponent,
+    InvestmentFundListComponent,
+    InvestmentCreateComponent,
   ],
   imports: [
     BrowserModule,
