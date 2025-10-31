@@ -1,0 +1,104 @@
+<div class="crowdfunding-list-container">
+  <div class="header-section">
+    <h1>Campagnes de Financement</h1>
+    <p>Découvrez et soutenez des objectifs de carrière ambitieux</p>
+    <button class="btn btn-primary" (click)="createCampaign()">
+      <i class="fas fa-plus"></i>
+      Créer une Campagne
+    </button>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Rechercher des campagnes..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange()"
+        class="search-input">
+      <i class="fas fa-search search-icon"></i>
+    </div>
+
+    <div class="filter-selects">
+      <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()" class="filter-select">
+        <option value="">Toutes les catégories</option>
+        <option *ngFor="let category of categories" [value]="category">
+          {{getCategoryLabel(category)}}
+        </option>
+      </select>
+
+      <select [(ngModel)]="selectedStatus" (change)="onStatusChange()" class="filter-select">
+        <option value="">Tous les statuts</option>
+        <option *ngFor="let status of statuses" [value]="status">
+          {{getStatusLabel(status)}}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+
+  <!-- Campaigns Grid -->
+  <div *ngIf="!loading" class="campaigns-grid">
+    <div *ngFor="let campaign of filteredCampaigns" class="campaign-card" (click)="viewCampaign(campaign.id)">
+      <div class="campaign-header">
+        <div class="campaign-category" [class]="'category-' + campaign.category.toLowerCase()">
+          {{getCategoryLabel(campaign.category)}}
+        </div>
+        <div class="campaign-status" [class]="'status-' + campaign.status.toLowerCase()">
+          {{getStatusLabel(campaign.status)}}
+        </div>
+      </div>
+
+      <div class="campaign-content">
+        <h3 class="campaign-title">{{campaign.title}}</h3>
+        <p class="campaign-description">{{campaign.description | slice:0:120}}...</p>
+
+        <div class="campaign-progress">
+          <div class="progress-info">
+            <span class="amount-raised">{{campaign.currentAmount | currency:campaign.currency:'symbol':'1.0-0'}}</span>
+            <span class="amount-target">sur {{campaign.targetAmount | currency:campaign.currency:'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="getProgressPercentage(campaign)"></div>
+          </div>
+          <div class="progress-percentage">{{getProgressPercentage(campaign) | number:'1.0-1'}}%</div>
+        </div>
+
+        <div class="campaign-footer">
+          <div class="campaign-stats">
+            <span class="days-remaining" *ngIf="isCampaignActive(campaign)">
+              <i class="fas fa-clock"></i>
+              {{getDaysRemaining(campaign)}} jours restants
+            </span>
+            <span class="campaign-expired" *ngIf="isCampaignExpired(campaign)">
+              <i class="fas fa-times-circle"></i>
+              Expirée
+            </span>
+          </div>
+          <div class="campaign-actions">
+            <button class="btn btn-outline btn-sm" (click)="viewCampaign(campaign.id); $event.stopPropagation()">
+              Voir les détails
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredCampaigns.length === 0" class="empty-state">
+      <div class="empty-state-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <h3>Aucune campagne trouvée</h3>
+      <p>Essayez de modifier vos critères de recherche ou créez votre propre campagne.</p>
+      <button class="btn btn-primary" (click)="createCampaign()">
+        Créer une Campagne
+      </button>
+    </div>
+  </div>
+</div>

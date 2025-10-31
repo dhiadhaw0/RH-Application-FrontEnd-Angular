@@ -1,0 +1,213 @@
+<div class="crowdfunding-create-container">
+  <div class="header-section">
+    <h1>Créer une Campagne de Financement</h1>
+    <p>Partagez votre objectif de carrière et recevez le soutien de la communauté</p>
+  </div>
+
+  <form [formGroup]="campaignForm" (ngSubmit)="onSubmit()" class="campaign-form">
+    <!-- Career Goal Section -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-bullseye"></i>
+        Objectif de Carrière
+      </h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="goalTitle">Titre de l'objectif *</label>
+          <input
+            type="text"
+            id="goalTitle"
+            formControlName="title"
+            [ngClass]="{'is-invalid': campaignForm.get('careerGoal.title')?.invalid && campaignForm.get('careerGoal.title')?.touched}"
+            placeholder="Ex: Formation en Développement Web">
+        </div>
+
+        <div class="form-group">
+          <label for="goalCategory">Catégorie *</label>
+          <select id="goalCategory" formControlName="category" class="form-select">
+            <option *ngFor="let category of goalCategories" [value]="category">
+              {{getCategoryLabel(category)}}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="goalDescription">Description détaillée *</label>
+        <textarea
+          id="goalDescription"
+          formControlName="description"
+          rows="4"
+          [ngClass]="{'is-invalid': campaignForm.get('careerGoal.description')?.invalid && campaignForm.get('careerGoal.description')?.touched}"
+          placeholder="Décrivez votre objectif professionnel et pourquoi vous en avez besoin..."></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="targetAmount">Montant cible (€) *</label>
+          <input
+            type="number"
+            id="targetAmount"
+            formControlName="targetAmount"
+            min="1"
+            [ngClass]="{'is-invalid': campaignForm.get('careerGoal.targetAmount')?.invalid && campaignForm.get('careerGoal.targetAmount')?.touched}"
+            placeholder="500">
+        </div>
+
+        <div class="form-group">
+          <label for="endDate">Date limite *</label>
+          <input
+            type="date"
+            id="endDate"
+            formControlName="endDate"
+            [min]="getMinDate()"
+            [ngClass]="{'is-invalid': campaignForm.get('careerGoal.endDate')?.invalid && campaignForm.get('careerGoal.endDate')?.touched}">
+        </div>
+      </div>
+    </div>
+
+    <!-- Campaign Details Section -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Détails de la Campagne
+      </h3>
+
+      <div class="form-group">
+        <label for="campaignTitle">Titre de la campagne *</label>
+        <input
+          type="text"
+          id="campaignTitle"
+          formControlName="campaignTitle"
+          [ngClass]="{'is-invalid': campaignForm.get('campaignTitle')?.invalid && campaignForm.get('campaignTitle')?.touched}"
+          placeholder="Titre accrocheur pour votre campagne">
+      </div>
+
+      <div class="form-group">
+        <label for="campaignDescription">Description de la campagne *</label>
+        <textarea
+          id="campaignDescription"
+          formControlName="campaignDescription"
+          rows="6"
+          [ngClass]="{'is-invalid': campaignForm.get('campaignDescription')?.invalid && campaignForm.get('campaignDescription')?.touched}"
+          placeholder="Racontez votre histoire, expliquez comment l'argent sera utilisé..."></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="videoUrl">URL de la vidéo (optionnel)</label>
+          <input
+            type="url"
+            id="videoUrl"
+            formControlName="videoUrl"
+            placeholder="https://youtube.com/...">
+        </div>
+
+        <div class="form-group">
+          <label for="tags">Tags (séparés par des virgules)</label>
+          <input
+            type="text"
+            id="tags"
+            formControlName="tags"
+            placeholder="développement, formation, carrière">
+        </div>
+      </div>
+    </div>
+
+    <!-- Contribution Tiers Section -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-gift"></i>
+        Niveaux de Contribution
+      </h3>
+      <p class="section-subtitle">Définissez les récompenses pour différents niveaux de contribution</p>
+
+      <div formArrayName="contributionTiers">
+        <div
+          *ngFor="let tier of contributionTiers.controls; let i = index"
+          [formGroupName]="i"
+          class="tier-card">
+
+          <div class="tier-header">
+            <h4>Niveau {{i + 1}}</h4>
+            <button
+              type="button"
+              class="btn btn-outline-danger btn-sm"
+              (click)="removeTier(i)"
+              *ngIf="contributionTiers.length > 1">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+
+          <div class="tier-content">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nom du niveau *</label>
+                <input
+                  type="text"
+                  formControlName="name"
+                  placeholder="Ex: Supporter, Ami, Partenaire">
+              </div>
+
+              <div class="form-group">
+                <label>Montant (€) *</label>
+                <input
+                  type="number"
+                  formControlName="amount"
+                  min="1"
+                  placeholder="25">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Description *</label>
+              <textarea
+                formControlName="description"
+                rows="2"
+                placeholder="Décrivez ce niveau..."></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Récompenses (séparées par des virgules) *</label>
+                <input
+                  type="text"
+                  formControlName="rewards"
+                  placeholder="Remerciement, Badge virtuel, Accès premium">
+              </div>
+
+              <div class="form-group">
+                <label>Limite de contributeurs (optionnel)</label>
+                <input
+                  type="number"
+                  formControlName="maxContributors"
+                  min="1"
+                  placeholder="100">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-outline-primary" (click)="addTier()">
+        <i class="fas fa-plus"></i>
+        Ajouter un niveau
+      </button>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()">
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="campaignForm.invalid || submitting">
+        <span *ngIf="submitting" class="spinner-border spinner-border-sm" role="status"></span>
+        {{submitting ? 'Création...' : 'Créer la Campagne'}}
+      </button>
+    </div>
+  </form>
+</div>

@@ -119,6 +119,11 @@ import { PaymentMethodsComponent } from './components/wallet/payment-methods/pay
 import { SubscriptionsComponent } from './components/wallet/subscriptions/subscriptions.component';
 import { TransactionsComponent } from './components/wallet/transactions/transactions.component';
 
+// Crowdfunding Components
+import { CrowdfundingListComponent } from './components/crowdfunding/crowdfunding-list/crowdfunding-list.component';
+import { CrowdfundingCreateComponent } from './components/crowdfunding/crowdfunding-create/crowdfunding-create.component';
+import { CrowdfundingDetailComponent } from './components/crowdfunding/crowdfunding-detail/crowdfunding-detail.component';
+
 const routes: Routes = [
   { path: '', component: HomeComponent, data: { animation: 'Home' } },
   { path: 'login', component: LoginComponent, canActivate: [guestGuard], data: { animation: 'Login' } },
@@ -244,6 +249,11 @@ const routes: Routes = [
   { path: 'live-events/calendar', component: LiveEventsCalendarComponent, data: { animation: 'LiveEventsCalendar' } },
   { path: 'live-events/create', component: LiveEventCreateComponent, data: { animation: 'LiveEventCreate' } },
   { path: 'live-events/:id', component: LiveEventViewerComponent, data: { animation: 'LiveEventViewer' } },
+
+  // Crowdfunding Routes
+  { path: 'crowdfunding', component: CrowdfundingListComponent, data: { animation: 'CrowdfundingList' } },
+  { path: 'crowdfunding/create', component: CrowdfundingCreateComponent, data: { animation: 'CrowdfundingCreate' } },
+  { path: 'crowdfunding/:id', component: CrowdfundingDetailComponent, data: { animation: 'CrowdfundingDetail' } },
 
   { path: '**', redirectTo: '' }
 ];

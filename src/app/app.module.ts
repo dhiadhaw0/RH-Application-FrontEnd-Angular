@@ -128,6 +128,9 @@ import { LiveEventsListComponent } from './components/live-events/live-events-li
 import { LiveEventViewerComponent } from './components/live-events/live-event-viewer/live-event-viewer.component';
 import { LiveEventCreateComponent } from './components/live-events/live-event-create/live-event-create.component';
 import { LiveEventsCalendarComponent } from './components/live-events/live-events-calendar/live-events-calendar.component';
+import { CrowdfundingListComponent } from './components/crowdfunding/crowdfunding-list/crowdfunding-list.component';
+import { CrowdfundingCreateComponent } from './components/crowdfunding/crowdfunding-create/crowdfunding-create.component';
+import { CrowdfundingDetailComponent } from './components/crowdfunding/crowdfunding-detail/crowdfunding-detail.component';
 
 @NgModule({
   declarations: [
@@ -159,6 +162,9 @@ import { LiveEventsCalendarComponent } from './components/live-events/live-event
     LiveEventViewerComponent,
     LiveEventCreateComponent,
     LiveEventsCalendarComponent,
+    CrowdfundingListComponent,
+    CrowdfundingCreateComponent,
+    CrowdfundingDetailComponent,
   ],
   imports: [
     BrowserModule,

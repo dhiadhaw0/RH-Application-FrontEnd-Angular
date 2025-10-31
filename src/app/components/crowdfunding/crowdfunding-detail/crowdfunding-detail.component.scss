@@ -1,0 +1,535 @@
+.crowdfunding-detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  .campaign-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .campaign-status-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+
+      &.status-active { background: #e8f5e8; color: #388e3c; }
+      &.status-funded { background: #e3f2fd; color: #1976d2; }
+      &.status-expired { background: #ffebee; color: #d32f2f; }
+      &.status-draft { background: #f5f5f5; color: #616161; }
+      &.status-cancelled { background: #ffebee; color: #d32f2f; }
+    }
+  }
+
+  .campaign-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 3rem;
+    margin-bottom: 3rem;
+    color: white;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    align-items: center;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .hero-content {
+      .campaign-category {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+
+        &.category-education { background: rgba(255,255,255,0.2); }
+        &.category-equipment { background: rgba(255,255,255,0.2); }
+        &.category-certifications { background: rgba(255,255,255,0.2); }
+        &.category-training { background: rgba(255,255,255,0.2); }
+        &.category-business { background: rgba(255,255,255,0.2); }
+        &.category-other { background: rgba(255,255,255,0.2); }
+      }
+
+      .campaign-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+      }
+
+      @media (max-width: 768px) {
+        .campaign-title {
+          font-size: 2rem;
+        }
+      }
+
+      .campaign-meta {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+
+        @media (max-width: 768px) {
+          justify-content: center;
+        }
+
+        .meta-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.9rem;
+
+          i {
+            opacity: 0.8;
+          }
+        }
+      }
+
+      .campaign-progress {
+        .progress-stats {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 1rem;
+          font-size: 1.1rem;
+
+          .amount-raised {
+            font-weight: 700;
+            font-size: 1.5rem;
+          }
+
+          .amount-target {
+            opacity: 0.8;
+          }
+        }
+
+        .progress-bar {
+          height: 12px;
+          background: rgba(255,255,255,0.3);
+          border-radius: 6px;
+          overflow: hidden;
+          margin-bottom: 0.5rem;
+
+          .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            border-radius: 6px;
+            transition: width 0.3s ease;
+          }
+        }
+
+        .progress-percentage {
+          text-align: right;
+          font-weight: 600;
+          font-size: 1.1rem;
+        }
+      }
+    }
+
+    .hero-media {
+      .campaign-video {
+        width: 100%;
+        height: 200px;
+        border-radius: 8px;
+        border: none;
+      }
+    }
+  }
+
+  .campaign-content {
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 3rem;
+
+      @media (max-width: 992px) {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .main-content {
+        .content-section {
+          background: white;
+          border-radius: 12px;
+          padding: 2rem;
+          margin-bottom: 2rem;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+          h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+          }
+
+          .campaign-description {
+            line-height: 1.6;
+            color: #6c757d;
+          }
+        }
+
+        .milestones-list {
+          .milestone-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+
+            &.achieved {
+              border-color: #28a745;
+              background: #f8fff8;
+
+              .milestone-status i {
+                color: #28a745;
+              }
+            }
+
+            .milestone-status {
+              flex-shrink: 0;
+              margin-top: 0.25rem;
+
+              i {
+                font-size: 1.2rem;
+                color: #dee2e6;
+              }
+            }
+
+            .milestone-content {
+              flex: 1;
+
+              h4 {
+                margin: 0 0 0.5rem 0;
+                color: #2c3e50;
+                font-size: 1.1rem;
+              }
+
+              p {
+                margin: 0 0 0.5rem 0;
+                color: #6c757d;
+                line-height: 1.5;
+              }
+
+              .milestone-amount {
+                font-weight: 600;
+                color: #28a745;
+              }
+            }
+          }
+        }
+
+        .contributions-list {
+          .contribution-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            .contribution-avatar {
+              flex-shrink: 0;
+              width: 40px;
+              height: 40px;
+              background: #f8f9fa;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #6c757d;
+            }
+
+            .contribution-content {
+              flex: 1;
+
+              .contribution-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.5rem;
+
+                .contributor-name {
+                  font-weight: 600;
+                  color: #2c3e50;
+                }
+
+                .contribution-amount {
+                  font-weight: 700;
+                  color: #28a745;
+                }
+              }
+
+              .contribution-message {
+                margin: 0.5rem 0;
+                font-style: italic;
+                color: #6c757d;
+              }
+
+              .contribution-date {
+                font-size: 0.8rem;
+                color: #adb5bd;
+              }
+            }
+          }
+        }
+      }
+
+      .sidebar {
+        .contribution-card, .campaign-stats-card, .tags-card, .owner-actions {
+          background: white;
+          border-radius: 12px;
+          padding: 2rem;
+          margin-bottom: 2rem;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+          h3 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+          }
+        }
+
+        .contribution-tiers {
+          margin-bottom: 2rem;
+
+          h4 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+          }
+
+          .tiers-grid {
+            display: grid;
+            gap: 1rem;
+
+            .tier-option {
+              padding: 1rem;
+              border: 2px solid #e9ecef;
+              border-radius: 8px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+
+              &:hover {
+                border-color: #007bff;
+                transform: translateY(-2px);
+              }
+
+              &.selected {
+                border-color: #007bff;
+                background: #f8f9ff;
+              }
+
+              .tier-name {
+                font-weight: 600;
+                color: #2c3e50;
+                margin-bottom: 0.5rem;
+              }
+
+              .tier-amount {
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: #28a745;
+                margin-bottom: 0.5rem;
+              }
+
+              .tier-description {
+                color: #6c757d;
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+              }
+
+              .tier-rewards {
+                color: #007bff;
+                font-size: 0.8rem;
+              }
+            }
+          }
+        }
+
+        .custom-amount {
+          margin-bottom: 2rem;
+
+          h4 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+          }
+
+          .amount-input {
+            position: relative;
+
+            .form-control {
+              width: 100%;
+              padding-right: 3rem;
+            }
+
+            .currency-symbol {
+              position: absolute;
+              right: 1rem;
+              top: 50%;
+              transform: translateY(-50%);
+              color: #6c757d;
+              font-weight: 600;
+            }
+          }
+        }
+
+        .contribution-message, .anonymous-option {
+          margin-bottom: 1.5rem;
+
+          label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+          }
+
+          .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            resize: vertical;
+          }
+        }
+
+        .anonymous-option {
+          .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: normal;
+
+            input[type="checkbox"] {
+              margin-right: 0.5rem;
+            }
+          }
+        }
+
+        .btn-block {
+          width: 100%;
+          padding: 0.75rem;
+          border-radius: 8px;
+          font-weight: 600;
+        }
+
+        .campaign-stats-card {
+          .stats-list {
+            .stat-item {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 0.75rem 0;
+              border-bottom: 1px solid #e9ecef;
+
+              &:last-child {
+                border-bottom: none;
+              }
+
+              .stat-label {
+                color: #6c757d;
+              }
+
+              .stat-value {
+                font-weight: 600;
+                color: #2c3e50;
+              }
+            }
+          }
+        }
+
+        .tags-card {
+          .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+
+            .tag {
+              background: #f8f9fa;
+              color: #6c757d;
+              padding: 0.25rem 0.75rem;
+              border-radius: 20px;
+              font-size: 0.8rem;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .loading-container, .error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    text-align: center;
+
+    .error-content {
+      i {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+      }
+
+      h2 {
+        color: #6c757d;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        color: #adb5bd;
+        margin-bottom: 2rem;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .crowdfunding-detail-container {
+    padding: 1rem;
+
+    .campaign-hero {
+      padding: 2rem 1.5rem;
+      margin-bottom: 2rem;
+
+      .hero-content {
+        .campaign-title {
+          font-size: 1.8rem;
+        }
+
+        .campaign-meta {
+          justify-content: center;
+          gap: 1rem;
+        }
+      }
+    }
+
+    .campaign-content {
+      .content-grid {
+        gap: 1.5rem;
+      }
+    }
+  }
+}

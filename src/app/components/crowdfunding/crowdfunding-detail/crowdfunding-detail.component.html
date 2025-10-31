@@ -1,0 +1,269 @@
+<div class="crowdfunding-detail-container" *ngIf="campaign">
+  <!-- Campaign Header -->
+  <div class="campaign-header">
+    <button class="btn btn-outline back-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Retour
+    </button>
+
+    <div class="campaign-status-badge" [class]="'status-' + campaign.status.toLowerCase()">
+      {{getStatusLabel()}}
+    </div>
+  </div>
+
+  <!-- Campaign Hero Section -->
+  <div class="campaign-hero">
+    <div class="hero-content">
+      <div class="campaign-category" [class]="'category-' + campaign.category.toLowerCase()">
+        {{getCategoryLabel()}}
+      </div>
+
+      <h1 class="campaign-title">{{campaign.title}}</h1>
+
+      <div class="campaign-meta">
+        <div class="meta-item">
+          <i class="fas fa-user"></i>
+          <span>Créé par l'utilisateur #{{campaign.userId}}</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-calendar"></i>
+          <span>{{campaign.endDate | date:'dd/MM/yyyy'}}</span>
+        </div>
+        <div class="meta-item" *ngIf="isCampaignActive()">
+          <i class="fas fa-clock"></i>
+          <span>{{getDaysRemaining()}} jours restants</span>
+        </div>
+      </div>
+
+      <!-- Progress Section -->
+      <div class="campaign-progress">
+        <div class="progress-stats">
+          <div class="amount-raised">{{campaign.currentAmount | currency:campaign.currency:'symbol':'1.0-0'}}</div>
+          <div class="amount-target">sur {{campaign.targetAmount | currency:campaign.currency:'symbol':'1.0-0'}}</div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+        </div>
+        <div class="progress-percentage">{{getProgressPercentage() | number:'1.0-1'}}%</div>
+      </div>
+    </div>
+
+    <!-- Video/Image Section -->
+    <div class="hero-media" *ngIf="campaign.videoUrl">
+      <iframe
+        [src]="campaign.videoUrl"
+        frameborder="0"
+        allowfullscreen
+        class="campaign-video">
+      </iframe>
+    </div>
+  </div>
+
+  <!-- Campaign Content -->
+  <div class="campaign-content">
+    <div class="content-grid">
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Description -->
+        <div class="content-section">
+          <h2>À propos de cette campagne</h2>
+          <div class="campaign-description" [innerHTML]="campaign.description"></div>
+        </div>
+
+        <!-- Milestones -->
+        <div class="content-section" *ngIf="campaign.milestones && campaign.milestones.length > 0">
+          <h2>Jalons</h2>
+          <div class="milestones-list">
+            <div
+              *ngFor="let milestone of campaign.milestones"
+              class="milestone-item"
+              [class.achieved]="milestone.achieved">
+              <div class="milestone-status">
+                <i class="fas" [class]="milestone.achieved ? 'fa-check-circle' : 'fa-circle'"></i>
+              </div>
+              <div class="milestone-content">
+                <h4>{{milestone.title}}</h4>
+                <p>{{milestone.description}}</p>
+                <div class="milestone-amount">{{milestone.targetAmount | currency:campaign.currency:'symbol':'1.0-0'}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Contributions -->
+        <div class="content-section" *ngIf="recentContributions.length > 0">
+          <h2>Dernières contributions</h2>
+          <div class="contributions-list">
+            <div *ngFor="let contribution of recentContributions" class="contribution-item">
+              <div class="contribution-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="contribution-content">
+                <div class="contribution-header">
+                  <span class="contributor-name">
+                    {{contribution.anonymous ? 'Anonyme' : 'Utilisateur #' + contribution.userId}}
+                  </span>
+                  <span class="contribution-amount">{{contribution.amount | currency:contribution.currency:'symbol':'1.0-0'}}</span>
+                </div>
+                <p class="contribution-message" *ngIf="contribution.message">{{contribution.message}}</p>
+                <span class="contribution-date">{{contribution.createdAt | date:'dd/MM/yyyy à HH:mm'}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Contribution Section -->
+        <div class="contribution-card" *ngIf="canContribute()">
+          <h3>Soutenir cette campagne</h3>
+
+          <!-- Contribution Tiers -->
+          <div class="contribution-tiers" *ngIf="campaign.contributionTiers && campaign.contributionTiers.length > 0">
+            <h4>Choisir un niveau</h4>
+            <div class="tiers-grid">
+              <div
+                *ngFor="let tier of campaign.contributionTiers"
+                class="tier-option"
+                [class.selected]="selectedTier?.id === tier.id"
+                (click)="selectTier(tier)">
+                <div class="tier-name">{{tier.name}}</div>
+                <div class="tier-amount">{{tier.amount | currency:campaign.currency:'symbol':'1.0-0'}}</div>
+                <div class="tier-description">{{tier.description}}</div>
+                <div class="tier-rewards" *ngIf="tier.rewards && tier.rewards.length > 0">
+                  <small>Récompenses: {{tier.rewards.join(', ')}}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Amount -->
+          <div class="custom-amount">
+            <h4>Ou saisir un montant personnalisé</h4>
+            <div class="amount-input">
+              <input
+                type="number"
+                [(ngModel)]="contributionAmount"
+                (input)="customAmountSelected()"
+                min="1"
+                placeholder="Montant en €"
+                class="form-control">
+              <span class="currency-symbol">€</span>
+            </div>
+          </div>
+
+          <!-- Contribution Message -->
+          <div class="contribution-message">
+            <label>Message (optionnel)</label>
+            <textarea
+              [(ngModel)]="contributionMessage"
+              placeholder="Un message d'encouragement..."
+              rows="3"
+              class="form-control"></textarea>
+          </div>
+
+          <!-- Anonymous Option -->
+          <div class="anonymous-option">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="anonymousContribution">
+              <span class="checkmark"></span>
+              Contribution anonyme
+            </label>
+          </div>
+
+          <!-- Contribute Button -->
+          <button
+            class="btn btn-primary btn-block"
+            (click)="contribute()"
+            [disabled]="contributing || contributionAmount <= 0">
+            <span *ngIf="contributing" class="spinner-border spinner-border-sm" role="status"></span>
+            {{contributing ? 'Contribution en cours...' : 'Contribuer'}}
+          </button>
+        </div>
+
+        <!-- Campaign Owner Actions -->
+        <div class="owner-actions" *ngIf="isCampaignOwner()">
+          <button class="btn btn-outline btn-block" (click)="editCampaign()">
+            <i class="fas fa-edit"></i>
+            Modifier la campagne
+          </button>
+
+          <!-- Success/Failure Actions -->
+          <div class="campaign-actions" *ngIf="campaign.status === 'ACTIVE'">
+            <button
+              class="btn btn-success btn-block"
+              (click)="processCampaignSuccess()"
+              *ngIf="campaign.currentAmount >= campaign.targetAmount">
+              <i class="fas fa-check"></i>
+              Marquer comme réussie
+            </button>
+
+            <button class="btn btn-danger btn-block" (click)="processCampaignFailure()">
+              <i class="fas fa-times"></i>
+              Annuler la campagne
+            </button>
+          </div>
+
+          <!-- Expired Campaign Action -->
+          <div class="campaign-actions" *ngIf="isCampaignExpired() && campaign.status === 'EXPIRED'">
+            <button class="btn btn-warning btn-block" (click)="processExpiredCampaign()">
+              <i class="fas fa-clock"></i>
+              Traiter la campagne expirée
+            </button>
+          </div>
+        </div>
+
+        <!-- Campaign Stats -->
+        <div class="campaign-stats-card">
+          <h3>Statistiques</h3>
+          <div class="stats-list">
+            <div class="stat-item">
+              <span class="stat-label">Objectif</span>
+              <span class="stat-value">{{campaign.targetAmount | currency:campaign.currency:'symbol':'1.0-0'}}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Collecté</span>
+              <span class="stat-value">{{campaign.currentAmount | currency:campaign.currency:'symbol':'1.0-0'}}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Progression</span>
+              <span class="stat-value">{{getProgressPercentage() | number:'1.0-1'}}%</span>
+            </div>
+            <div class="stat-item" *ngIf="campaignStats.totalContributions">
+              <span class="stat-label">Contributeurs</span>
+              <span class="stat-value">{{campaignStats.totalContributors}}</span>
+            </div>
+            <div class="stat-item" *ngIf="campaignStats.averageContribution">
+              <span class="stat-label">Moyenne</span>
+              <span class="stat-value">{{campaignStats.averageContribution | currency:campaign.currency:'symbol':'1.0-0'}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="tags-card" *ngIf="campaign.tags && campaign.tags.length > 0">
+          <h3>Tags</h3>
+          <div class="tags-list">
+            <span *ngFor="let tag of campaign.tags" class="tag">{{tag}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="loading-container">
+  <app-loading-spinner></app-loading-spinner>
+</div>
+
+<!-- Error State -->
+<div *ngIf="!loading && !campaign" class="error-container">
+  <div class="error-content">
+    <i class="fas fa-exclamation-triangle"></i>
+    <h2>Campagne introuvable</h2>
+    <p>Cette campagne n'existe pas ou a été supprimée.</p>
+    <button class="btn btn-primary" (click)="goBack()">Retour à la liste</button>
+  </div>
+</div>
