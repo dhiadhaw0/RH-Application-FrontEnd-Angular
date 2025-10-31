@@ -1,0 +1,81 @@
+<div class="review-list-container">
+  <h2>Avis et Évaluations</h2>
+
+  <div class="loading" *ngIf="loading">
+    Chargement des avis...
+  </div>
+
+  <div class="reviews-content" *ngIf="!loading">
+    <!-- Rating Summary -->
+    <div class="rating-summary" *ngIf="reviews.length > 0">
+      <div class="summary-card">
+        <div class="average-rating">
+          <div class="rating-number">{{ getAverageRating() }}</div>
+          <div class="rating-stars">
+            <span *ngFor="let star of getRatingStars(getAverageRating())">{{ star }}</span>
+          </div>
+          <div class="rating-count">{{ reviews.length }} avis</div>
+        </div>
+
+        <div class="rating-distribution">
+          <div class="distribution-item" *ngFor="let item of getRatingDistribution()">
+            <span class="rating-label">{{ item.rating }} ★</span>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="item.percentage"></div>
+            </div>
+            <span class="rating-count">{{ item.count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="reviews-list" *ngIf="reviews.length > 0">
+      <div class="review-card" *ngFor="let review of reviews">
+        <div class="review-header">
+          <div class="reviewer-info">
+            <div class="reviewer-avatar">
+              {{ review.reviewer.firstName.charAt(0) }}{{ review.reviewer.lastName.charAt(0) }}
+            </div>
+            <div class="reviewer-details">
+              <h4>{{ review.reviewer.firstName }} {{ review.reviewer.lastName }}</h4>
+              <p class="review-date">{{ review.createdAt | date:'dd/MM/yyyy' }}</p>
+            </div>
+          </div>
+          <div class="review-rating">
+            <div class="stars">
+              <span *ngFor="let star of getRatingStars(review.rating)">{{ star }}</span>
+            </div>
+            <span class="rating-number">{{ review.rating }}/5</span>
+          </div>
+        </div>
+
+        <div class="review-content">
+          <div class="session-info">
+            <strong>Session:</strong> {{ review.session.mentorshipRequest.topic }}
+            <span class="session-date">• {{ review.session.scheduledAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+
+          <div class="review-comment" *ngIf="review.comment">
+            <p>{{ review.comment }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="no-reviews" *ngIf="reviews.length === 0">
+      <div class="empty-state">
+        <div class="empty-icon">⭐</div>
+        <h3>Aucun avis trouvé</h3>
+        <p>Il n'y a pas encore d'avis pour cette section.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="back-action">
+    <button class="btn btn-secondary" routerLink="/mentorship/dashboard">
+      Retour au tableau de bord
+    </button>
+  </div>
+</div>

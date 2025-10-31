@@ -1,0 +1,58 @@
+<div class="review-form-container">
+  <h2>Laisser un avis</h2>
+
+  <div class="loading" *ngIf="loading">
+    Vérification des avis existants...
+  </div>
+
+  <form class="review-form" (ngSubmit)="onSubmit()" *ngIf="!loading">
+    <div class="form-group">
+      <label>Note *</label>
+      <div class="rating-stars">
+        <span
+          class="star"
+          *ngFor="let star of getRatingStars()"
+          [class.selected]="star <= reviewData.rating"
+          (click)="setRating(star)"
+        >
+          ★
+        </span>
+      </div>
+      <small class="rating-text">{{ reviewData.rating }} étoile{{ reviewData.rating > 1 ? 's' : '' }}</small>
+    </div>
+
+    <div class="form-group">
+      <label for="comment">Commentaire *</label>
+      <textarea
+        id="comment"
+        name="comment"
+        [(ngModel)]="reviewData.comment"
+        placeholder="Partagez votre expérience avec cette session de mentorat..."
+        rows="6"
+        required
+        class="form-control"
+      ></textarea>
+      <small class="form-text">Votre avis aidera les autres utilisateurs à choisir leur mentor.</small>
+    </div>
+
+    <div class="form-info">
+      <h4>Conseils pour un bon avis</h4>
+      <ul>
+        <li>Soyez honnête et constructif</li>
+        <li>Mentionnez les points forts et les axes d'amélioration</li>
+        <li>Décrivez comment la session vous a aidé</li>
+        <li>Restez respectueux et professionnel</li>
+      </ul>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="submitting">
+        <span *ngIf="submitting">Soumission en cours...</span>
+        <span *ngIf="!submitting">Soumettre l'avis</span>
+      </button>
+    </div>
+  </form>
+</div>

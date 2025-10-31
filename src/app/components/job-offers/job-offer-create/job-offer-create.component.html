@@ -1,0 +1,156 @@
+<app-navbar></app-navbar>
+
+<div class="create-container">
+  <div class="header-section">
+    <button class="btn btn-back" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Retour
+    </button>
+    <h1>Créer une nouvelle offre d'emploi</h1>
+  </div>
+
+  <form [formGroup]="createForm" (ngSubmit)="onSubmit()" class="create-form">
+    <!-- General Information -->
+    <div class="form-section">
+      <h2>Informations générales</h2>
+
+      <div class="form-group">
+        <label for="title">Titre du poste *</label>
+        <input
+          type="text"
+          id="title"
+          formControlName="title"
+          class="form-control"
+          [class.error]="createForm.get('title')?.invalid && createForm.get('title')?.touched"
+          placeholder="Ex: Développeur Full Stack Senior">
+        <div class="error-message" *ngIf="getFieldError('title')">{{getFieldError('title')}}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description du poste *</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          class="form-control textarea"
+          rows="6"
+          [class.error]="createForm.get('description')?.invalid && createForm.get('description')?.touched"
+          placeholder="Décrivez le poste, les responsabilités, l'environnement de travail..."></textarea>
+        <div class="error-message" *ngIf="getFieldError('description')">{{getFieldError('description')}}</div>
+      </div>
+    </div>
+
+    <!-- Salary Information -->
+    <div class="form-section">
+      <h2>Rémunération</h2>
+
+      <div class="salary-grid">
+        <div class="form-group">
+          <label for="salaryMin">Salaire minimum (€)</label>
+          <input
+            type="number"
+            id="salaryMin"
+            formControlName="salaryMin"
+            class="form-control"
+            [class.error]="createForm.get('salaryMin')?.invalid && createForm.get('salaryMin')?.touched"
+            placeholder="30000">
+          <div class="error-message" *ngIf="getFieldError('salaryMin')">{{getFieldError('salaryMin')}}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="salaryMax">Salaire maximum (€)</label>
+          <input
+            type="number"
+            id="salaryMax"
+            formControlName="salaryMax"
+            class="form-control"
+            [class.error]="createForm.get('salaryMax')?.invalid && createForm.get('salaryMax')?.touched"
+            placeholder="50000">
+          <div class="error-message" *ngIf="getFieldError('salaryMax')">{{getFieldError('salaryMax')}}</div>
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="getFormError()">{{getFormError()}}</div>
+    </div>
+
+    <!-- Work Conditions -->
+    <div class="form-section">
+      <h2>Conditions de travail</h2>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" formControlName="remote">
+          <span class="checkmark"></span>
+          Travail à distance possible
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="expiresAt">Date d'expiration</label>
+        <input
+          type="datetime-local"
+          id="expiresAt"
+          formControlName="expiresAt"
+          class="form-control">
+        <small class="help-text">Laissez vide pour une offre sans expiration</small>
+      </div>
+    </div>
+
+    <!-- Skills Requirements -->
+    <div class="form-section">
+      <h2>Compétences requises</h2>
+
+      <div class="skills-section">
+        <div class="skill-group">
+          <h3>Compétences Techniques</h3>
+          <div class="skill-list" formArrayName="requirementsHardSkills">
+            <div class="skill-item" *ngFor="let skill of hardSkills.controls; let i = index" [formGroupName]="i">
+              <input
+                type="text"
+                formControlName="skill"
+                class="form-control skill-input"
+                placeholder="Ex: JavaScript, React, Node.js"
+                [class.error]="skill.invalid && skill.touched">
+              <button type="button" class="btn btn-remove" (click)="removeHardSkill(i)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-add" (click)="addHardSkill()">
+            <i class="fas fa-plus"></i> Ajouter une compétence technique
+          </button>
+        </div>
+
+        <div class="skill-group">
+          <h3>Compétences Comportementales</h3>
+          <div class="skill-list" formArrayName="requirementsSoftSkills">
+            <div class="skill-item" *ngFor="let skill of softSkills.controls; let i = index" [formGroupName]="i">
+              <input
+                type="text"
+                formControlName="skill"
+                class="form-control skill-input"
+                placeholder="Ex: Travail d'équipe, Communication"
+                [class.error]="skill.invalid && skill.touched">
+              <button type="button" class="btn btn-remove" (click)="removeSoftSkill(i)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-add" (click)="addSoftSkill()">
+            <i class="fas fa-plus"></i> Ajouter une compétence comportementale
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="goBack()">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="submitting">
+        <i class="fas fa-save" *ngIf="!submitting"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="submitting"></i>
+        {{submitting ? 'Création...' : 'Créer l\'offre'}}
+      </button>
+    </div>
+  </form>
+</div>

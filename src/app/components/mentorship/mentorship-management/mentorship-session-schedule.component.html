@@ -1,0 +1,82 @@
+<div class="schedule-container">
+  <h2>Planifier une Session de Mentorat</h2>
+
+  <form class="schedule-form" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="scheduledAt">Date et heure de la session *</label>
+      <input
+        type="datetime-local"
+        id="scheduledAt"
+        name="scheduledAt"
+        [(ngModel)]="sessionData.scheduledAt"
+        [min]="getMinDateTime()"
+        required
+        class="form-control"
+      />
+      <small class="form-text">La session doit être planifiée au minimum 30 minutes à l'avance.</small>
+    </div>
+
+    <div class="form-group">
+      <label for="durationMinutes">Durée (minutes) *</label>
+      <select
+        id="durationMinutes"
+        name="durationMinutes"
+        [(ngModel)]="sessionData.durationMinutes"
+        required
+        class="form-control"
+      >
+        <option [value]="30">30 minutes</option>
+        <option [value]="60">1 heure</option>
+        <option [value]="90">1 heure 30 minutes</option>
+        <option [value]="120">2 heures</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="location">Lieu de la session *</label>
+      <select
+        id="location"
+        name="location"
+        [(ngModel)]="sessionData.location"
+        required
+        class="form-control"
+      >
+        <option value="En ligne">En ligne (vidéoconférence)</option>
+        <option value="Présentiel">Présentiel</option>
+        <option value="Téléphone">Téléphone</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="agenda">Ordre du jour (optionnel)</label>
+      <textarea
+        id="agenda"
+        name="agenda"
+        [(ngModel)]="sessionData.agenda"
+        placeholder="Décrivez les sujets qui seront abordés pendant la session..."
+        rows="4"
+        class="form-control"
+      ></textarea>
+    </div>
+
+    <div class="form-info">
+      <h4>Informations importantes</h4>
+      <ul>
+        <li>Assurez-vous que les deux parties sont disponibles à l'heure prévue</li>
+        <li>Préparez les sujets à aborder à l'avance</li>
+        <li>Vous pouvez annuler ou modifier la session jusqu'à 24h avant</li>
+        <li>Un compte-rendu sera demandé à la fin de la session</li>
+      </ul>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="scheduling">
+        <span *ngIf="scheduling">Planification en cours...</span>
+        <span *ngIf="!scheduling">Planifier la session</span>
+      </button>
+    </div>
+  </form>
+</div>

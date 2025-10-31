@@ -1,0 +1,182 @@
+<app-navbar></app-navbar>
+
+<div class="badge-list-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="breadcrumb">
+      <a href="/" class="breadcrumb-link">
+        <i class="fas fa-home"></i>
+        Accueil
+      </a>
+      <span class="breadcrumb-link">/</span>
+      <span class="breadcrumb-link">Badges</span>
+    </div>
+
+    <div class="header-content">
+      <h1>Système de Badges</h1>
+      <p>Découvrez tous les badges disponibles et récompenses à gagner</p>
+    </div>
+
+    <div class="header-actions">
+      <a routerLink="/badges/create" class="btn btn-primary">
+        <i class="fas fa-plus"></i>
+        Créer un Badge
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="stats-overview">
+    <div class="stat-card">
+      <div class="stat-icon achievement">
+        <i class="fas fa-trophy"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getTotalBadges() }}</div>
+        <div class="stat-label">Total Badges</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon skill">
+        <i class="fas fa-star"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getAchievementBadges() }}</div>
+        <div class="stat-label">Accomplissements</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon participation">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getSkillBadges() }}</div>
+        <div class="stat-label">Compétences</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon special">
+        <i class="fas fa-crown"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getParticipationBadges() }}</div>
+        <div class="stat-label">Participation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        placeholder="Rechercher un badge..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+      >
+    </div>
+
+    <div class="filter-buttons">
+      <button
+        class="filter-btn"
+        [class.active]="activeFilter === 'all'"
+        (click)="setFilter('all')"
+      >
+        Tous
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="activeFilter === 'achievement'"
+        (click)="setFilter('achievement')"
+      >
+        Accomplissements
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="activeFilter === 'skill'"
+        (click)="setFilter('skill')"
+      >
+        Compétences
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="activeFilter === 'participation'"
+        (click)="setFilter('participation')"
+      >
+        Participation
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="activeFilter === 'special'"
+        (click)="setFilter('special')"
+      >
+        Spéciaux
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Chargement des badges...</p>
+  </div>
+
+  <!-- Badges Grid -->
+  <div *ngIf="!loading" class="badges-grid">
+    <div
+      *ngFor="let badge of filteredBadges; trackBy: trackByBadgeId"
+      class="badge-card"
+    >
+      <div class="badge-header">
+        <div class="badge-icon">
+          <i [class]="getBadgeIcon(badge)"></i>
+        </div>
+        <h3>{{ badge.nom }}</h3>
+        <div class="badge-category">{{ getBadgeCategory(badge) }}</div>
+      </div>
+
+      <div class="badge-content">
+        <div class="badge-description">
+          {{ badge.description }}
+        </div>
+
+        <div class="badge-stats">
+          <div class="stat-item">
+            <div class="stat-value">{{ getBadgeEarners(badge) }}</div>
+            <div class="stat-label">Gagnants</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ getBadgeEarnedThisMonth(badge) }}</div>
+            <div class="stat-label">Ce mois</div>
+          </div>
+        </div>
+
+        <div class="badge-actions">
+          <a [routerLink]="['/badges', badge.id]" class="btn btn-outline">
+            <i class="fas fa-eye"></i>
+            Voir
+          </a>
+          <button class="btn btn-primary" (click)="viewBadgeDetails(badge)">
+            <i class="fas fa-info-circle"></i>
+            Détails
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Badges State -->
+  <div *ngIf="!loading && filteredBadges.length === 0" class="no-badges">
+    <i class="fas fa-medal"></i>
+    <h3>Aucun badge trouvé</h3>
+    <p>Il n'y a pas de badges correspondant à vos critères de recherche.</p>
+    <a routerLink="/badges/create" class="btn">
+      <i class="fas fa-plus"></i>
+      Créer le premier badge
+    </a>
+  </div>
+</div>

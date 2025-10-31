@@ -1,0 +1,132 @@
+<app-navbar></app-navbar>
+
+<div class="workflow-container">
+  <div class="header-section" *ngIf="offer">
+    <button class="btn btn-back" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Retour
+    </button>
+    <div class="header-content">
+      <h1>Gestion du workflow</h1>
+      <p class="offer-title">{{offer.title}}</p>
+      <div class="offer-meta">
+        <span class="offer-id">#{{offer.idJobOffer}}</span>
+        <span class="current-status" [style.background-color]="getWorkflowStatusColor(offer.workflowStatus)">
+          {{getCurrentStep()?.label}}
+        </span>
+      </div>
+    </div>
+    <div class="header-actions" *ngIf="isOwner">
+      <button class="btn btn-outline" (click)="editOffer()" *ngIf="offer.workflowStatus === 'REDACTION'">
+        <i class="fas fa-edit"></i> Modifier
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Chargement du workflow...</p>
+    </div>
+  </div>
+
+  <div class="workflow-content" *ngIf="!loading && offer">
+    <!-- Workflow Steps -->
+    <div class="workflow-steps">
+      <div class="steps-container">
+        <div
+          class="workflow-step"
+          *ngFor="let step of workflowSteps; let i = index"
+          [class.completed]="isStepCompleted(step.status)"
+          [class.current]="isStepCurrent(step.status)"
+          [class.upcoming]="!isStepCompleted(step.status) && !isStepCurrent(step.status)">
+          <div class="step-header">
+            <div class="step-icon" [style.background-color]="step.color">
+              <i [class]="step.icon"></i>
+            </div>
+            <div class="step-connector" *ngIf="i < workflowSteps.length - 1"></div>
+          </div>
+          <div class="step-content">
+            <h3>{{step.label}}</h3>
+            <p>{{step.description}}</p>
+            <div class="step-details" *ngIf="isStepCurrent(step.status)">
+              <div class="requirements" *ngIf="step.requirements?.length">
+                <h4>Prérequis:</h4>
+                <ul>
+                  <li *ngFor="let req of step.requirements">{{req}}</li>
+                </ul>
+              </div>
+              <div class="actions" *ngIf="step.actions?.length">
+                <h4>Actions possibles:</h4>
+                <ul>
+                  <li *ngFor="let action of step.actions">{{action}}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workflow Controls -->
+    <div class="workflow-controls" *ngIf="isOwner">
+      <div class="controls-card">
+        <h2>Actions du workflow</h2>
+        <div class="controls-grid">
+          <div class="control-item" *ngIf="canAdvanceWorkflow()">
+            <div class="control-info">
+              <h3>Avancer</h3>
+              <p>Passer à l'étape suivante: {{getNextStep()?.label}}</p>
+            </div>
+            <button class="btn btn-success" (click)="advanceWorkflow()">
+              <i class="fas fa-arrow-right"></i> Avancer
+            </button>
+          </div>
+
+          <div class="control-item" *ngIf="canRevertWorkflow()">
+            <div class="control-info">
+              <h3>Revenir en arrière</h3>
+              <p>Retourner à l'étape: {{getPreviousStep()?.label}}</p>
+            </div>
+            <button class="btn btn-warning" (click)="revertWorkflow()">
+              <i class="fas fa-arrow-left"></i> Revenir
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workflow History -->
+    <div class="workflow-history">
+      <div class="history-card">
+        <h2>Historique du workflow</h2>
+        <div class="history-list" *ngIf="workflowHistory.length > 0; else noHistory">
+          <div class="history-item" *ngFor="let entry of workflowHistory">
+            <div class="history-icon">
+              <i class="fas fa-circle" [style.color]="getWorkflowStatusColor(entry.newStatus)"></i>
+            </div>
+            <div class="history-content">
+              <div class="history-header">
+                <span class="status-change">
+                  {{getWorkflowStepLabel(entry.oldStatus)}} → {{getWorkflowStepLabel(entry.newStatus)}}
+                </span>
+                <span class="change-date">{{entry.changedAt | date:'dd/MM/yyyy à HH:mm'}}</span>
+              </div>
+              <div class="history-details">
+                <span class="changed-by" *ngIf="entry.changedBy">
+                  Par: {{entry.changedBy}}
+                </span>
+                <p class="change-reason" *ngIf="entry.reason">{{entry.reason}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noHistory>
+          <div class="no-history">
+            <i class="fas fa-history"></i>
+            <p>Aucun historique disponible</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

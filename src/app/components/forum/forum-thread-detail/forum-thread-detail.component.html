@@ -1,0 +1,178 @@
+<!-- Forum Thread Detail Component -->
+<div class="forum-thread-detail-container">
+  <!-- Header -->
+  <div class="thread-header" *ngIf="thread">
+    <div class="header-content">
+      <button class="back-button" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div class="thread-info">
+        <div class="thread-meta">
+          <span class="category-badge">{{ thread.category.name }}</span>
+          <span class="status-badge" *ngIf="getThreadStatus()" [class]="getThreadStatusClass()">
+            {{ getThreadStatus() }}
+          </span>
+        </div>
+        <h1 class="thread-title">{{ thread.title }}</h1>
+        <div class="thread-author">
+          <i class="fas fa-user"></i>
+          <span>{{ thread.author.firstName }} {{ thread.author.lastName }}</span>
+          <span class="separator">•</span>
+          <i class="fas fa-calendar"></i>
+          <span>{{ formatDate(thread.createdAt) }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="thread-actions">
+      <button
+        class="btn btn-outline action-btn"
+        (click)="editThread()"
+        [disabled]="!canEditThread()"
+        title="Modifier la discussion"
+      >
+        <i class="fas fa-edit"></i>
+        Modifier
+      </button>
+      <button
+        class="btn btn-outline action-btn"
+        (click)="reportThread()"
+        title="Signaler cette discussion"
+      >
+        <i class="fas fa-flag"></i>
+        Signaler
+      </button>
+      <button
+        class="btn btn-outline action-btn"
+        (click)="viewThreadHistory()"
+        title="Voir l'historique des versions"
+      >
+        <i class="fas fa-history"></i>
+        Historique
+      </button>
+      <button
+        class="btn btn-primary reply-btn"
+        (click)="createNewPost()"
+        [disabled]="!canPost()"
+        [title]="canPost() ? 'Répondre à cette discussion' : 'Cette discussion est fermée'"
+      >
+        <i class="fas fa-reply"></i>
+        Répondre
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement de la discussion...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h3>Erreur de chargement</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadThreadDetails()">
+        <i class="fas fa-redo"></i>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Thread Content -->
+  <div *ngIf="!loading && !error && thread" class="thread-content">
+    <!-- Original Post -->
+    <div class="original-post" *ngIf="posts.length > 0">
+      <div class="post-card featured">
+        <div class="post-header">
+          <div class="post-author">
+            <div class="author-avatar">
+              <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="author-info">
+              <h4>{{ posts[0].author.firstName }} {{ posts[0].author.lastName }}</h4>
+              <span class="post-date">{{ formatDate(posts[0].createdAt) }}</span>
+            </div>
+          </div>
+          <div class="post-actions">
+            <app-forum-upvote
+              [postId]="posts[0].id"
+              [userId]="currentUser?.id"
+            ></app-forum-upvote>
+          </div>
+        </div>
+        <div class="post-content">
+          <p>{{ posts[0].content }}</p>
+        </div>
+        <div class="post-footer" *ngIf="posts[0].isAnswer">
+          <div class="answer-badge">
+            <i class="fas fa-check-circle"></i>
+            Réponse acceptée
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Replies -->
+    <div class="replies-section" *ngIf="posts.length > 1">
+      <h3 class="replies-title">
+        <i class="fas fa-comments"></i>
+        Réponses ({{ posts.length - 1 }})
+      </h3>
+
+      <div class="replies-list">
+        <div
+          *ngFor="let post of posts.slice(1)"
+          class="post-card reply"
+        >
+          <div class="post-header">
+            <div class="post-author">
+              <div class="author-avatar">
+                <i class="fas fa-user-circle"></i>
+              </div>
+              <div class="author-info">
+                <h4>{{ post.author.firstName }} {{ post.author.lastName }}</h4>
+                <span class="post-date">{{ formatDate(post.createdAt) }}</span>
+              </div>
+            </div>
+            <div class="post-actions">
+              <app-forum-upvote
+                [postId]="post.id"
+                [userId]="currentUser?.id"
+              ></app-forum-upvote>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>{{ post.content }}</p>
+          </div>
+          <div class="post-footer" *ngIf="post.isAnswer">
+            <div class="answer-badge">
+              <i class="fas fa-check-circle"></i>
+              Réponse acceptée
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Replies -->
+    <div *ngIf="posts.length === 1" class="no-replies">
+      <div class="no-replies-content">
+        <i class="fas fa-comments empty-icon"></i>
+        <h3>Aucune réponse</h3>
+        <p>Soyez le premier à répondre à cette discussion !</p>
+        <button
+          class="btn btn-primary"
+          (click)="createNewPost()"
+          [disabled]="!canPost()"
+        >
+          <i class="fas fa-plus"></i>
+          Ajouter une réponse
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

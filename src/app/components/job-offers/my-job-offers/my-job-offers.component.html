@@ -1,0 +1,203 @@
+<app-navbar></app-navbar>
+
+<div class="my-offers-container">
+  <div class="header-section">
+    <h1>Mes offres d'emploi</h1>
+    <p>Gérez vos offres d'emploi publiées</p>
+    <div class="header-actions">
+      <button class="btn btn-primary" routerLink="/job-offers/create">
+        <i class="fas fa-plus"></i> Nouvelle offre
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-section">
+    <div class="stat-card" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+      <div class="stat-icon">
+        <i class="fas fa-briefcase"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Total</h3>
+        <div class="stat-value">{{stats.total}}</div>
+      </div>
+    </div>
+
+    <div class="stat-card" [class.active]="activeFilter === 'drafts'" (click)="setFilter('drafts')">
+      <div class="stat-icon">
+        <i class="fas fa-edit"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Brouillons</h3>
+        <div class="stat-value">{{stats.drafts}}</div>
+      </div>
+    </div>
+
+    <div class="stat-card" [class.active]="activeFilter === 'published'" (click)="setFilter('published')">
+      <div class="stat-icon">
+        <i class="fas fa-globe"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Publiées</h3>
+        <div class="stat-value">{{stats.published}}</div>
+      </div>
+    </div>
+
+    <div class="stat-card" [class.active]="activeFilter === 'expired'" (click)="setFilter('expired')">
+      <div class="stat-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Expirées</h3>
+        <div class="stat-value">{{stats.expired}}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Sort -->
+  <div class="controls-section">
+    <div class="sort-controls">
+      <label>Trier par:</label>
+      <select [(ngModel)]="sortBy" (change)="setSort(sortBy)">
+        <option value="newest">Plus récent</option>
+        <option value="oldest">Plus ancien</option>
+        <option value="title">Titre</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Job Offers List -->
+  <div class="offers-section" *ngIf="!loading; else loadingTemplate">
+    <div class="offers-list" *ngIf="filteredOffers.length > 0; else noOffersTemplate">
+      <div class="offer-card" *ngFor="let offer of filteredOffers">
+        <div class="card-header">
+          <div class="offer-info">
+            <h3 class="offer-title">{{offer.title}}</h3>
+            <div class="offer-meta">
+              <span class="offer-id">#{{offer.idJobOffer}}</span>
+              <span class="offer-status" [style.background-color]="getStatusColor(offer.status)">
+                {{offer.status}}
+              </span>
+              <span class="workflow-status" [style.background-color]="getWorkflowStatusColor(offer.workflowStatus)">
+                {{getWorkflowStatusText(offer.workflowStatus)}}
+              </span>
+            </div>
+          </div>
+          <div class="offer-actions">
+            <button class="btn btn-sm btn-outline" routerLink="/job-offers/{{offer.idJobOffer}}">
+              <i class="fas fa-eye"></i> Voir
+            </button>
+            <button class="btn btn-sm btn-outline" (click)="editOffer(offer)" *ngIf="offer.workflowStatus === 'REDACTION'">
+              <i class="fas fa-edit"></i> Modifier
+            </button>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline dropdown-toggle">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <div class="dropdown-menu">
+                <button class="dropdown-item" (click)="duplicateOffer(offer)">
+                  <i class="fas fa-copy"></i> Dupliquer
+                </button>
+                <button class="dropdown-item" (click)="deleteOffer(offer)">
+                  <i class="fas fa-trash"></i> Supprimer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-content">
+          <p class="offer-description" *ngIf="offer.description">
+            {{offer.description | slice:0:200}}...
+          </p>
+
+          <div class="offer-details">
+            <div class="detail-row">
+              <div class="detail-item" *ngIf="offer.salaryMin || offer.salaryMax">
+                <label>Salaire:</label>
+                <span>
+                  {{offer.salaryMin ? (offer.salaryMin | currency:'EUR':'symbol':'1.0-0') : 'N/A'}} -
+                  {{offer.salaryMax ? (offer.salaryMax | currency:'EUR':'symbol':'1.0-0') : 'N/A'}}
+                </span>
+              </div>
+              <div class="detail-item">
+                <label>Remote:</label>
+                <span [class]="offer.remote ? 'remote-yes' : 'remote-no'">
+                  <i class="fas" [class]="offer.remote ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                  {{offer.remote ? 'Oui' : 'Non'}}
+                </span>
+              </div>
+              <div class="detail-item">
+                <label>Publié:</label>
+                <span>{{offer.publishedAt | date:'dd/MM/yyyy'}}</span>
+              </div>
+            </div>
+
+            <div class="skills-section" *ngIf="offer.requirementsHardSkills?.length || offer.requirementsSoftSkills?.length">
+              <div class="skills-group" *ngIf="offer.requirementsHardSkills?.length">
+                <label>Compétences Techniques:</label>
+                <div class="skills-list">
+                  <span class="skill-tag" *ngFor="let skill of offer.requirementsHardSkills">{{skill}}</span>
+                </div>
+              </div>
+              <div class="skills-group" *ngIf="offer.requirementsSoftSkills?.length">
+                <label>Compétences Comportementales:</label>
+                <div class="skills-list">
+                  <span class="skill-tag soft-skill" *ngFor="let skill of offer.requirementsSoftSkills">{{skill}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="offer-dates">
+              <span class="expiry-date" *ngIf="offer.expiresAt">
+                Expire le: {{offer.expiresAt | date:'dd/MM/yyyy'}}
+              </span>
+              <span class="created-date">
+                Créé le: {{offer.createdAt | date:'dd/MM/yyyy'}}
+              </span>
+            </div>
+
+            <!-- Workflow Actions -->
+            <div class="workflow-actions" *ngIf="offer.workflowStatus !== 'REFUSE'">
+              <button
+                class="btn btn-sm btn-success"
+                (click)="advanceWorkflow(offer)"
+                *ngIf="canAdvanceWorkflow(offer)"
+                [disabled]="offer.workflowStatus === 'PUBLIE'">
+                <i class="fas fa-arrow-right"></i>
+                {{getNextWorkflowStatus(offer.workflowStatus)}}
+              </button>
+              <button
+                class="btn btn-sm btn-warning"
+                (click)="revertWorkflow(offer)"
+                *ngIf="canRevertWorkflow(offer)">
+                <i class="fas fa-arrow-left"></i>
+                {{getPreviousWorkflowStatus(offer.workflowStatus)}}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noOffersTemplate>
+      <div class="no-offers">
+        <i class="fas fa-briefcase"></i>
+        <h3>Aucune offre trouvée</h3>
+        <p>Vous n'avez pas encore créé d'offre d'emploi.</p>
+        <button class="btn btn-primary" routerLink="/job-offers/create">
+          <i class="fas fa-plus"></i> Créer votre première offre
+        </button>
+      </div>
+    </ng-template>
+  </div>
+
+  <ng-template #loadingTemplate>
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Chargement de vos offres...</p>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,235 @@
+<app-navbar></app-navbar>
+
+<!-- AI Agent Hero Section -->
+<div class="ai-hero">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="floating-elements">
+      <div class="ai-brain brain-1">🧠</div>
+      <div class="ai-brain brain-2">🤖</div>
+      <div class="ai-brain brain-3">💡</div>
+      <div class="ai-brain brain-4">⚡</div>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <div class="ai-header">
+      <div class="ai-avatar">
+        <div class="avatar-glow"></div>
+        <div class="avatar-face">
+          <div class="eyes">
+            <div class="eye left-eye"></div>
+            <div class="eye right-eye"></div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+      </div>
+      <div class="ai-info">
+        <h1><i class="fas fa-robot"></i> AI Assistant</h1>
+        <p class="ai-subtitle">Votre assistant intelligent pour toutes vos questions</p>
+        <div class="ai-status">
+          <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>En ligne</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Interface -->
+<div class="chatbot-main">
+  <div class="chatbot-container">
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <div class="chat-avatar">
+        <div class="avatar-icon">
+          <i class="fas fa-robot"></i>
+        </div>
+      </div>
+      <div class="chat-info">
+        <h3>AI Assistant</h3>
+        <p>Prêt à vous aider</p>
+      </div>
+      <div class="chat-actions">
+        <button class="action-btn" title="Paramètres">
+          <i class="fas fa-cog"></i>
+        </button>
+        <button class="action-btn" title="Fermer">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Window -->
+    <div class="chat-window" #chatWindow>
+      <!-- Welcome Message -->
+      <div class="welcome-message" *ngIf="messages.length === 0">
+        <div class="welcome-avatar">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="welcome-content">
+          <h3>Bonjour ! 👋</h3>
+          <p>Je suis votre assistant IA. Comment puis-je vous aider aujourd'hui ?</p>
+          <div class="quick-suggestions">
+            <button class="suggestion-btn" (click)="sendQuickMessage('Quelles formations recommandez-vous ?')">
+              <i class="fas fa-graduation-cap"></i>
+              Formations
+            </button>
+            <button class="suggestion-btn" (click)="sendQuickMessage('Comment créer un CV ?')">
+              <i class="fas fa-file-alt"></i>
+              CV & Carrière
+            </button>
+            <button class="suggestion-btn" (click)="sendQuickMessage('Aide pour les entretiens')">
+              <i class="fas fa-comments"></i>
+              Entretiens
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div *ngFor="let msg of messages; let i = index; trackBy: trackByMessage" class="message-wrapper" [ngClass]="{ 'user-message': !msg.fromBot, 'bot-message': msg.fromBot }">
+        <div class="message-avatar" *ngIf="msg.fromBot">
+          <div class="bot-avatar">
+            <i class="fas fa-robot"></i>
+          </div>
+        </div>
+
+        <div class="message" [ngClass]="{ 'user': !msg.fromBot, 'bot': msg.fromBot }">
+          <div class="message-content">
+            <div class="bubble">
+              <div class="message-text">{{ msg.content }}</div>
+              <div class="message-time">{{ getMessageTime() }}</div>
+            </div>
+          </div>
+
+          <!-- Typing Indicator for Bot -->
+          <div class="typing-indicator" *ngIf="msg.fromBot && isTyping && i === messages.length - 1">
+            <div class="typing-dots">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="message-avatar" *ngIf="!msg.fromBot">
+          <div class="user-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div class="typing-wrapper" *ngIf="isTyping && messages.length > 0">
+        <div class="message-avatar">
+          <div class="bot-avatar">
+            <i class="fas fa-robot"></i>
+          </div>
+        </div>
+        <div class="message bot">
+          <div class="message-content">
+            <div class="bubble typing-bubble">
+              <div class="typing-indicator">
+                <div class="typing-dots">
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                </div>
+                <span class="typing-text">L'IA écrit...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="chat-input-section">
+      <div class="input-container">
+        <div class="input-wrapper">
+          <input
+            type="text"
+            [(ngModel)]="newMessage"
+            (keyup.enter)="sendMessage()"
+            placeholder="Posez votre question..."
+            class="message-input"
+            #messageInput
+          />
+          <div class="input-actions">
+            <button class="voice-btn" title="Commande vocale">
+              <i class="fas fa-microphone"></i>
+            </button>
+            <button class="emoji-btn" title="Emojis">
+              <i class="fas fa-smile"></i>
+            </button>
+          </div>
+        </div>
+        <button
+          class="send-btn"
+          (click)="sendMessage()"
+          [disabled]="!newMessage.trim() || isTyping"
+          [class.sending]="isTyping">
+          <i class="fas" [class]="isTyping ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
+        </button>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <button class="quick-action-btn" (click)="clearChat()">
+          <i class="fas fa-trash"></i>
+          Nouvelle conversation
+        </button>
+        <button class="quick-action-btn" (click)="toggleSound()">
+          <i class="fas" [class]="soundEnabled ? 'fa-volume-up' : 'fa-volume-mute'"></i>
+          {{ soundEnabled ? 'Son activé' : 'Son désactivé' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Sidebar -->
+  <div class="features-sidebar">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <i class="fas fa-brain"></i>
+      </div>
+      <div class="feature-content">
+        <h4>Intelligence Artificielle</h4>
+        <p>Réponses intelligentes et contextuelles</p>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="feature-content">
+        <h4>Disponible 24/7</h4>
+        <p>Aide instantanée à toute heure</p>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <i class="fas fa-language"></i>
+      </div>
+      <div class="feature-content">
+        <h4>Multilingue</h4>
+        <p>Support en plusieurs langues</p>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <div class="feature-content">
+        <h4>Sécurisé</h4>
+        <p>Conversations privées et sécurisées</p>
+      </div>
+    </div>
+  </div>
+</div>

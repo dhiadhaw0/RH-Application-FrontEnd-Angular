@@ -1,0 +1,200 @@
+<app-navbar></app-navbar>
+
+<div class="application-detail-container">
+  <div class="header-section">
+    <div class="breadcrumb">
+      <a routerLink="/applications" class="breadcrumb-link">
+        <i class="fas fa-arrow-left"></i> Retour aux candidatures
+      </a>
+    </div>
+    <div class="header-content">
+      <h1>Candidature #{{application?.idApplication}}</h1>
+      <div class="application-status" [class]="'status-' + application?.status.toLowerCase()">
+        {{application?.status}}
+      </div>
+    </div>
+  </div>
+
+  <div class="content-grid" *ngIf="application; else loadingTemplate">
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Basic Information -->
+      <div class="info-card">
+        <h2>Informations Générales</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>ID Candidature:</label>
+            <span>{{application.idApplication}}</span>
+          </div>
+          <div class="info-item">
+            <label>ID Utilisateur:</label>
+            <span>{{application.user}}</span>
+          </div>
+          <div class="info-item">
+            <label>ID Offre d'emploi:</label>
+            <span>{{application.jobOffer}}</span>
+          </div>
+          <div class="info-item">
+            <label>Date de création:</label>
+            <span>{{application.createdAt | date:'dd/MM/yyyy à HH:mm'}}</span>
+          </div>
+          <div class="info-item">
+            <label>Dernière mise à jour:</label>
+            <span>{{application.updatedAt | date:'dd/MM/yyyy à HH:mm'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Motivation Letter -->
+      <div class="content-card" *ngIf="application.motivationLetter">
+        <h2>Lettre de Motivation</h2>
+        <div class="letter-content">
+          <pre>{{application.motivationLetter}}</pre>
+        </div>
+      </div>
+
+      <!-- Cover Letter -->
+      <div class="content-card" *ngIf="application.coverLetter">
+        <h2>Lettre de Couverture</h2>
+        <div class="letter-content">
+          <p>{{application.coverLetter}}</p>
+        </div>
+      </div>
+
+      <!-- AI Analysis -->
+      <div class="analysis-card">
+        <h2>Analyse IA</h2>
+        <div class="scores-grid">
+          <div class="score-card" *ngIf="application.relevanceScore">
+            <div class="score-header">
+              <h3>Score de Pertinence</h3>
+              <div class="score-value">{{application.relevanceScore}}/10</div>
+            </div>
+            <div class="score-bar">
+              <div class="score-fill" [style.width.%]="application.relevanceScore * 10"></div>
+            </div>
+          </div>
+
+          <div class="score-card" *ngIf="application.scoreIA">
+            <div class="score-header">
+              <h3>Score IA Global</h3>
+              <div class="score-value">{{application.scoreIA}}/10</div>
+            </div>
+            <div class="score-bar">
+              <div class="score-fill" [style.width.%]="application.scoreIA * 10"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-report" *ngIf="application.aiRelevanceReport">
+          <h3>Rapport Détaillé</h3>
+          <div class="report-content">
+            <p>{{application.aiRelevanceReport}}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents -->
+      <div class="documents-card" *ngIf="documents && documents.length > 0">
+        <h2>Documents Attachés</h2>
+        <div class="documents-list">
+          <div class="document-item" *ngFor="let doc of documents">
+            <div class="document-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="document-info">
+              <h4>{{doc.name}}</h4>
+              <span class="document-meta">{{doc.fileSize}} bytes • {{doc.uploadedAt | date:'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="document-actions">
+              <button class="btn btn-sm btn-outline" (click)="downloadDocument(doc)">
+                <i class="fas fa-download"></i>
+              </button>
+              <button class="btn btn-sm btn-outline" (click)="viewDocument(doc)">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Quick Actions -->
+      <div class="sidebar-card">
+        <h3>Actions Rapides</h3>
+        <div class="action-buttons">
+          <button class="btn btn-primary btn-block" routerLink="/applications/{{application.idApplication}}/edit">
+            <i class="fas fa-edit"></i> Modifier
+          </button>
+          <button class="btn btn-outline btn-block" routerLink="/applications/{{application.idApplication}}/timeline">
+            <i class="fas fa-history"></i> Voir Timeline
+          </button>
+          <button class="btn btn-outline btn-block" (click)="generateReport()">
+            <i class="fas fa-file-pdf"></i> Générer Rapport
+          </button>
+          <button class="btn btn-danger btn-block" (click)="deleteApplication()">
+            <i class="fas fa-trash"></i> Supprimer
+          </button>
+        </div>
+      </div>
+
+      <!-- Status Management -->
+      <div class="sidebar-card">
+        <h3>Changer le Statut</h3>
+        <div class="status-selector">
+          <select [(ngModel)]="selectedStatus" class="form-control">
+            <option *ngFor="let status of statusOptions" [value]="status" [selected]="status === application.status">
+              {{status}}
+            </option>
+          </select>
+          <button class="btn btn-primary btn-block" (click)="updateStatus()" [disabled]="selectedStatus === application.status">
+            Mettre à jour
+          </button>
+        </div>
+      </div>
+
+      <!-- Interviews -->
+      <div class="sidebar-card" *ngIf="interviews && interviews.length > 0">
+        <h3>Entretiens</h3>
+        <div class="interviews-list">
+          <div class="interview-item" *ngFor="let interview of interviews">
+            <div class="interview-type" [class]="'type-' + interview.type.toLowerCase()">
+              {{interview.type}}
+            </div>
+            <div class="interview-date">
+              {{interview.scheduledAt | date:'dd/MM/yyyy HH:mm'}}
+            </div>
+            <div class="interview-status" [class]="'status-' + interview.status.toLowerCase()">
+              {{interview.status}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tests -->
+      <div class="sidebar-card" *ngIf="testEvaluations && testEvaluations.length > 0">
+        <h3>Évaluations de Test</h3>
+        <div class="tests-list">
+          <div class="test-item" *ngFor="let test of testEvaluations">
+            <div class="test-type">{{test.testType}}</div>
+            <div class="test-score" *ngIf="test.score">
+              Score: {{test.score}}/10
+            </div>
+            <div class="test-date">
+              {{test.submittedAt | date:'dd/MM/yyyy'}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #loadingTemplate>
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Chargement de la candidature...</p>
+    </div>
+  </ng-template>
+</div>

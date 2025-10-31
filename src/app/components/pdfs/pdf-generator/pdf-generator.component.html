@@ -1,0 +1,61 @@
+<div class="pdf-generator-container">
+  <div class="generator-header">
+    <h2 class="title">📄 Générateur de PDF</h2>
+    <p class="subtitle">Générez un PDF récapitulatif de votre candidature</p>
+  </div>
+
+  <div class="generator-content">
+    <div class="pdf-preview">
+      <div class="preview-icon">📋</div>
+      <div class="preview-info">
+        <h3>Récapitulatif de Candidature</h3>
+        <p>Candidature ID: {{ applicationId }}</p>
+        <p>Ce PDF contiendra tous les détails de votre candidature, documents inclus.</p>
+      </div>
+    </div>
+
+    <div class="action-section">
+      <button
+        class="generate-btn"
+        [disabled]="generating"
+        (click)="generatePdf()"
+      >
+        <span *ngIf="!generating">🚀 Générer PDF</span>
+        <span *ngIf="generating" class="loading">
+          <span class="spinner"></span>
+          Génération en cours...
+        </span>
+      </button>
+
+      <button
+        class="download-btn"
+        [disabled]="generating"
+        (click)="downloadExistingPdf()"
+        *ngIf="generationSuccess"
+      >
+        📥 Télécharger PDF
+      </button>
+    </div>
+
+    <div class="status-messages">
+      <div class="success-message" *ngIf="generationSuccess">
+        ✅ PDF généré avec succès ! Cliquez sur "Télécharger" pour l'obtenir.
+      </div>
+      <div class="error-message" *ngIf="generationError">
+        ❌ {{ generationError }}
+      </div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-card">
+      <h3>ℹ️ À propos du PDF</h3>
+      <ul>
+        <li>Inclut tous les détails de la candidature</li>
+        <li>Contient la liste des documents joints</li>
+        <li>Format professionnel prêt à imprimer</li>
+        <li>Taille optimisée pour le partage</li>
+      </ul>
+    </div>
+  </div>
+</div>

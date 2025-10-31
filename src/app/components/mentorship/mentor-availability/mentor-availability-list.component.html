@@ -1,0 +1,48 @@
+<div class="availability-list-container">
+  <h2>Mes Créneaux de Disponibilité</h2>
+
+  <div class="loading" *ngIf="loading">
+    Chargement des créneaux...
+  </div>
+
+  <div class="no-availabilities" *ngIf="!loading && availabilities.length === 0">
+    Aucun créneau de disponibilité trouvé.
+  </div>
+
+  <div class="availabilities-grid" *ngIf="!loading && availabilities.length > 0">
+    <div class="availability-card" *ngFor="let availability of availabilities">
+      <div class="card-header">
+        <h3>Créneau #{{ availability.id }}</h3>
+        <span class="status" [class.booked]="availability.isBooked">
+          {{ availability.isBooked ? 'Réservé' : 'Disponible' }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="time-info">
+          <p><strong>Début:</strong> {{ availability.startDateTime | date:'medium' }}</p>
+          <p><strong>Fin:</strong> {{ availability.endDateTime | date:'medium' }}</p>
+        </div>
+
+        <div class="mentor-info" *ngIf="availability.mentor">
+          <p><strong>Mentor:</strong> {{ availability.mentor.firstName }} {{ availability.mentor.lastName }}</p>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn btn-edit" (click)="editAvailability(availability)" *ngIf="!availability.isBooked">
+          Modifier
+        </button>
+        <button class="btn btn-delete" (click)="deleteAvailability(availability)" *ngIf="!availability.isBooked">
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" routerLink="/mentor-availability/add">
+      Ajouter un créneau
+    </button>
+  </div>
+</div>

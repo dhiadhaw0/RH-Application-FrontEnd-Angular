@@ -1,0 +1,174 @@
+<div class="dashboard-container">
+  <h2>Tableau de Bord Mentorat</h2>
+
+  <div class="loading" *ngIf="loading">
+    Chargement du tableau de bord...
+  </div>
+
+  <div class="dashboard-content" *ngIf="!loading">
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-info">
+          <h3>{{ stats.totalRequests }}</h3>
+          <p>Total demandes</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-info">
+          <h3>{{ stats.pendingRequests }}</h3>
+          <p>Demandes en attente</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <h3>{{ stats.acceptedRequests }}</h3>
+          <p>Demandes acceptées</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-info">
+          <h3>{{ stats.completedSessions }}</h3>
+          <p>Sessions terminées</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-info">
+          <h3>{{ stats.upcomingSessions }}</h3>
+          <p>Sessions à venir</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-info">
+          <h3>{{ stats.averageRating }}</h3>
+          <p>Note moyenne</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="activity-section">
+      <div class="activity-column">
+        <h3>Demandes récentes</h3>
+        <div class="activity-list">
+          <div class="activity-item" *ngFor="let request of recentRequests">
+            <div class="activity-header">
+              <h4>{{ request.topic }}</h4>
+              <span class="status" [style.background-color]="getStatusColor(request.status)">
+                {{ getStatusText(request.status) }}
+              </span>
+            </div>
+            <p class="activity-meta">
+              {{ isMentor ? request.mentee.firstName + ' ' + request.mentee.lastName : request.mentor.firstName + ' ' + request.mentor.lastName }}
+              • {{ request.requestedAt | date:'dd/MM/yyyy' }}
+            </p>
+            <button class="btn-link" routerLink="/mentorship/requests/{{ request.id }}">
+              Voir détails
+            </button>
+          </div>
+
+          <div class="no-activity" *ngIf="recentRequests.length === 0">
+            Aucune demande récente.
+          </div>
+        </div>
+      </div>
+
+      <div class="activity-column">
+        <h3>Sessions à venir</h3>
+        <div class="activity-list">
+          <div class="activity-item" *ngFor="let session of upcomingSessions">
+            <div class="activity-header">
+              <h4>{{ session.mentorshipRequest.topic }}</h4>
+              <span class="status" [style.background-color]="getStatusColor(session.status)">
+                {{ getStatusText(session.status) }}
+              </span>
+            </div>
+            <p class="activity-meta">
+              {{ session.scheduledAt | date:'dd/MM/yyyy à HH:mm' }}
+              • {{ session.durationMinutes }} min
+            </p>
+            <button class="btn-link" routerLink="/mentorship/sessions/{{ session.id }}">
+              Voir détails
+            </button>
+          </div>
+
+          <div class="no-activity" *ngIf="upcomingSessions.length === 0">
+            Aucune session à venir.
+          </div>
+        </div>
+      </div>
+
+      <div class="activity-column">
+        <h3>Sessions récentes</h3>
+        <div class="activity-list">
+          <div class="activity-item" *ngFor="let session of recentSessions">
+            <div class="activity-header">
+              <h4>{{ session.mentorshipRequest.topic }}</h4>
+              <span class="status" [style.background-color]="getStatusColor(session.status)">
+                {{ getStatusText(session.status) }}
+              </span>
+            </div>
+            <p class="activity-meta">
+              {{ session.scheduledAt | date:'dd/MM/yyyy' }}
+              • {{ session.durationMinutes }} min
+            </p>
+            <button class="btn-link" routerLink="/mentorship/sessions/{{ session.id }}">
+              Voir détails
+            </button>
+          </div>
+
+          <div class="no-activity" *ngIf="recentSessions.length === 0">
+            Aucune session récente.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h3>Actions rapides</h3>
+      <div class="actions-grid">
+        <button class="action-btn" routerLink="/mentorship/requests/new" *ngIf="!isMentor">
+          <span class="action-icon">📝</span>
+          Nouvelle demande
+        </button>
+
+        <button class="action-btn" routerLink="/mentorship/availability" *ngIf="isMentor">
+          <span class="action-icon">📅</span>
+          Gérer disponibilités
+        </button>
+
+        <button class="action-btn" routerLink="/mentorship/requests">
+          <span class="action-icon">📋</span>
+          Voir les demandes
+        </button>
+
+        <button class="action-btn" routerLink="/mentorship/sessions">
+          <span class="action-icon">🎯</span>
+          Voir les sessions
+        </button>
+
+        <button class="action-btn" routerLink="/mentorship/mentors" *ngIf="!isMentor">
+          <span class="action-icon">👥</span>
+          Trouver un mentor
+        </button>
+
+        <button class="action-btn" routerLink="/mentorship/reviews">
+          <span class="action-icon">⭐</span>
+          Voir les avis
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

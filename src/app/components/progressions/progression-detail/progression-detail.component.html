@@ -1,0 +1,104 @@
+<div class="progression-detail" *ngIf="formation">
+  <div class="detail-header">
+    <button class="back-btn" (click)="goBack()">
+      ← Retour au tableau de bord
+    </button>
+    <div class="formation-info">
+      <h1 class="formation-title">{{ formation.title }}</h1>
+      <p class="formation-provider">{{ formation.provider }}</p>
+    </div>
+  </div>
+
+  <div class="progress-overview" *ngIf="!loading && progression">
+    <div class="overview-card">
+      <div class="progress-circle">
+        <div class="circle-content">
+          <span class="progress-percentage">{{ progression.progression }}%</span>
+          <span class="progress-label">Terminé</span>
+        </div>
+        <svg class="progress-ring" width="120" height="120">
+          <circle
+            class="progress-ring-circle-bg"
+            stroke="#e1e8ed"
+            stroke-width="8"
+            fill="transparent"
+            r="52"
+            cx="60"
+            cy="60"
+          />
+          <circle
+            class="progress-ring-circle"
+            [style.stroke]="getProgressColor(progression.progression)"
+            stroke-width="8"
+            fill="transparent"
+            r="52"
+            cx="60"
+            cy="60"
+            [style.stroke-dasharray]="327"
+            [style.stroke-dashoffset]="327 - (progression.progression / 100) * 327"
+          />
+        </svg>
+      </div>
+
+      <div class="overview-stats">
+        <div class="stat-item">
+          <span class="stat-value">{{ formatDuration(getCompletedDuration()) }}</span>
+          <span class="stat-label">Temps passé</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ completedModulesCount }}</span>
+          <span class="stat-label">Modules terminés</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ formatDuration(totalDuration) }}</span>
+          <span class="stat-label">Durée totale</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modules-section">
+    <h2 class="section-title">Modules de Formation</h2>
+    <div class="modules-list">
+      <div
+        class="module-card"
+        *ngFor="let module of modules; trackBy: trackByModuleId"
+        [class.completed]="module.completed"
+      >
+        <div class="module-header">
+          <div class="module-icon">
+            <span *ngIf="module.completed">✅</span>
+            <span *ngIf="!module.completed">⏳</span>
+          </div>
+          <div class="module-info">
+            <h3 class="module-title">{{ module.title }}</h3>
+            <div class="module-meta">
+              <span class="duration">⏰ {{ formatDuration(module.duration) }}</span>
+              <span class="status" [class.completed]="module.completed">
+                {{ getModuleStatus(module) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-actions" *ngIf="!module.completed">
+          <button class="complete-btn" (click)="updateProgress(module.id)">
+            Marquer comme terminé
+          </button>
+        </div>
+
+        <div class="module-score" *ngIf="module.completed && module.score > 0">
+          <span class="score-label">Score:</span>
+          <span class="score-value" [class.high-score]="module.score >= 90">
+            {{ module.score }}%
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Chargement des détails de progression...</p>
+  </div>
+</div>

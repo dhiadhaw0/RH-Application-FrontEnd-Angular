@@ -1,0 +1,169 @@
+<app-navbar></app-navbar>
+
+<div class="suggestions-container">
+  <div class="header-section" *ngIf="offer">
+    <button class="btn btn-back" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Retour
+    </button>
+    <div class="header-content">
+      <h1>Suggestions d'amélioration</h1>
+      <p class="offer-title">{{offer.title}}</p>
+      <div class="offer-meta">
+        <span class="offer-id">#{{offer.idJobOffer}}</span>
+        <span class="current-status" [style.background-color]="getWorkflowStatusColor(offer.workflowStatus)">
+          {{offer.workflowStatus}}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Analyse de l'offre en cours...</p>
+    </div>
+  </div>
+
+  <div class="suggestions-content" *ngIf="!loading && offer">
+    <!-- Filters and Stats -->
+    <div class="filters-section">
+      <div class="filters-card">
+        <div class="filters-header">
+          <h2><i class="fas fa-filter"></i> Filtres</h2>
+          <div class="stats">
+            <span class="stat-item">
+              <strong>{{filteredSuggestions.length}}</strong> suggestion(s)
+            </span>
+            <span class="stat-item high-priority">
+              <strong>{{highPriorityCount}}</strong> priorité haute
+            </span>
+          </div>
+        </div>
+
+        <div class="filters-grid">
+          <!-- Priority Filter -->
+          <div class="filter-group">
+            <label>Priorité:</label>
+            <div class="filter-buttons">
+              <button
+                class="btn btn-filter"
+                [class.active]="activeFilter === 'all'"
+                (click)="setFilter('all')">
+                Toutes
+              </button>
+              <button
+                class="btn btn-filter high"
+                [class.active]="activeFilter === 'high'"
+                (click)="setFilter('high')">
+                <i class="fas fa-exclamation-circle"></i> Haute
+              </button>
+              <button
+                class="btn btn-filter medium"
+                [class.active]="activeFilter === 'medium'"
+                (click)="setFilter('medium')">
+                Moyenne
+              </button>
+              <button
+                class="btn btn-filter low"
+                [class.active]="activeFilter === 'low'"
+                (click)="setFilter('low')">
+                Basse
+              </button>
+            </div>
+          </div>
+
+          <!-- Type Filter -->
+          <div class="filter-group">
+            <label>Type:</label>
+            <div class="filter-buttons">
+              <button
+                class="btn btn-filter"
+                [class.active]="typeFilter === 'all'"
+                (click)="setTypeFilter('all')">
+                Tous
+              </button>
+              <button
+                class="btn btn-filter improvement"
+                [class.active]="typeFilter === 'improvement'"
+                (click)="setTypeFilter('improvement')">
+                <i class="fas fa-arrow-up"></i> Amélioration
+              </button>
+              <button
+                class="btn btn-filter warning"
+                [class.active]="typeFilter === 'warning'"
+                (click)="setTypeFilter('warning')">
+                <i class="fas fa-exclamation-triangle"></i> Avertissement
+              </button>
+              <button
+                class="btn btn-filter tip"
+                [class.active]="typeFilter === 'tip'"
+                (click)="setTypeFilter('tip')">
+                <i class="fas fa-lightbulb"></i> Conseil
+              </button>
+              <button
+                class="btn btn-filter optimization"
+                [class.active]="typeFilter === 'optimization'"
+                (click)="setTypeFilter('optimization')">
+                <i class="fas fa-search-plus"></i> Optimisation
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suggestions List -->
+    <div class="suggestions-list" *ngIf="filteredSuggestions.length > 0; else noSuggestions">
+      <div
+        class="suggestion-card"
+        *ngFor="let suggestion of filteredSuggestions"
+        [class]="suggestion.priority + '-priority ' + (suggestion.applied ? 'applied' : '')">
+
+        <div class="suggestion-header">
+          <div class="suggestion-icon" [style.background-color]="getTypeColor(suggestion.type)">
+            <i [class]="getSuggestionIcon(suggestion.type)"></i>
+          </div>
+          <div class="suggestion-info">
+            <h3>{{suggestion.title}}</h3>
+            <div class="suggestion-meta">
+              <span class="priority-badge" [style.background-color]="getPriorityColor(suggestion.priority)">
+                {{suggestion.priority === 'high' ? 'Haute' : suggestion.priority === 'medium' ? 'Moyenne' : 'Basse'}}
+              </span>
+              <span class="type-badge" [style.color]="getTypeColor(suggestion.type)">
+                {{suggestion.type === 'improvement' ? 'Amélioration' :
+                  suggestion.type === 'warning' ? 'Avertissement' :
+                  suggestion.type === 'tip' ? 'Conseil' : 'Optimisation'}}
+              </span>
+              <span class="category-badge">{{suggestion.category}}</span>
+            </div>
+          </div>
+          <div class="suggestion-actions" *ngIf="suggestion.actionable && !suggestion.applied">
+            <button class="btn btn-sm btn-primary" (click)="applySuggestion(suggestion)">
+              <i class="fas fa-check"></i> Appliquer
+            </button>
+          </div>
+        </div>
+
+        <div class="suggestion-content">
+          <p class="description">{{suggestion.description}}</p>
+          <div class="suggestion-footer" *ngIf="suggestion.applied">
+            <span class="applied-badge">
+              <i class="fas fa-check-circle"></i> Suggestion appliquée
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noSuggestions>
+      <div class="no-suggestions">
+        <i class="fas fa-check-circle"></i>
+        <h3>Parfait !</h3>
+        <p>Votre offre d'emploi semble bien optimisée. Aucune suggestion d'amélioration pour le moment.</p>
+        <button class="btn btn-primary" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i> Retour à l'offre
+        </button>
+      </div>
+    </ng-template>
+  </div>
+</div>

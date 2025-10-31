@@ -1,0 +1,415 @@
+<div class="applications-container">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-background">
+      <div class="floating-elements">
+        <div class="floating-circle circle-1"></div>
+        <div class="floating-circle circle-2"></div>
+        <div class="floating-circle circle-3"></div>
+      </div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <i class="fas fa-file-alt"></i>
+          Gestion des Candidatures
+          <span class="highlight">StageHub</span>
+        </h1>
+        <p class="hero-subtitle">
+          Analysez et gérez efficacement toutes les candidatures avec l'aide de l'intelligence artificielle
+        </p>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <div class="stat-number">{{totalApplications}}</div>
+          <div class="stat-label">Total Candidatures</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-brain"></i>
+          </div>
+          <div class="stat-number">{{avgRelevance | number:'1.1-1'}}</div>
+          <div class="stat-label">Score IA Moyen</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="stat-number">{{countsByStatus.length}}</div>
+          <div class="stat-label">Statuts Actifs</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-large" routerLink="/applications/create">
+          <i class="fas fa-plus-circle"></i>
+          Nouvelle Candidature
+        </button>
+        <button class="btn btn-outline btn-large" (click)="exportApplications()">
+          <i class="fas fa-download"></i>
+          Exporter Données
+        </button>
+        <button class="btn btn-secondary btn-large" routerLink="/applications/stats">
+          <i class="fas fa-chart-bar"></i>
+          Statistiques
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced Search & Filters Section -->
+  <div class="search-filters-section">
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Rechercher par ID, statut, utilisateur..."
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()">
+        <button class="search-clear" *ngIf="searchTerm" (click)="clearSearch()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="filters-container">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-filter"></i>
+          Filtrer par statut
+        </label>
+        <div class="filter-buttons">
+          <button
+            class="filter-btn"
+            [class.active]="filterStatus === ''"
+            (click)="setFilter('')">
+            <i class="fas fa-th-large"></i>
+            Tous
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="filterStatus === 'en_attente'"
+            (click)="setFilter('en_attente')">
+            <i class="fas fa-clock"></i>
+            En attente
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="filterStatus === 'acceptee'"
+            (click)="setFilter('acceptee')">
+            <i class="fas fa-check-circle"></i>
+            Acceptées
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="filterStatus === 'refusee'"
+            (click)="setFilter('refusee')">
+            <i class="fas fa-times-circle"></i>
+            Refusées
+          </button>
+        </div>
+      </div>
+
+      <div class="advanced-filters">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label>ID Utilisateur</label>
+            <input
+              type="number"
+              [(ngModel)]="filterUserId"
+              (input)="applyFilters()"
+              placeholder="ID utilisateur"
+              class="form-control">
+          </div>
+
+          <div class="filter-group">
+            <label>ID Offre</label>
+            <input
+              type="number"
+              [(ngModel)]="filterJobOfferId"
+              (input)="applyFilters()"
+              placeholder="ID offre"
+              class="form-control">
+          </div>
+
+          <div class="filter-group">
+            <label>Score IA min</label>
+            <input
+              type="number"
+              [(ngModel)]="filterMinScore"
+              (input)="applyFilters()"
+              placeholder="Score minimum"
+              class="form-control"
+              step="0.1"
+              min="0"
+              max="10">
+          </div>
+
+          <div class="filter-actions">
+            <button class="btn btn-outline" (click)="clearFilters()">
+              <i class="fas fa-times"></i>
+              Effacer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Toggle -->
+  <div class="chart-toggle">
+    <button class="btn btn-toggle" [class.active]="chartMode === 'donut'" (click)="setChartMode('donut')">
+      <i class="fas fa-chart-pie"></i> Camembert
+    </button>
+    <button class="btn btn-toggle" [class.active]="chartMode === 'bar'" (click)="setChartMode('bar')">
+      <i class="fas fa-chart-bar"></i> Barres
+    </button>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section" *ngIf="countsByStatus.length > 0">
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas *ngIf="chartMode === 'donut'" baseChart
+                [data]="doughnutData"
+                [options]="doughnutOptions"
+                [type]="'doughnut'">
+        </canvas>
+        <canvas *ngIf="chartMode === 'bar'" baseChart
+                [data]="barData"
+                [options]="barOptions"
+                [type]="'bar'">
+        </canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Applications Grid -->
+  <div class="applications-section">
+    <div class="applications-grid" *ngIf="!loading; else loadingTemplate">
+      <div
+        class="application-card"
+        *ngFor="let application of applications; trackBy: trackByApplicationId"
+        [class.featured]="application.relevanceScore && application.relevanceScore >= 8">
+
+        <!-- Card Ribbon for High Scores -->
+        <div class="card-ribbon" *ngIf="application.relevanceScore && application.relevanceScore >= 8">
+          <i class="fas fa-star"></i>
+          Score Élevé
+        </div>
+
+        <!-- Enhanced Card Header -->
+        <div class="card-header">
+          <div class="application-info">
+            <div class="application-id-section">
+              <h3 class="application-title">
+                <i class="fas fa-file-alt"></i>
+                Candidature #{{application.idApplication}}
+              </h3>
+              <div class="application-status" [class]="'status-' + application.status.toLowerCase()">
+                <i class="fas fa-circle"></i>
+                {{application.status}}
+              </div>
+            </div>
+
+            <div class="application-meta">
+              <div class="meta-item">
+                <i class="fas fa-user meta-icon"></i>
+                <div class="meta-content">
+                  <label>Utilisateur</label>
+                  <span>ID: {{application.user}}</span>
+                </div>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-briefcase meta-icon"></i>
+                <div class="meta-content">
+                  <label>Offre d'emploi</label>
+                  <span>ID: {{application.jobOffer}}</span>
+                </div>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-calendar meta-icon"></i>
+                <div class="meta-content">
+                  <label>Date de candidature</label>
+                  <span>{{application.createdAt | date:'dd/MM/yyyy'}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enhanced Card Content -->
+        <div class="card-content">
+          <div class="application-details">
+            <!-- Motivation Letter Section -->
+            <div class="detail-section motivation-section" *ngIf="application.motivationLetter">
+              <h4 class="section-title">
+                <i class="fas fa-envelope-open-text"></i>
+                Lettre de Motivation
+              </h4>
+              <div class="motivation-content">
+                <p class="motivation-preview">{{application.motivationLetter | slice:0:150}}
+                  <span *ngIf="application.motivationLetter.length > 150">...</span>
+                </p>
+                <button class="btn-link" (click)="viewFullMotivation(application)">
+                  <i class="fas fa-expand"></i>
+                  Voir en entier
+                </button>
+              </div>
+            </div>
+
+            <!-- Cover Letter Section -->
+            <div class="detail-section cover-section" *ngIf="application.coverLetter">
+              <h4 class="section-title">
+                <i class="fas fa-file-signature"></i>
+                Lettre de Couverture
+              </h4>
+              <p class="cover-preview">{{application.coverLetter | slice:0:120}}
+                <span *ngIf="application.coverLetter.length > 120">...</span>
+              </p>
+            </div>
+
+            <!-- Enhanced Scores Section -->
+            <div class="scores-section" *ngIf="application.relevanceScore || application.scoreIA">
+              <h4 class="section-title">
+                <i class="fas fa-chart-line"></i>
+                Évaluation IA
+              </h4>
+              <div class="scores-grid">
+                <div class="score-item" *ngIf="application.relevanceScore">
+                  <div class="score-header">
+                    <label>Score de Pertinence</label>
+                    <span class="score-badge" [class]="'score-' + getScoreLevel(application.relevanceScore)">
+                      {{application.relevanceScore}}/10
+                    </span>
+                  </div>
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="application.relevanceScore * 10"></div>
+                  </div>
+                </div>
+
+                <div class="score-item" *ngIf="application.scoreIA">
+                  <div class="score-header">
+                    <label>Score IA Global</label>
+                    <span class="score-badge" [class]="'score-' + getScoreLevel(application.scoreIA)">
+                      {{application.scoreIA}}/10
+                    </span>
+                  </div>
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="application.scoreIA * 10"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Report Section -->
+            <div class="ai-report-section" *ngIf="application.aiRelevanceReport">
+              <h4 class="section-title">
+                <i class="fas fa-robot"></i>
+                Analyse IA Détaillée
+              </h4>
+              <div class="ai-report-content">
+                <p class="ai-report-text">{{application.aiRelevanceReport | slice:0:250}}
+                  <span *ngIf="application.aiRelevanceReport.length > 250">...</span>
+                </p>
+                <div class="ai-insights" *ngIf="getAIInsights(application)">
+                  <div class="insight-item" *ngFor="let insight of getAIInsights(application)">
+                    <i class="fas fa-lightbulb insight-icon"></i>
+                    <span>{{insight}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Enhanced Card Actions -->
+          <div class="card-actions">
+            <div class="action-buttons">
+              <button class="btn btn-outline btn-sm" routerLink="/applications/{{application.idApplication}}" title="Voir les détails">
+                <i class="fas fa-eye"></i>
+                <span>Détails</span>
+              </button>
+              <button class="btn btn-outline btn-sm" routerLink="/applications/{{application.idApplication}}/edit" title="Modifier la candidature">
+                <i class="fas fa-edit"></i>
+                <span>Modifier</span>
+              </button>
+              <button class="btn btn-outline btn-sm" routerLink="/applications/{{application.idApplication}}/timeline" title="Voir l'historique">
+                <i class="fas fa-history"></i>
+                <span>Timeline</span>
+              </button>
+              <button class="btn btn-primary btn-sm" (click)="generateReport(application.idApplication)" title="Générer un rapport">
+                <i class="fas fa-file-pdf"></i>
+                <span>Rapport</span>
+              </button>
+              <button class="btn btn-danger btn-sm" (click)="deleteApplication(application)" title="Supprimer la candidature">
+                <i class="fas fa-trash"></i>
+                <span>Supprimer</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hover Effect Overlay -->
+        <div class="card-hover-overlay">
+          <div class="overlay-actions">
+            <button class="overlay-btn primary" routerLink="/applications/{{application.idApplication}}">
+              <i class="fas fa-eye"></i>
+              <span>Voir les Détails</span>
+            </button>
+            <button class="overlay-btn secondary" (click)="generateReport(application.idApplication)">
+              <i class="fas fa-file-pdf"></i>
+              <span>Rapport IA</span>
+            </button>
+            <button class="overlay-btn danger" (click)="deleteApplication(application)">
+              <i class="fas fa-trash"></i>
+              <span>Supprimer</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Empty State -->
+      <div class="empty-state" *ngIf="applications.length === 0">
+        <div class="empty-icon">
+          <i class="fas fa-search"></i>
+        </div>
+        <h3 class="empty-title">Aucune candidature trouvée</h3>
+        <p class="empty-description">
+          Il n'y a actuellement aucune candidature dans le système.
+          Les nouvelles candidatures apparaîtront ici automatiquement.
+        </p>
+        <div class="empty-actions">
+          <button class="btn btn-primary" (click)="clearFilters()">
+            <i class="fas fa-refresh"></i>
+            Actualiser
+          </button>
+          <button class="btn btn-outline" routerLink="/applications/create">
+            <i class="fas fa-plus"></i>
+            Créer une candidature
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Loading Template -->
+    <ng-template #loadingTemplate>
+      <div class="loading-state">
+        <div class="loading-spinner">
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+        </div>
+        <h3>Chargement des candidatures...</h3>
+        <p>Analyse des données avec l'IA en cours</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

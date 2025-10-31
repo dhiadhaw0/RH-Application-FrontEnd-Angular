@@ -1,0 +1,472 @@
+<nav class="navbar" role="banner" [style.opacity]="navbarOpacity">
+  <!-- Breadcrumb Navigation -->
+  <div class="breadcrumb-container" *ngIf="breadcrumbs.length > 0">
+    <div class="breadcrumb-nav">
+      <ol class="breadcrumb-list" itemscope itemtype="https://schema.org/BreadcrumbList">
+        <li class="breadcrumb-item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a routerLink="/" class="breadcrumb-link" itemprop="item">
+            <span itemprop="name">Accueil</span>
+          </a>
+          <meta itemprop="position" content="1">
+        </li>
+        <li class="breadcrumb-item" *ngFor="let breadcrumb of breadcrumbs; let i = index" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <i class="fas fa-chevron-right breadcrumb-separator"></i>
+          <a [routerLink]="breadcrumb.route" class="breadcrumb-link" itemprop="item" *ngIf="!breadcrumb.active; else activeBreadcrumb">
+            <span itemprop="name">{{breadcrumb.label}}</span>
+          </a>
+          <ng-template #activeBreadcrumb>
+            <span class="breadcrumb-current" itemprop="name" aria-current="page">{{breadcrumb.label}}</span>
+          </ng-template>
+          <meta itemprop="position" [content]="i + 2">
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="nav-container">
+    <!-- Logo and Brand -->
+    <div class="nav-brand">
+      <a routerLink="/" class="brand-link">
+        <div class="logo">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <span class="brand-text">StageHub</span>
+      </a>
+    </div>
+
+    <!-- Compact Search Toggle -->
+    <button class="search-toggle" (click)="toggleSearch()" [class.active]="searchActive" aria-label="Ouvrir la recherche">
+      <i class="fas fa-search"></i>
+    </button>
+
+    <!-- Expandable Search Bar -->
+    <div class="nav-search" [class.expanded]="searchActive">
+      <div class="search-container" [class.active]="searchActive">
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput($event)"
+          (focus)="searchActive = true"
+          (blur)="onSearchBlur()"
+          (keydown)="onSearchKeydown($event)"
+          placeholder="Rechercher..."
+          class="search-input"
+          #searchInput
+          aria-label="Recherche globale"
+          aria-expanded="false"
+          aria-haspopup="listbox"
+          role="combobox"
+          aria-autocomplete="list">
+        <button class="search-btn" (click)="performSearch()" [disabled]="!searchQuery?.trim()">
+          <i class="fas fa-search"></i>
+        </button>
+        <button class="search-close" (click)="closeSearch()" aria-label="Fermer la recherche">
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="search-results" *ngIf="searchResults.length > 0 && searchActive" role="listbox" aria-label="Résultats de recherche">
+          <div class="search-result-item" *ngFor="let result of searchResults; let i = index" (click)="navigateToResult(result)" [attr.aria-selected]="i === selectedResultIndex" role="option">
+            <i [class]="result.icon" aria-hidden="true"></i>
+            <div class="result-content">
+              <span class="result-title">{{result.title}}</span>
+              <span class="result-type">{{result.type}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <div class="nav-menu">
+      <ul class="nav-links">
+        <li class="nav-item">
+          <a routerLink="/" routerLinkActive="active" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Accueil</span>
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle" (click)="toggleLearningDropdown()">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Apprendre</span>
+            <i class="fas fa-chevron-down dropdown-icon" [class.rotated]="showLearningDropdown"></i>
+          </button>
+          <div class="dropdown-menu" [class.show]="showLearningDropdown">
+            <a routerLink="/formations" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-book"></i>
+              Formations
+            </a>
+            <a routerLink="/certifications" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-certificate"></i>
+              Certifications
+            </a>
+            <a routerLink="/progression" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-chart-line"></i>
+              Ma progression
+            </a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle" (click)="toggleCareerDropdown()">
+            <i class="fas fa-briefcase"></i>
+            <span>Carrière</span>
+            <i class="fas fa-chevron-down dropdown-icon" [class.rotated]="showCareerDropdown"></i>
+          </button>
+          <div class="dropdown-menu" [class.show]="showCareerDropdown">
+            <a routerLink="/job-offers" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-briefcase"></i>
+              Offres d'emploi
+            </a>
+            <a routerLink="/applications" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-file-alt"></i>
+              Mes candidatures
+            </a>
+            <a routerLink="/profile" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-user"></i>
+              Mon profil
+            </a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle" (click)="toggleUserDropdown()">
+            <i class="fas fa-users-cog"></i>
+            <span>Utilisateurs</span>
+            <i class="fas fa-chevron-down dropdown-icon" [class.rotated]="showUserDropdown"></i>
+          </button>
+          <div class="dropdown-menu" [class.show]="showUserDropdown">
+            <a routerLink="/profile" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-user"></i>
+              Mon profil
+            </a>
+            <a routerLink="/profile/edit" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-edit"></i>
+              Modifier mon profil
+            </a>
+            <div class="dropdown-divider"></div>
+            <a routerLink="/users" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-users"></i>
+              Liste des utilisateurs
+            </a>
+            <a routerLink="/users/create" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-user-plus"></i>
+              Créer un utilisateur
+            </a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/forum" routerLinkActive="active" class="nav-link">
+            <i class="fas fa-comments"></i>
+            <span>Forum</span>
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle" (click)="toggleMentorshipDropdown()">
+            <i class="fas fa-handshake"></i>
+            <span>Mentorat</span>
+            <i class="fas fa-chevron-down dropdown-icon" [class.rotated]="showMentorshipDropdown"></i>
+          </button>
+          <div class="dropdown-menu" [class.show]="showMentorshipDropdown">
+            <a routerLink="/mentors" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-user-tie"></i>
+              Trouver un mentor
+            </a>
+            <a routerLink="/mentorship/requests" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-list"></i>
+              Mes demandes
+            </a>
+            <a routerLink="/mentorship/sessions" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-clock"></i>
+              Mes sessions
+            </a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle" (click)="toggleMentorshipDropdown()">
+            <i class="fas fa-handshake"></i>
+            <span>Mentorat</span>
+            <i class="fas fa-chevron-down dropdown-icon" [class.rotated]="showMentorshipDropdown"></i>
+          </button>
+          <div class="dropdown-menu" [class.show]="showMentorshipDropdown">
+            <div class="dropdown-section">
+              <h4>Disponibilité des Mentors</h4>
+              <a routerLink="/mentor-availability" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-calendar-alt"></i>
+                Liste des créneaux
+              </a>
+              <a routerLink="/mentor-availability/add" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-plus"></i>
+                Ajouter disponibilité
+              </a>
+              <a routerLink="/mentor-availability/calendar" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-calendar"></i>
+                Calendrier
+              </a>
+            </div>
+            <div class="dropdown-section">
+              <h4>Gestion du Mentorat</h4>
+              <a routerLink="/mentors" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-user-tie"></i>
+                Liste des mentors
+              </a>
+              <a routerLink="/mentors/search" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-search"></i>
+                Rechercher mentors
+              </a>
+              <a routerLink="/mentorship/requests" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-list"></i>
+                Mes demandes
+              </a>
+              <a routerLink="/mentorship/sessions" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-clock"></i>
+                Mes sessions
+              </a>
+              <a routerLink="/mentorship/dashboard" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-tachometer-alt"></i>
+                Tableau de bord
+              </a>
+            </div>
+            <div class="dropdown-section">
+              <h4>Évaluations</h4>
+              <a routerLink="/mentorship/reviews" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-star"></i>
+                Avis et notes
+              </a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle" (click)="toggleCertificationsDropdown()">
+            <i class="fas fa-certificate"></i>
+            <span>Certifications/Documents</span>
+            <i class="fas fa-chevron-down dropdown-icon" [class.rotated]="showCertificationsDropdown"></i>
+          </button>
+          <div class="dropdown-menu" [class.show]="showCertificationsDropdown">
+            <div class="dropdown-section">
+              <h4>Documents</h4>
+              <a routerLink="/documents" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-file-alt"></i>
+                Liste des documents
+              </a>
+              <a routerLink="/documents/upload" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-upload"></i>
+                Téléverser document
+              </a>
+              <a routerLink="/documents/viewer" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-eye"></i>
+                Visionneuse
+              </a>
+            </div>
+            <div class="dropdown-section">
+              <h4>Certifications</h4>
+              <a routerLink="/certifications" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-list"></i>
+                Liste des certifications
+              </a>
+              <a routerLink="/certifications/generate" class="dropdown-item" (click)="closeDropdowns()">
+                <i class="fas fa-plus"></i>
+                Générer certification
+              </a>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Chatbot Button -->
+    <button class="chatbot-btn" routerLink="/chatbot" [class.active]="chatbotOpen" aria-label="Ouvrir le chatbot" title="Discuter avec l'assistant IA">
+      <i class="fas fa-robot"></i>
+      <span class="chatbot-pulse" *ngIf="!chatbotOpen"></span>
+    </button>
+
+
+    <!-- User Menu -->
+    <div class="nav-user">
+      <div class="user-menu" *ngIf="currentUser; else loginButton">
+        <button class="user-button" (click)="toggleUserDropdown()">
+          <img [src]="currentUser.profilePictureUrl || '/assets/default-avatar.png'"
+               [alt]="currentUser.firstName"
+               class="user-avatar">
+          <span class="user-name">{{currentUser.firstName}} {{currentUser.lastName}}</span>
+          <i class="fas fa-chevron-down dropdown-icon" [class.rotated]="showDropdown"></i>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div class="dropdown-menu" [class.show]="showDropdown">
+          <a routerLink="/profile" class="dropdown-item">
+            <i class="fas fa-user"></i>
+            Mon Profil
+          </a>
+          <a routerLink="/settings" class="dropdown-item">
+            <i class="fas fa-cog"></i>
+            Paramètres
+          </a>
+          <a routerLink="/notifications" class="dropdown-item" *ngIf="unreadNotifications > 0" (click)="markNotificationsAsRead()">
+            <i class="fas fa-bell"></i>
+            Notifications
+            <span class="notification-badge">{{unreadNotifications}}</span>
+          </a>
+          <a routerLink="/notifications" class="dropdown-item" *ngIf="unreadNotifications === 0">
+            <i class="fas fa-bell"></i>
+            Notifications
+          </a>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item logout-btn" (click)="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            Déconnexion
+          </button>
+        </div>
+      </div>
+
+      <ng-template #loginButton>
+        <div class="auth-buttons">
+          <button class="btn btn-outline" routerLink="/login">
+            Connexion
+          </button>
+          <button class="btn btn-primary" routerLink="/register">
+            S'inscrire
+          </button>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" [class.active]="mobileMenuOpen" aria-label="Ouvrir le menu mobile" [attr.aria-expanded]="mobileMenuOpen">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.open]="mobileMenuOpen" role="navigation" aria-label="Menu mobile">
+    <!-- Mobile Search -->
+    <div class="mobile-search">
+      <div class="search-container" [class.active]="searchActive">
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput($event)"
+          (focus)="searchActive = true"
+          (blur)="onSearchBlur()"
+          placeholder="Rechercher..."
+          class="search-input"
+          #mobileSearchInput>
+        <button class="search-btn" (click)="performSearch()" [disabled]="!searchQuery?.trim()">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+      <div class="search-results" *ngIf="searchResults.length > 0 && searchActive">
+        <div class="search-result-item" *ngFor="let result of searchResults" (click)="navigateToResult(result)">
+          <i [class]="result.icon"></i>
+          <div class="result-content">
+            <span class="result-title">{{result.title}}</span>
+            <span class="result-type">{{result.type}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="mobile-nav-links">
+      <li class="mobile-nav-item">
+        <a routerLink="/" routerLinkActive="active" class="mobile-nav-link" (click)="closeMobileMenu()">
+          <i class="fas fa-home"></i>
+          <span>Accueil</span>
+        </a>
+      </li>
+      <li class="mobile-nav-item">
+        <a routerLink="/formations" routerLinkActive="active" class="mobile-nav-link" (click)="closeMobileMenu()">
+          <i class="fas fa-book"></i>
+          <span>Formations</span>
+        </a>
+      </li>
+      <li class="mobile-nav-item">
+        <a routerLink="/job-offers" routerLinkActive="active" class="mobile-nav-link" (click)="closeMobileMenu()">
+          <i class="fas fa-briefcase"></i>
+          <span>Offres d'emploi</span>
+        </a>
+      </li>
+      <li class="mobile-nav-item">
+        <a routerLink="/applications" routerLinkActive="active" class="mobile-nav-link" (click)="closeMobileMenu()">
+          <i class="fas fa-file-alt"></i>
+          <span>Candidatures</span>
+        </a>
+      </li>
+      <li class="mobile-nav-item">
+        <a routerLink="/forum" routerLinkActive="active" class="mobile-nav-link" (click)="closeMobileMenu()">
+          <i class="fas fa-comments"></i>
+          <span>Forum</span>
+        </a>
+      </li>
+      <li class="mobile-nav-item">
+        <a routerLink="/users" routerLinkActive="active" class="mobile-nav-link" (click)="closeMobileMenu()">
+          <i class="fas fa-users"></i>
+          <span>Utilisateurs</span>
+        </a>
+      </li>
+      <li class="mobile-nav-item">
+        <a routerLink="/chatbot" routerLinkActive="active" class="mobile-nav-link" (click)="closeMobileMenu()">
+          <i class="fas fa-robot"></i>
+          <span>Chatbot</span>
+        </a>
+      </li>
+
+      <!-- Mobile Mentorship Section -->
+      <li class="mobile-nav-section">
+        <div class="mobile-section-header" (click)="toggleMobileMentorship()">
+          <i class="fas fa-handshake"></i>
+          <span>Mentorat</span>
+          <i class="fas fa-chevron-down" [class.rotated]="showMobileMentorship"></i>
+        </div>
+        <div class="mobile-submenu" [class.open]="showMobileMentorship">
+          <a routerLink="/mentor-availability" class="mobile-submenu-item" (click)="closeMobileMenu()">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Disponibilité des Mentors</span>
+          </a>
+          <a routerLink="/mentors" class="mobile-submenu-item" (click)="closeMobileMenu()">
+            <i class="fas fa-user-tie"></i>
+            <span>Liste des mentors</span>
+          </a>
+          <a routerLink="/mentorship/requests" class="mobile-submenu-item" (click)="closeMobileMenu()">
+            <i class="fas fa-list"></i>
+            <span>Mes demandes</span>
+          </a>
+          <a routerLink="/mentorship/sessions" class="mobile-submenu-item" (click)="closeMobileMenu()">
+            <i class="fas fa-clock"></i>
+            <span>Mes sessions</span>
+          </a>
+        </div>
+      </li>
+
+      <!-- Mobile Certifications Section -->
+      <li class="mobile-nav-section">
+        <div class="mobile-section-header" (click)="toggleMobileCertifications()">
+          <i class="fas fa-certificate"></i>
+          <span>Certifications/Documents</span>
+          <i class="fas fa-chevron-down" [class.rotated]="showMobileCertifications"></i>
+        </div>
+        <div class="mobile-submenu" [class.open]="showMobileCertifications">
+          <a routerLink="/documents" class="mobile-submenu-item" (click)="closeMobileMenu()">
+            <i class="fas fa-file-alt"></i>
+            <span>Liste des documents</span>
+          </a>
+          <a routerLink="/certifications" class="mobile-submenu-item" (click)="closeMobileMenu()">
+            <i class="fas fa-list"></i>
+            <span>Liste des certifications</span>
+          </a>
+        </div>
+      </li>
+    </ul>
+
+    <!-- Mobile Auth Buttons -->
+    <div class="mobile-auth" *ngIf="!currentUser">
+      <button class="btn btn-outline mobile-btn" routerLink="/login" (click)="closeMobileMenu()">
+        Connexion
+      </button>
+      <button class="btn btn-primary mobile-btn" routerLink="/register" (click)="closeMobileMenu()">
+        S'inscrire
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-overlay" [class.show]="mobileMenuOpen" (click)="closeMobileMenu()"></div>
+</nav>

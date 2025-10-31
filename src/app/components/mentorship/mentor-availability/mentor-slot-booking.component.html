@@ -1,0 +1,61 @@
+<div class="booking-container">
+  <h2>Réserver un Créneau de Mentorat</h2>
+
+  <div class="loading" *ngIf="loading">
+    Chargement des détails du créneau...
+  </div>
+
+  <div class="slot-details" *ngIf="!loading && availability">
+    <div class="mentor-info">
+      <h3>Mentor: {{ availability.mentor.firstName }} {{ availability.mentor.lastName }}</h3>
+      <p *ngIf="availability.mentor.mentorBio">{{ availability.mentor.mentorBio }}</p>
+    </div>
+
+    <div class="slot-info">
+      <div class="info-card">
+        <h4>Détails du créneau</h4>
+        <div class="time-details">
+          <p><strong>Date:</strong> {{ availability.startDateTime | date:'dd/MM/yyyy' }}</p>
+          <p><strong>Début:</strong> {{ availability.startDateTime | date:'HH:mm' }}</p>
+          <p><strong>Fin:</strong> {{ availability.endDateTime | date:'HH:mm' }}</p>
+          <p><strong>Durée:</strong> {{ getDuration() }} minutes</p>
+        </div>
+      </div>
+
+      <div class="status-card" [class.available]="!availability.isBooked" [class.booked]="availability.isBooked">
+        <h4>Statut</h4>
+        <p class="status-text">
+          <span class="status-icon">{{ availability.isBooked ? '✗' : '✓' }}</span>
+          {{ availability.isBooked ? 'Créneau déjà réservé' : 'Créneau disponible' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="booking-actions" *ngIf="!availability.isBooked">
+      <button
+        class="btn btn-primary"
+        (click)="bookSlot()"
+        [disabled]="booking"
+      >
+        <span *ngIf="booking">Réservation en cours...</span>
+        <span *ngIf="!booking">Réserver ce créneau</span>
+      </button>
+    </div>
+
+    <div class="already-booked" *ngIf="availability.isBooked">
+      <p class="warning-message">
+        ⚠️ Ce créneau n'est plus disponible. Il a déjà été réservé.
+      </p>
+    </div>
+  </div>
+
+  <div class="error" *ngIf="!loading && !availability">
+    Impossible de charger les détails du créneau.
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-secondary" (click)="cancel()">
+      Retour à la liste des mentors
+    </button>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="certification-generator">
+  <div class="generator-header">
+    <h2 class="title">🎓 Générer une Certification</h2>
+    <p class="subtitle">Sélectionnez une formation pour générer votre certificat de réussite</p>
+  </div>
+
+  <div class="generator-content">
+    <div class="formation-selector">
+      <label for="formation-select" class="form-label">Formation Complétée</label>
+      <select
+        id="formation-select"
+        class="form-select"
+        [(ngModel)]="selectedFormationId"
+        [disabled]="loading || generating"
+      >
+        <option value="">-- Choisir une formation --</option>
+        <option *ngFor="let formation of formations" [value]="formation.idFormation">
+          {{ formation.title }} - {{ formation.provider }}
+        </option>
+      </select>
+    </div>
+
+    <div class="preview-section" *ngIf="selectedFormationId">
+      <div class="preview-card">
+        <div class="preview-icon">📜</div>
+        <div class="preview-info">
+          <h3>Certification Preview</h3>
+          <p>Formation: {{ getSelectedFormation()?.title }}</p>
+          <p>Provider: {{ getSelectedFormation()?.provider }}</p>
+          <p>Date: {{ getCurrentDate() | date:'dd/MM/yyyy' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-section">
+      <button
+        class="generate-btn"
+        [disabled]="!selectedFormationId || generating"
+        (click)="generateCertification()"
+      >
+        <span *ngIf="!generating">🚀 Générer Certification</span>
+        <span *ngIf="generating" class="loading">
+          <span class="spinner"></span>
+          Génération en cours...
+        </span>
+      </button>
+    </div>
+
+    <div class="loading-state" *ngIf="loading">
+      <div class="loading-spinner"></div>
+      <p>Chargement des formations...</p>
+    </div>
+  </div>
+</div>

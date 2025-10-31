@@ -1,0 +1,171 @@
+<app-navbar></app-navbar>
+
+<div class="badge-create-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="breadcrumb">
+      <a routerLink="/badges" class="breadcrumb-link">
+        <i class="fas fa-arrow-left"></i>
+        Badges
+      </a>
+      <span class="breadcrumb-link">/</span>
+      <span class="breadcrumb-link">Créer</span>
+    </div>
+
+    <div class="header-content">
+      <h1>Créer un Nouveau Badge</h1>
+    </div>
+  </div>
+
+  <form [formGroup]="badgeForm" (ngSubmit)="onSubmit()" class="form-container">
+    <!-- Form Header -->
+    <div class="form-header">
+      <div class="badge-preview">
+        <i [class]="selectedIcon"></i>
+      </div>
+      <h2>{{ getBadgePreview().nom || 'Nouveau Badge' }}</h2>
+      <p>{{ getBadgePreview().description || 'Description du badge...' }}</p>
+    </div>
+
+    <div class="form-grid">
+      <!-- Main Form -->
+      <div class="form-section">
+        <h3>Informations Générales</h3>
+
+        <!-- Badge Name -->
+        <div class="form-group">
+          <label for="nom">Nom du Badge *</label>
+          <input
+            id="nom"
+            type="text"
+            class="form-control"
+            formControlName="nom"
+            placeholder="Ex: Premier Pas, Expert Certifié..."
+            [class.error]="isFieldInvalid('nom')"
+          >
+          <div *ngIf="isFieldInvalid('nom')" class="error-message">
+            {{ getFieldError('nom') }}
+          </div>
+          <div class="character-count">
+            {{ getCharacterCount('nom') }}/{{ getMaxLength('nom') }}
+          </div>
+        </div>
+
+        <!-- Badge Description -->
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea
+            id="description"
+            class="form-control textarea"
+            formControlName="description"
+            placeholder="Décrivez ce badge et ce qu'il représente..."
+            rows="4"
+            [class.error]="isFieldInvalid('description')"
+          ></textarea>
+          <div *ngIf="isFieldInvalid('description')" class="error-message">
+            {{ getFieldError('description') }}
+          </div>
+          <div class="character-count">
+            {{ getCharacterCount('description') }}/{{ getMaxLength('description') }}
+          </div>
+          <div class="help-text">
+            Soyez descriptif pour aider les utilisateurs à comprendre l'objectif du badge.
+          </div>
+        </div>
+
+        <!-- Icon Selection -->
+        <div class="form-group">
+          <label>Icône du Badge</label>
+          <div class="badge-icon-selector">
+            <div
+              *ngFor="let icon of availableIcons"
+              class="icon-option"
+              [class.selected]="selectedIcon === icon"
+              (click)="selectIcon(icon)"
+            >
+              <i [class]="icon"></i>
+            </div>
+          </div>
+          <div class="help-text">
+            Choisissez une icône représentative du badge.
+          </div>
+        </div>
+
+        <!-- Requirements Builder -->
+        <div class="form-group">
+          <label>Exigences du Badge</label>
+          <div class="requirements-builder">
+            <div class="requirements-list">
+              <div *ngFor="let requirement of requirements; let i = index" class="requirement-item">
+                <input
+                  type="text"
+                  placeholder="Ex: Compléter 5 formations..."
+                  [(ngModel)]="requirements[i]"
+                  [ngModelOptions]="{standalone: true}"
+                >
+                <button type="button" class="btn" (click)="removeRequirement(i)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <button type="button" class="add-requirement" (click)="addRequirement()">
+              <i class="fas fa-plus"></i>
+              Ajouter une exigence
+            </button>
+          </div>
+          <div class="help-text">
+            Définissez les conditions à remplir pour gagner ce badge.
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview Section -->
+      <div class="form-preview">
+        <h3>Aperçu du Badge</h3>
+
+        <div class="preview-card">
+          <div class="preview-header">
+            <div class="preview-icon">
+              <i [class]="selectedIcon"></i>
+            </div>
+            <h4>{{ getBadgePreview().nom || 'Nom du Badge' }}</h4>
+            <div class="preview-category">Nouveau Badge</div>
+          </div>
+
+          <div class="preview-content">
+            <div class="preview-description">
+              {{ getBadgePreview().description || 'Description du badge...' }}
+            </div>
+
+            <div class="preview-requirements">
+              <div *ngFor="let req of getValidRequirements()" class="requirement-item">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ req }}</span>
+              </div>
+              <div *ngIf="getValidRequirements().length === 0" class="requirement-item">
+                <i class="fas fa-info-circle"></i>
+                <span>Aucune exigence définie</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <a routerLink="/badges" class="btn btn-outline">
+        <i class="fas fa-times"></i>
+        Annuler
+      </a>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="badgeForm.invalid || isSubmitting"
+      >
+        <i class="fas fa-save"></i>
+        {{ isSubmitting ? 'Création...' : 'Créer le Badge' }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,56 @@
+<div class="document-list-container">
+  <div class="list-header">
+    <h1 class="main-title">📋 Documents de Candidature</h1>
+    <p class="subtitle">Gérez tous vos documents pour cette candidature</p>
+  </div>
+
+  <div class="documents-grid" *ngIf="!loading">
+    <div class="document-card" *ngFor="let document of documents; trackBy: trackByDocumentId">
+      <div class="card-header">
+        <div class="doc-icon">{{ getDocumentTypeInfo(document.type).icon }}</div>
+        <div class="doc-type">{{ getDocumentTypeInfo(document.type).label }}</div>
+      </div>
+
+      <div class="card-content">
+        <h3 class="doc-name">{{ document.name }}</h3>
+        <p class="doc-description" *ngIf="document.description">{{ document.description }}</p>
+
+        <div class="doc-meta">
+          <div class="meta-item">
+            <span class="meta-label">Taille:</span>
+            <span class="meta-value">{{ getFileSizeDisplay(document.fileSize) }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Type:</span>
+            <span class="meta-value">{{ document.mimeType }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Téléchargé:</span>
+            <span class="meta-value">{{ document.uploadedAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="action-btn view-btn" (click)="downloadDocument(document)">
+          👁️ Voir/Télécharger
+        </button>
+        <button class="action-btn delete-btn" (click)="deleteDocument(document)">
+          🗑️ Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && documents.length === 0">
+    <div class="empty-icon">📂</div>
+    <h3>Aucun document trouvé</h3>
+    <p>Vous n'avez pas encore ajouté de documents à cette candidature.</p>
+    <p>Utilisez le formulaire d'upload pour ajouter vos premiers documents !</p>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Chargement des documents...</p>
+  </div>
+</div>

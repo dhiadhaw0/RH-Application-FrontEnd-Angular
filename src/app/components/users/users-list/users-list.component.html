@@ -1,0 +1,338 @@
+<div class="users-container">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-background">
+      <div class="floating-elements">
+        <div class="floating-circle circle-1"></div>
+        <div class="floating-circle circle-2"></div>
+        <div class="floating-circle circle-3"></div>
+      </div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <i class="fas fa-users-cog"></i>
+          Gestion des Utilisateurs
+          <span class="highlight">StageHub</span>
+        </h1>
+        <p class="hero-subtitle">
+          Gérez efficacement votre communauté d'utilisateurs, mentors et modérateurs
+        </p>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-number">{{users.length}}</div>
+          <div class="stat-label">Total Utilisateurs</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <div class="stat-number">{{getMentorsCount()}}</div>
+          <div class="stat-label">Mentors Actifs</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="stat-number">{{getModeratorsCount()}}</div>
+          <div class="stat-label">Modérateurs</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-large" routerLink="/users/create">
+          <i class="fas fa-plus-circle"></i>
+          Nouvel Utilisateur
+        </button>
+        <button class="btn btn-outline btn-large" routerLink="/profile">
+          <i class="fas fa-user"></i>
+          Mon Profil
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced Search & Filters Section -->
+  <div class="search-filters-section">
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Rechercher par nom, email, rôle..."
+          [(ngModel)]="searchTerm"
+          (input)="filterUsers()">
+        <button class="search-clear" *ngIf="searchTerm" (click)="clearSearch()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="filters-container">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-filter"></i>
+          Filtrer par rôle
+        </label>
+        <div class="filter-buttons">
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'all'"
+            (click)="setFilter('all')">
+            <i class="fas fa-th-large"></i>
+            Tous
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'mentors'"
+            (click)="setFilter('mentors')">
+            <i class="fas fa-user-graduate"></i>
+            Mentors
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'moderators'"
+            (click)="setFilter('moderators')">
+            <i class="fas fa-shield-alt"></i>
+            Modérateurs
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'active'"
+            (click)="setFilter('active')">
+            <i class="fas fa-check-circle"></i>
+            Actifs
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Users Grid -->
+  <div class="users-section">
+    <div class="users-grid" *ngIf="!loading; else loadingTemplate">
+      <div
+        class="user-card"
+        *ngFor="let user of filteredUsers; trackBy: trackByUserId"
+        [class.featured]="user.isMentor">
+
+        <!-- Card Ribbon for Special Status -->
+        <div class="card-ribbon" *ngIf="user.isMentor">
+          <i class="fas fa-star"></i>
+          Mentor
+        </div>
+
+        <!-- Card Header with Enhanced Avatar -->
+        <div class="card-header">
+          <div class="user-avatar-section">
+            <div class="user-avatar">
+              <img
+                [src]="user.profilePictureUrl || 'https://via.placeholder.com/120'"
+                [alt]="user.firstName + ' ' + user.lastName"
+                class="avatar-image">
+              <div class="user-status" [class]="user.banned ? 'status-banned' : 'status-active'"></div>
+              <div class="avatar-overlay" *ngIf="user.isMentor">
+                <i class="fas fa-user-graduate"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="user-info">
+            <h3 class="user-name">{{user.firstName}} {{user.lastName}}</h3>
+            <div class="user-meta">
+              <span class="user-email">{{user.email}}</span>
+              <span class="user-role" [class]="'role-' + user.role.toLowerCase()">
+                <i class="fas fa-crown" *ngIf="user.role === 'ADMIN'"></i>
+                <i class="fas fa-shield-alt" *ngIf="user.role === 'MODERATOR'"></i>
+                <i class="fas fa-user-tie" *ngIf="user.role === 'RECRUITER'"></i>
+                <i class="fas fa-briefcase" *ngIf="user.role === 'CANDIDATE'"></i>
+                <i class="fas fa-brain" *ngIf="user.role === 'AI_ANALYST'"></i>
+                <i class="fas fa-user" *ngIf="user.role === 'USER'"></i>
+                {{user.role}}
+              </span>
+            </div>
+          </div>
+
+          <div class="user-actions">
+            <button class="btn btn-outline btn-sm" routerLink="/users/{{user.id}}" title="Voir le profil">
+              <i class="fas fa-eye"></i>
+              <span>Voir</span>
+            </button>
+            <button class="btn btn-outline btn-sm" (click)="editUser(user)" title="Modifier l'utilisateur">
+              <i class="fas fa-edit"></i>
+              <span>Modifier</span>
+            </button>
+            <button
+              class="btn btn-danger btn-sm"
+              (click)="toggleUserStatus(user)"
+              [title]="user.banned ? 'Débannir l\'utilisateur' : 'Bannir l\'utilisateur'">
+              <i class="fas" [class]="user.banned ? 'fa-unlock' : 'fa-ban'"></i>
+              <span>{{user.banned ? 'Débannir' : 'Bannir'}}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Enhanced Card Content -->
+        <div class="card-content">
+          <div class="user-details">
+            <div class="details-grid">
+              <div class="detail-item">
+                <i class="fas fa-phone detail-icon"></i>
+                <div class="detail-content">
+                  <label>Téléphone</label>
+                  <span>{{user.phoneNumber || 'Non renseigné'}}</span>
+                </div>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-birthday-cake detail-icon"></i>
+                <div class="detail-content">
+                  <label>Âge</label>
+                  <span>{{getUserAge(user)}} ans</span>
+                </div>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-clock detail-icon"></i>
+                <div class="detail-content">
+                  <label>Dernière connexion</label>
+                  <span>{{user.lastLogin | date:'dd/MM/yyyy'}}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mentor Specialties Section -->
+            <div class="mentor-section" *ngIf="user.isMentor">
+              <h4 class="section-title">
+                <i class="fas fa-user-graduate"></i>
+                Profil Mentor
+              </h4>
+              <div class="mentor-details">
+                <div class="mentor-bio" *ngIf="user.mentorBio">
+                  <p class="bio-text">{{user.mentorBio | slice:0:120}}...</p>
+                </div>
+                <div class="mentor-skills" *ngIf="user.mentorExpertise">
+                  <div class="skill-tags">
+                    <span class="skill-tag" *ngFor="let skill of getSkillsArray(user.mentorExpertise)">
+                      {{skill}}
+                    </span>
+                  </div>
+                </div>
+                <div class="mentor-languages" *ngIf="user.languages">
+                  <div class="language-tags">
+                    <span class="language-tag" *ngFor="let lang of getLanguagesArray(user.languages)">
+                      <i class="fas fa-globe"></i> {{lang}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- User Skills Section -->
+            <div class="skills-section" *ngIf="user.expertise && !user.isMentor">
+              <h4 class="section-title">
+                <i class="fas fa-tools"></i>
+                Compétences
+              </h4>
+              <div class="skill-tags">
+                <span class="skill-tag" *ngFor="let skill of getSkillsArray(user.expertise)">
+                  {{skill}}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Enhanced Card Footer -->
+          <div class="card-footer">
+            <div class="footer-left">
+              <div class="registration-date">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Membre depuis {{user.createdAt | date:'MM/yyyy'}}</span>
+              </div>
+              <div class="mentor-date" *ngIf="user.mentorSince">
+                <i class="fas fa-star"></i>
+                <span>Mentor depuis {{user.mentorSince | date:'MM/yyyy'}}</span>
+              </div>
+            </div>
+
+            <div class="footer-right">
+              <div class="user-indicators">
+                <span class="indicator mentor" *ngIf="user.isMentor">
+                  <i class="fas fa-user-graduate"></i>
+                  <span>Mentor</span>
+                </span>
+                <span class="indicator moderator" *ngIf="user.isModerator">
+                  <i class="fas fa-shield-alt"></i>
+                  <span>Modérateur</span>
+                </span>
+                <span class="indicator linkedin" *ngIf="user.linkedinUrl">
+                  <i class="fab fa-linkedin"></i>
+                  <span>LinkedIn</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hover Effect Overlay -->
+        <div class="card-hover-overlay">
+          <div class="overlay-actions">
+            <button class="overlay-btn primary" routerLink="/users/{{user.id}}">
+              <i class="fas fa-eye"></i>
+              <span>Voir le Profil</span>
+            </button>
+            <button class="overlay-btn secondary" (click)="editUser(user)">
+              <i class="fas fa-edit"></i>
+              <span>Modifier</span>
+            </button>
+            <button class="overlay-btn danger" (click)="toggleUserStatus(user)">
+              <i class="fas" [class]="user.banned ? 'fa-unlock' : 'fa-ban'"></i>
+              <span>{{user.banned ? 'Débannir' : 'Bannir'}}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredUsers.length === 0">
+        <div class="empty-icon">
+          <i class="fas fa-search"></i>
+        </div>
+        <h3 class="empty-title">Aucun utilisateur trouvé</h3>
+        <p class="empty-description">
+          Aucun utilisateur ne correspond à vos critères de recherche.
+          Essayez de modifier vos filtres ou créez un nouvel utilisateur.
+        </p>
+        <div class="empty-actions">
+          <button class="btn btn-primary" (click)="resetFilters()">
+            <i class="fas fa-refresh"></i>
+            Réinitialiser les filtres
+          </button>
+          <button class="btn btn-outline" routerLink="/users/create">
+            <i class="fas fa-plus"></i>
+            Créer un utilisateur
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Template -->
+    <ng-template #loadingTemplate>
+      <div class="loading-state">
+        <div class="loading-spinner">
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+        </div>
+        <h3>Chargement des utilisateurs...</h3>
+        <p>Découvrez bientôt votre communauté</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

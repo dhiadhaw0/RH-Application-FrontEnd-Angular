@@ -1,0 +1,314 @@
+<!-- Forum Moderation Dashboard Component -->
+<div class="moderation-dashboard-container">
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">
+      <i class="fas fa-shield-alt"></i>
+      Tableau de Bord Modération
+    </h1>
+    <p class="dashboard-subtitle">Gérez et modérez le contenu du forum</p>
+
+    <!-- Navigation Actions -->
+    <div class="header-actions">
+      <button class="btn btn-outline" (click)="goBackToForum()">
+        <i class="fas fa-arrow-left"></i>
+        Retour au Forum
+      </button>
+      <button class="btn btn-primary" (click)="navigateToReports()">
+        <i class="fas fa-flag"></i>
+        Voir tous les Signalements
+      </button>
+      <button class="btn btn-info" (click)="navigateToSearch()">
+        <i class="fas fa-search"></i>
+        Recherche Avancée
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement du tableau de bord...</p>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading" class="dashboard-content">
+    <!-- Navigation Tabs -->
+    <div class="dashboard-tabs">
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'overview'"
+        (click)="setActiveTab('overview')"
+      >
+        <i class="fas fa-chart-line"></i>
+        Vue d'ensemble
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'reports'"
+        (click)="setActiveTab('reports')"
+      >
+        <i class="fas fa-flag"></i>
+        Signalements ({{ stats.pendingReports }})
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'threads'"
+        (click)="setActiveTab('threads')"
+      >
+        <i class="fas fa-comments"></i>
+        Fils de discussion
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'posts'"
+        (click)="setActiveTab('posts')"
+      >
+        <i class="fas fa-reply"></i>
+        Messages
+      </button>
+    </div>
+
+    <!-- Overview Tab -->
+    <div *ngIf="activeTab === 'overview'" class="tab-content">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon reports">
+            <i class="fas fa-flag"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.totalReports }}</div>
+            <div class="stat-label">Total Signalements</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon pending">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.pendingReports }}</div>
+            <div class="stat-label">En attente</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon resolved">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.resolvedReports }}</div>
+            <div class="stat-label">Résolus</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon threads">
+            <i class="fas fa-comments"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.totalThreads }}</div>
+            <div class="stat-label">Fils actifs</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon pinned">
+            <i class="fas fa-thumbtack"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.pinnedThreads }}</div>
+            <div class="stat-label">Épinglés</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon posts">
+            <i class="fas fa-reply"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.totalPosts }}</div>
+            <div class="stat-label">Messages</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="recent-activity">
+        <h3>Activité récente</h3>
+        <div class="activity-list">
+          <div *ngFor="let report of recentReports.slice(0, 5)" class="activity-item">
+            <div class="activity-icon" [style.background-color]="getStatusColor(report.status)">
+              <i class="fas fa-flag"></i>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">
+                Signalement {{ report.reportedThread ? 'de fil' : 'de message' }}
+              </div>
+              <div class="activity-meta">
+                Par {{ report.reporter.firstName }} {{ report.reporter.lastName }} • {{ formatDate(report.createdAt) }}
+              </div>
+            </div>
+            <div class="activity-status" [style.color]="getStatusColor(report.status)">
+              {{ getStatusText(report.status) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports Tab -->
+    <div *ngIf="activeTab === 'reports'" class="tab-content">
+      <div class="reports-list">
+        <div *ngFor="let report of recentReports" class="report-item">
+          <div class="report-header">
+            <div class="report-type">
+              <i class="fas" [class]="report.reportedThread ? 'fa-comments' : 'fa-reply'"></i>
+              {{ report.reportedThread ? 'Fil de discussion' : 'Message' }}
+            </div>
+            <div class="report-status" [style.background-color]="getStatusColor(report.status)">
+              {{ getStatusText(report.status) }}
+            </div>
+          </div>
+
+          <div class="report-content">
+            <p class="report-reason">{{ report.reason }}</p>
+            <div class="report-meta">
+              <span class="reporter">Signalé par: {{ report.reporter.firstName }} {{ report.reporter.lastName }}</span>
+              <span class="separator">•</span>
+              <span class="date">{{ formatDate(report.createdAt) }}</span>
+            </div>
+          </div>
+
+          <div class="report-actions" *ngIf="report.status === 'PENDING'">
+            <button class="btn btn-resolve" (click)="resolveReport(report.id)">
+              <i class="fas fa-check"></i>
+              Résoudre
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Threads Tab -->
+    <div *ngIf="activeTab === 'threads'" class="tab-content">
+      <div class="threads-management">
+        <div class="management-header">
+          <h3>Gestion des Fils de Discussion</h3>
+          <p>Outils de modération pour gérer les discussions du forum</p>
+        </div>
+
+        <div class="management-actions">
+          <button class="btn btn-primary" (click)="pinThread(1)">
+            <i class="fas fa-thumbtack"></i>
+            Épingler un fil
+          </button>
+          <button class="btn btn-warning" (click)="closeThread(1)">
+            <i class="fas fa-lock"></i>
+            Fermer un fil
+          </button>
+          <button class="btn btn-danger" (click)="deleteThread(1)">
+            <i class="fas fa-trash"></i>
+            Supprimer un fil
+          </button>
+          <button class="btn btn-info" (click)="moveThread(1)">
+            <i class="fas fa-arrows-alt"></i>
+            Déplacer un fil
+          </button>
+        </div>
+
+        <div class="thread-tools">
+          <div class="tool-section">
+            <h4><i class="fas fa-search"></i> Recherche de Fils</h4>
+            <div class="search-form">
+              <input type="text" placeholder="Rechercher par titre ou auteur..." class="search-input">
+              <button class="btn btn-outline">
+                <i class="fas fa-search"></i>
+                Rechercher
+              </button>
+            </div>
+          </div>
+
+          <div class="tool-section">
+            <h4><i class="fas fa-filter"></i> Filtres</h4>
+            <div class="filter-options">
+              <label class="filter-option">
+                <input type="checkbox" checked>
+                <span>Fils épinglés</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" checked>
+                <span>Fils fermés</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" checked>
+                <span>Fils signalés</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts Tab -->
+    <div *ngIf="activeTab === 'posts'" class="tab-content">
+      <div class="posts-management">
+        <div class="management-header">
+          <h3>Gestion des Messages</h3>
+          <p>Outils de modération pour gérer les messages du forum</p>
+        </div>
+
+        <div class="management-actions">
+          <button class="btn btn-success" (click)="markAsAnswer(1)">
+            <i class="fas fa-check-circle"></i>
+            Marquer comme réponse
+          </button>
+          <button class="btn btn-warning" (click)="hidePost(1)">
+            <i class="fas fa-eye-slash"></i>
+            Masquer un message
+          </button>
+          <button class="btn btn-danger" (click)="deletePost(1)">
+            <i class="fas fa-trash"></i>
+            Supprimer un message
+          </button>
+          <button class="btn btn-info" (click)="editPost(1)">
+            <i class="fas fa-edit"></i>
+            Modifier un message
+          </button>
+        </div>
+
+        <div class="post-tools">
+          <div class="tool-section">
+            <h4><i class="fas fa-search"></i> Recherche de Messages</h4>
+            <div class="search-form">
+              <input type="text" placeholder="Rechercher par contenu ou auteur..." class="search-input">
+              <button class="btn btn-outline">
+                <i class="fas fa-search"></i>
+                Rechercher
+              </button>
+            </div>
+          </div>
+
+          <div class="tool-section">
+            <h4><i class="fas fa-filter"></i> Filtres</h4>
+            <div class="filter-options">
+              <label class="filter-option">
+                <input type="checkbox" checked>
+                <span>Messages signalés</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" checked>
+                <span>Messages masqués</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox">
+                <span>Réponses acceptées</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

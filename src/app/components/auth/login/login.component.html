@@ -1,0 +1,59 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h2>Connexion</h2>
+      <p>Connectez-vous à votre compte StageHub</p>
+    </div>
+
+    <form class="login-form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="loginData.email"
+          name="email"
+          required
+          placeholder="votre.email@example.com"
+          class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="loginData.password"
+          name="password"
+          required
+          placeholder="Votre mot de passe"
+          class="form-control">
+      </div>
+
+      <div class="form-options">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe">
+          Se souvenir de moi
+        </label>
+        <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading">
+        <i class="fas fa-sign-in-alt" *ngIf="!loading"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="loading"></i>
+        {{ loading ? 'Connexion...' : 'Se connecter' }}
+      </button>
+    </form>
+
+    <div class="error-message" *ngIf="error">
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ error }}
+    </div>
+
+    <div class="login-footer">
+      <p>Pas encore de compte ?
+        <a href="#" class="signup-link" (click)="switchToSignup()">S'inscrire</a>
+      </p>
+    </div>
+  </div>
+</div>

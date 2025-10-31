@@ -1,0 +1,24 @@
+<div class="rating-container" [ngClass]="size" *ngIf="!loading">
+  <div class="rating-stars">
+    <span
+      class="star"
+      *ngFor="let star of getRatingStars(); let i = index"
+      [style.color]="i < Math.floor(averageRating) ? getRatingColor() : '#ddd'"
+    >
+      {{ star }}
+    </span>
+  </div>
+
+  <div class="rating-info">
+    <span class="rating-number">{{ averageRating }}</span>
+    <span class="rating-text">({{ totalReviews }} avis)</span>
+  </div>
+
+  <div class="rating-label" *ngIf="size !== 'small'">
+    {{ getRatingText() }}
+  </div>
+</div>
+
+<div class="loading" *ngIf="loading">
+  <span>Chargement...</span>
+</div>

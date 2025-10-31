@@ -1,0 +1,80 @@
+<div class="mentor-profile-container">
+  <div class="loading" *ngIf="loading">
+    Chargement du profil...
+  </div>
+
+  <div class="profile-content" *ngIf="!loading && mentor">
+    <div class="profile-header">
+      <div class="avatar-section">
+        <div class="avatar">
+          <span *ngIf="!mentor.profilePictureUrl">{{ mentor.firstName.charAt(0) }}{{ mentor.lastName.charAt(0) }}</span>
+          <img *ngIf="mentor.profilePictureUrl" [src]="mentor.profilePictureUrl" [alt]="mentor.firstName + ' ' + mentor.lastName">
+        </div>
+        <div class="mentor-badge">
+          <span class="badge">MENTOR</span>
+        </div>
+      </div>
+
+      <div class="header-info">
+        <h1>{{ mentor.firstName }} {{ mentor.lastName }}</h1>
+        <p class="expertise">{{ mentor.mentorExpertise }}</p>
+        <div class="mentor-since" *ngIf="mentor.mentorSince">
+          Mentor depuis {{ mentor.mentorSince | date:'MMMM yyyy' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <div class="bio-section">
+        <h2>À propos</h2>
+        <p>{{ mentor.mentorBio }}</p>
+      </div>
+
+      <div class="details-grid">
+        <div class="detail-card">
+          <h3>Domaines d'expertise</h3>
+          <p>{{ mentor.expertise }}</p>
+        </div>
+
+        <div class="detail-card">
+          <h3>Langues parlées</h3>
+          <p>{{ mentor.languages }}</p>
+        </div>
+
+        <div class="detail-card">
+          <h3>Disponibilité</h3>
+          <p>{{ mentor.availability }}</p>
+        </div>
+
+        <div class="detail-card" *ngIf="mentor.linkedinUrl">
+          <h3>LinkedIn</h3>
+          <a [href]="mentor.linkedinUrl" target="_blank" class="linkedin-link">
+            Voir le profil LinkedIn
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="btn btn-primary" (click)="requestMentorship()">
+        Demander un mentorat
+      </button>
+      <button class="btn btn-outline" (click)="viewAvailability()">
+        Voir les disponibilités
+      </button>
+      <button class="btn btn-outline" (click)="contactMentor()">
+        Contacter
+      </button>
+    </div>
+  </div>
+
+  <div class="error" *ngIf="!loading && !mentor">
+    Impossible de charger le profil du mentor.
+  </div>
+
+  <div class="back-action">
+    <button class="btn btn-secondary" routerLink="/mentorship/mentors">
+      Retour à la liste
+    </button>
+  </div>
+</div>

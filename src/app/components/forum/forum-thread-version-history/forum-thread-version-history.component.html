@@ -1,0 +1,194 @@
+<!-- Forum Thread Version History Component -->
+<div class="version-history-container">
+  <div class="history-header">
+    <h1 class="history-title">
+      <i class="fas fa-history"></i>
+      Historique des versions
+    </h1>
+    <p class="history-subtitle">Suivez l'évolution de cette discussion au fil du temps</p>
+    <button class="btn btn-outline" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Retour à la discussion
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement de l'historique...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h4>Erreur de chargement</h4>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadThreadAndVersions()">
+        <i class="fas fa-redo"></i>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Current Thread Info -->
+  <div *ngIf="!loading && !error && currentThread" class="current-thread-info">
+    <div class="thread-card">
+      <div class="thread-header">
+        <h3 class="thread-title">{{ currentThread.title }}</h3>
+        <span class="thread-category">{{ currentThread.category.name }}</span>
+      </div>
+      <div class="thread-meta">
+        <span class="thread-author">
+          <i class="fas fa-user"></i>
+          {{ currentThread.author.firstName }} {{ currentThread.author.lastName }}
+        </span>
+        <span class="thread-date">
+          <i class="fas fa-calendar"></i>
+          Créée le {{ formatDate(currentThread.createdAt) }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Version Timeline -->
+  <div *ngIf="!loading && !error && versions.length > 0" class="version-timeline">
+    <div class="timeline-header">
+      <h3>Historique des modifications</h3>
+      <p>{{ versions.length }} version{{ versions.length > 1 ? 's' : '' }} trouvée{{ versions.length > 1 ? 's' : '' }}</p>
+    </div>
+
+    <div class="timeline">
+      <div
+        *ngFor="let version of versions; let i = index; trackBy: trackByVersion"
+        class="timeline-item"
+        [class.current-version]="version.isCurrent"
+      >
+        <!-- Timeline connector -->
+        <div class="timeline-connector" *ngIf="i < versions.length - 1"></div>
+
+        <!-- Version marker -->
+        <div class="timeline-marker" [class.current]="version.isCurrent">
+          <div class="marker-dot">
+            <i [class]="getChangeTypeIcon(version.changeType)"></i>
+          </div>
+          <div class="version-number">{{ version.versionNumber }}</div>
+        </div>
+
+        <!-- Version content -->
+        <div class="timeline-content">
+          <div class="version-header">
+            <div class="version-info">
+              <h4 class="version-title">
+                Version {{ version.versionNumber }}
+                <span class="current-badge" *ngIf="version.isCurrent">ACTUELLE</span>
+              </h4>
+              <div class="change-type">
+                <i [class]="getChangeTypeIcon(version.changeType)"></i>
+                {{ getChangeTypeLabel(version.changeType) }}
+              </div>
+            </div>
+            <div class="version-actions">
+              <button class="btn btn-sm btn-outline" (click)="viewVersion(version)">
+                <i class="fas fa-eye"></i>
+                Voir
+              </button>
+            </div>
+          </div>
+
+          <div class="version-meta">
+            <span class="editor-info">
+              <i class="fas fa-user-edit"></i>
+              Modifié par {{ version.editedBy.firstName }} {{ version.editedBy.lastName }}
+            </span>
+            <span class="edit-date">
+              <i class="fas fa-clock"></i>
+              {{ formatDate(version.editedAt) }}
+            </span>
+          </div>
+
+          <!-- Preview content -->
+          <div class="version-preview">
+            <div class="preview-title" *ngIf="version.changeType === 'title' || version.changeType === 'both'">
+              <strong>Titre:</strong> {{ version.title }}
+            </div>
+            <div class="preview-content">
+              <strong>Contenu:</strong>
+              <div class="content-text">{{ version.content | truncate:150 }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && versions.length === 0" class="empty-state">
+    <div class="empty-content">
+      <i class="fas fa-history empty-icon"></i>
+      <h3>Aucun historique disponible</h3>
+      <p>Cette discussion n'a pas encore été modifiée.</p>
+    </div>
+  </div>
+
+  <!-- Version Modal -->
+  <div *ngIf="showVersionModal && selectedVersion" class="version-modal-overlay" (click)="closeVersionModal()">
+    <div class="version-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Version {{ selectedVersion.versionNumber }}</h3>
+        <button class="modal-close" (click)="closeVersionModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-content">
+        <div class="version-details">
+          <div class="detail-section">
+            <label class="detail-label">Titre</label>
+            <div class="detail-value">{{ selectedVersion.title }}</div>
+          </div>
+
+          <div class="detail-section">
+            <label class="detail-label">Contenu</label>
+            <div class="detail-value content-full">{{ selectedVersion.content }}</div>
+          </div>
+
+          <div class="detail-section">
+            <label class="detail-label">Modifié par</label>
+            <div class="detail-value">
+              {{ selectedVersion.editedBy.firstName }} {{ selectedVersion.editedBy.lastName }}
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <label class="detail-label">Date de modification</label>
+            <div class="detail-value">{{ formatDate(selectedVersion.editedAt) }}</div>
+          </div>
+
+          <div class="detail-section">
+            <label class="detail-label">Type de modification</label>
+            <div class="detail-value">
+              <span class="change-badge">
+                <i [class]="getChangeTypeIcon(selectedVersion.changeType)"></i>
+                {{ getChangeTypeLabel(selectedVersion.changeType) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" (click)="closeVersionModal()">
+          <i class="fas fa-times"></i>
+          Fermer
+        </button>
+        <button class="btn btn-primary" (click)="closeVersionModal()">
+          <i class="fas fa-check"></i>
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

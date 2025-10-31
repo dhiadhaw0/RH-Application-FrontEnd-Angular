@@ -1,0 +1,195 @@
+<app-navbar></app-navbar>
+
+<div class="my-applications-container">
+  <div class="header-section">
+    <h1>Mes Candidatures</h1>
+    <p>Gérez vos candidatures aux offres d'emploi</p>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="stats-overview">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-file-alt"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{getTotalApplications()}}</div>
+        <div class="stat-label">Total Candidatures</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{getPendingApplications()}}</div>
+        <div class="stat-label">En Attente</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{getAcceptedApplications()}}</div>
+        <div class="stat-label">Acceptées</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-handshake"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{getInterviewApplications()}}</div>
+        <div class="stat-label">Entretiens</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" [(ngModel)]="searchTerm" (input)="filterApplications()"
+             placeholder="Rechercher par titre d'offre, entreprise..." class="form-control">
+    </div>
+
+    <div class="filter-buttons">
+      <button class="filter-btn" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+        Toutes
+      </button>
+      <button class="filter-btn" [class.active]="activeFilter === 'pending'" (click)="setFilter('pending')">
+        En Attente
+      </button>
+      <button class="filter-btn" [class.active]="activeFilter === 'interview'" (click)="setFilter('interview')">
+        Entretiens
+      </button>
+      <button class="filter-btn" [class.active]="activeFilter === 'accepted'" (click)="setFilter('accepted')">
+        Acceptées
+      </button>
+      <button class="filter-btn" [class.active]="activeFilter === 'rejected'" (click)="setFilter('rejected')">
+        Refusées
+      </button>
+    </div>
+  </div>
+
+  <!-- Applications List -->
+  <div class="applications-list" *ngIf="!loading; else loadingTemplate">
+    <div class="application-card" *ngFor="let application of filteredApplications">
+      <div class="card-header">
+        <div class="job-info">
+          <h3 class="job-title">{{getJobOfferTitle(application)}}</h3>
+          <div class="job-meta">
+            <span class="company">
+              <i class="fas fa-building"></i>
+              {{getJobOfferCompany(application)}}
+            </span>
+            <span class="location" *ngIf="getJobOfferLocation(application)">
+              <i class="fas fa-map-marker-alt"></i>
+              {{getJobOfferLocation(application)}}
+            </span>
+            <span class="date">
+              <i class="fas fa-calendar"></i>
+              Candidature du {{application.createdAt | date:'dd/MM/yyyy'}}
+            </span>
+          </div>
+        </div>
+        <div class="application-status" [class]="'status-' + application.status.toLowerCase()">
+          {{application.status}}
+        </div>
+      </div>
+
+      <div class="card-content">
+        <div class="application-details">
+          <!-- Scores Section -->
+          <div class="scores-section" *ngIf="application.relevanceScore || application.scoreIA">
+            <h4>Évaluation</h4>
+            <div class="scores-grid">
+              <div class="score-item" *ngIf="application.relevanceScore">
+                <label>Score de Pertinence:</label>
+                <div class="score-display">
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="application.relevanceScore * 10"></div>
+                  </div>
+                  <span class="score-value">{{application.relevanceScore}}/10</span>
+                </div>
+              </div>
+              <div class="score-item" *ngIf="application.scoreIA">
+                <label>Score IA:</label>
+                <div class="score-display">
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="application.scoreIA * 10"></div>
+                  </div>
+                  <span class="score-value">{{application.scoreIA}}/10</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Report Preview -->
+          <div class="ai-insights" *ngIf="application.aiRelevanceReport">
+            <h4>Insights IA</h4>
+            <p class="ai-preview">{{application.aiRelevanceReport | slice:0:150}}...</p>
+            <button class="btn btn-sm btn-outline" routerLink="/applications/{{application.idApplication}}">
+              Voir le rapport complet
+            </button>
+          </div>
+
+          <!-- Next Steps -->
+          <div class="next-steps" *ngIf="getNextSteps(application)">
+            <h4>Prochaines Étapes</h4>
+            <div class="steps-list">
+              <div class="step-item" *ngFor="let step of getNextSteps(application)">
+                <i class="fas fa-check-circle" *ngIf="step.completed"></i>
+                <i class="fas fa-circle" *ngIf="!step.completed"></i>
+                <span [class.completed]="step.completed">{{step.title}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-sm btn-primary" routerLink="/applications/{{application.idApplication}}">
+            <i class="fas fa-eye"></i> Voir Détails
+          </button>
+          <button class="btn btn-sm btn-outline" routerLink="/applications/{{application.idApplication}}/timeline">
+            <i class="fas fa-history"></i> Timeline
+          </button>
+          <button class="btn btn-sm btn-outline" (click)="downloadApplicationReport(application)">
+            <i class="fas fa-download"></i> Rapport
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="withdrawApplication(application)" *ngIf="canWithdraw(application)">
+            <i class="fas fa-times"></i> Retirer
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress Indicator -->
+      <div class="progress-indicator" *ngIf="getApplicationProgress(application) > 0">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="getApplicationProgress(application)"></div>
+        </div>
+        <span class="progress-text">{{getApplicationProgress(application)}}% complété</span>
+      </div>
+    </div>
+
+    <div class="no-applications" *ngIf="filteredApplications.length === 0">
+      <i class="fas fa-file-alt"></i>
+      <h3>Aucune candidature trouvée</h3>
+      <p>Vous n'avez pas encore postulé à des offres d'emploi.</p>
+      <button class="btn btn-primary" routerLink="/job-offers">
+        <i class="fas fa-search"></i> Explorer les Offres
+      </button>
+    </div>
+  </div>
+
+  <ng-template #loadingTemplate>
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Chargement de vos candidatures...</p>
+    </div>
+  </ng-template>
+</div>

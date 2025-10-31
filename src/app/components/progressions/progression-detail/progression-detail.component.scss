@@ -1,0 +1,335 @@
+.progression-detail {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e1e8ed;
+
+  .back-btn {
+    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .formation-info {
+    flex: 1;
+
+    .formation-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+
+    .formation-provider {
+      font-size: 1.1rem;
+      color: #7f8c8d;
+      background: rgba(102, 126, 234, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      display: inline-block;
+    }
+  }
+}
+
+.progress-overview {
+  margin-bottom: 3rem;
+
+  .overview-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    color: white;
+
+    .progress-circle {
+      position: relative;
+      width: 120px;
+      height: 120px;
+
+      .circle-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+
+        .progress-percentage {
+          font-size: 2rem;
+          font-weight: 700;
+          display: block;
+        }
+
+        .progress-label {
+          font-size: 0.9rem;
+          opacity: 0.9;
+        }
+      }
+
+      .progress-ring {
+        transform: rotate(-90deg);
+
+        .progress-ring-circle-bg {
+          stroke-dasharray: 327;
+        }
+
+        .progress-ring-circle {
+          stroke-dasharray: 327;
+          stroke-linecap: round;
+          transition: stroke-dashoffset 0.5s ease;
+        }
+      }
+    }
+
+    .overview-stats {
+      display: flex;
+      gap: 3rem;
+
+      .stat-item {
+        text-align: center;
+
+        .stat-value {
+          font-size: 2rem;
+          font-weight: 700;
+          display: block;
+          margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+          font-size: 1rem;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+}
+
+.modules-section {
+  .section-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+}
+
+.modules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.module-card {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  border: 2px solid #e1e8ed;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  }
+
+  &.completed {
+    border-color: #27ae60;
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.05) 0%, rgba(39, 174, 96, 0.02) 100%);
+  }
+
+  .module-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+
+    .module-icon {
+      font-size: 2.5rem;
+      opacity: 0.8;
+    }
+
+    .module-info {
+      flex: 1;
+
+      .module-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+      }
+
+      .module-meta {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+
+        .duration {
+          background: rgba(102, 126, 234, 0.1);
+          color: #667eea;
+          padding: 0.4rem 0.8rem;
+          border-radius: 15px;
+          font-size: 0.9rem;
+          font-weight: 500;
+        }
+
+        .status {
+          padding: 0.4rem 0.8rem;
+          border-radius: 15px;
+          font-size: 0.9rem;
+          font-weight: 500;
+
+          &.completed {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+          }
+
+          &:not(.completed) {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+          }
+        }
+      }
+    }
+  }
+
+  .module-actions {
+    margin-top: 1rem;
+
+    .complete-btn {
+      background: linear-gradient(45deg, #27ae60, #2ecc71);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  .module-score {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e1e8ed;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .score-label {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .score-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #27ae60;
+
+      &.high-score {
+        color: #e74c3c;
+      }
+    }
+  }
+}
+
+.loading-state {
+  text-align: center;
+  padding: 4rem 2rem;
+
+  .loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1.5rem;
+  }
+
+  p {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .progression-detail {
+    padding: 1rem;
+  }
+
+  .detail-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+
+    .formation-title {
+      font-size: 2rem;
+    }
+  }
+
+  .overview-card {
+    flex-direction: column;
+    gap: 2rem;
+    text-align: center;
+
+    .overview-stats {
+      justify-content: center;
+      gap: 2rem;
+    }
+  }
+
+  .module-card {
+    padding: 1.5rem;
+
+    .module-header {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+    }
+  }
+}

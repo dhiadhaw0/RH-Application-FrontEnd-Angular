@@ -1,0 +1,40 @@
+<div class="pdf-viewer-container">
+  <div class="viewer-header">
+    <button class="back-btn" (click)="goBack()">
+      ← Retour
+    </button>
+    <div class="pdf-info">
+      <h1 class="pdf-title">📄 PDF de Candidature</h1>
+      <p class="pdf-subtitle">Application ID: {{ applicationId }}</p>
+    </div>
+    <button class="download-btn" (click)="downloadPdf()">
+      📥 Télécharger
+    </button>
+  </div>
+
+  <div class="viewer-content">
+    <div class="loading-state" *ngIf="loading">
+      <div class="loading-spinner"></div>
+      <p>Chargement du PDF...</p>
+    </div>
+
+    <div class="error-state" *ngIf="error && !loading">
+      <div class="error-icon">⚠️</div>
+      <h3>Erreur de chargement</h3>
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="loadPdf()">
+        Réessayer
+      </button>
+    </div>
+
+    <div class="pdf-display" *ngIf="!loading && !error && pdfUrl">
+      <iframe
+        [src]="pdfUrl"
+        width="100%"
+        height="600px"
+        frameborder="0"
+        class="pdf-iframe">
+      </iframe>
+    </div>
+  </div>
+</div>

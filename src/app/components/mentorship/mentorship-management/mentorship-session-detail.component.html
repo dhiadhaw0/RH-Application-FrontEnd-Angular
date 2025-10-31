@@ -1,0 +1,119 @@
+<div class="session-detail-container">
+  <div class="loading" *ngIf="loading">
+    Chargement des détails de la session...
+  </div>
+
+  <div class="session-content" *ngIf="!loading && session">
+    <div class="session-header">
+      <h1>{{ session.mentorshipRequest.topic }}</h1>
+      <div class="status-badge" [style.background-color]="getStatusColor(session.status)">
+        {{ getStatusText(session.status) }}
+      </div>
+    </div>
+
+    <div class="session-info">
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>Informations générales</h3>
+          <div class="info-content">
+            <p><strong>Date:</strong> {{ session.scheduledAt | date:'dd/MM/yyyy' }}</p>
+            <p><strong>Heure:</strong> {{ session.scheduledAt | date:'HH:mm' }}</p>
+            <p><strong>Durée:</strong> {{ session.durationMinutes }} minutes</p>
+            <p><strong>Lieu:</strong> {{ session.location }}</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <h3>Participants</h3>
+          <div class="participants">
+            <div class="participant">
+              <strong>Mentor:</strong> {{ session.mentorshipRequest.mentor.firstName }} {{ session.mentorshipRequest.mentor.lastName }}
+            </div>
+            <div class="participant">
+              <strong>Mentee:</strong> {{ session.mentorshipRequest.mentee.firstName }} {{ session.mentorshipRequest.mentee.lastName }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="agenda-section" *ngIf="session.agenda">
+      <h3>Ordre du jour</h3>
+      <div class="agenda-content">
+        {{ session.agenda }}
+      </div>
+    </div>
+
+    <div class="notes-section">
+      <div class="notes-grid">
+        <div class="notes-card" *ngIf="isMentor">
+          <h3>Notes du mentor</h3>
+          <textarea
+            [(ngModel)]="mentorNotes"
+            placeholder="Ajoutez vos notes sur la session..."
+            rows="6"
+            class="notes-textarea"
+          ></textarea>
+          <button class="btn btn-primary" (click)="saveMentorNotes()">
+            Enregistrer les notes
+          </button>
+        </div>
+
+        <div class="notes-card" *ngIf="!isMentor">
+          <h3>Notes du mentor</h3>
+          <div class="notes-display" *ngIf="session.mentorNotes; else noMentorNotes">
+            {{ session.mentorNotes }}
+          </div>
+          <ng-template #noMentorNotes>
+            <div class="no-notes">Aucune note du mentor pour le moment.</div>
+          </ng-template>
+        </div>
+
+        <div class="notes-card" *ngIf="!isMentor">
+          <h3>Vos notes</h3>
+          <textarea
+            [(ngModel)]="menteeNotes"
+            placeholder="Ajoutez vos notes sur la session..."
+            rows="6"
+            class="notes-textarea"
+          ></textarea>
+          <button class="btn btn-primary" (click)="saveMenteeNotes()">
+            Enregistrer les notes
+          </button>
+        </div>
+
+        <div class="notes-card" *ngIf="isMentor">
+          <h3>Notes du mentee</h3>
+          <div class="notes-display" *ngIf="session.menteeNotes; else noMenteeNotes">
+            {{ session.menteeNotes }}
+          </div>
+          <ng-template #noMenteeNotes>
+            <div class="no-notes">Aucune note du mentee pour le moment.</div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="session-actions" *ngIf="canComplete()">
+      <button class="btn btn-success" (click)="completeSession()">
+        Marquer la session comme terminée
+      </button>
+    </div>
+
+    <div class="session-actions" *ngIf="session.status === 'COMPLETED'">
+      <button class="btn btn-primary" routerLink="/mentorship/reviews/new/{{ session.id }}">
+        Laisser un avis
+      </button>
+    </div>
+  </div>
+
+  <div class="error" *ngIf="!loading && !session">
+    Impossible de charger les détails de la session.
+  </div>
+
+  <div class="back-action">
+    <button class="btn btn-secondary" routerLink="/mentorship/sessions">
+      Retour à la liste
+    </button>
+  </div>
+</div>

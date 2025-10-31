@@ -1,0 +1,182 @@
+<app-navbar></app-navbar>
+
+<div class="badge-detail-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="breadcrumb">
+      <a routerLink="/badges" class="breadcrumb-link">
+        <i class="fas fa-arrow-left"></i>
+        Badges
+      </a>
+      <span class="breadcrumb-link">/</span>
+      <span class="breadcrumb-link">{{ badge?.nom }}</span>
+    </div>
+
+    <div class="header-content">
+      <h1>{{ badge?.nom }}</h1>
+      <div class="badge-status status-active">
+        Actif
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-outline" (click)="editBadge()">
+        <i class="fas fa-edit"></i>
+        Modifier
+      </button>
+      <button class="btn btn-danger" (click)="deleteBadge()">
+        <i class="fas fa-trash"></i>
+        Supprimer
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Chargement du badge...</p>
+  </div>
+
+  <!-- Badge Hero -->
+  <div *ngIf="!loading && badge" class="badge-hero">
+    <div class="badge-icon">
+      <i [class]="getBadgeIcon()"></i>
+    </div>
+    <div class="badge-title">{{ badge.nom }}</div>
+    <div class="badge-category">{{ getBadgeCategory() }}</div>
+
+    <div class="badge-stats">
+      <div class="stat-item">
+        <div class="stat-value">{{ getTotalEarners() }}</div>
+        <div class="stat-label">Total Gagnants</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ getEarnedThisMonth() }}</div>
+        <div class="stat-label">Ce Mois</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ getBadgeRarity() }}%</div>
+        <div class="stat-label">Rareté</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div *ngIf="!loading && badge" class="content-grid">
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Badge Description -->
+      <div class="content-section">
+        <h2>Description</h2>
+        <div class="badge-description">
+          {{ badge.description }}
+        </div>
+      </div>
+
+      <!-- Badge Details -->
+      <div class="content-section">
+        <h2>Détails du Badge</h2>
+        <div class="badge-details">
+          <div class="detail-item">
+            <label>Nom</label>
+            <span>{{ badge.nom }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Catégorie</label>
+            <span>{{ getBadgeCategory() }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Créé le</label>
+            <span>{{ badge.createdAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Dernière mise à jour</label>
+            <span>{{ badge.updatedAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Requirements -->
+      <div class="content-section">
+        <h2>Exigences</h2>
+        <div class="requirements-section">
+          <div class="requirements-list">
+            <div *ngFor="let requirement of getRequirements()" class="requirement-item">
+              <i class="fas fa-check-circle"></i>
+              <span>{{ requirement }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How to Earn -->
+      <div class="content-section">
+        <h2>Comment gagner ce badge</h2>
+        <div class="how-to-earn">
+          <h3>Étapes à suivre</h3>
+          <div class="steps-list">
+            <div *ngFor="let step of getHowToEarnSteps(); let i = index" class="step-item">
+              <div class="step-number">{{ i + 1 }}</div>
+              <div class="step-content">
+                <h4>{{ step.title }}</h4>
+                <p>{{ step.description }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Recent Earners -->
+      <div class="sidebar-section">
+        <h3>Derniers Gagnants</h3>
+        <div class="recent-earners">
+          <div *ngFor="let earner of recentEarners; trackBy: trackByEarnerId" class="earner-item">
+            <div class="earner-avatar">
+              {{ earner.avatar }}
+            </div>
+            <div class="earner-info">
+              <div class="earner-name">{{ earner.name }}</div>
+              <div class="earned-date">{{ earner.earnedAt | date:'dd/MM/yyyy' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badge Actions -->
+      <div class="sidebar-section">
+        <h3>Actions</h3>
+        <div class="badge-actions">
+          <button class="btn btn-primary" (click)="shareBadge('facebook')">
+            <i class="fab fa-facebook-f"></i>
+            Partager
+          </button>
+          <button class="btn btn-outline" (click)="viewBadgeDetails()">
+            <i class="fas fa-info-circle"></i>
+            Plus d'infos
+          </button>
+        </div>
+      </div>
+
+      <!-- Social Share -->
+      <div class="sidebar-section">
+        <h3>Partager ce badge</h3>
+        <div class="badge-share">
+          <div class="share-buttons">
+            <button class="share-btn facebook" (click)="shareBadge('facebook')" title="Partager sur Facebook">
+              <i class="fab fa-facebook-f"></i>
+            </button>
+            <button class="share-btn twitter" (click)="shareBadge('twitter')" title="Partager sur Twitter">
+              <i class="fab fa-twitter"></i>
+            </button>
+            <button class="share-btn linkedin" (click)="shareBadge('linkedin')" title="Partager sur LinkedIn">
+              <i class="fab fa-linkedin-in"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

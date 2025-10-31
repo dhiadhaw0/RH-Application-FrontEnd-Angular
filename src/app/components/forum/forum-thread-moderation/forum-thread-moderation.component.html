@@ -1,0 +1,208 @@
+<!-- Forum Thread Moderation Component -->
+<div class="thread-moderation-container">
+  <div class="moderation-header">
+    <h2 class="moderation-title">
+      <i class="fas fa-gavel"></i>
+      Modération de discussion
+    </h2>
+    <p class="moderation-subtitle">Gérer et modérer cette discussion selon les règles de la communauté</p>
+    <button class="btn btn-outline" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Retour au tableau de bord
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement de la discussion...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h4>Erreur de chargement</h4>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadThread()">
+        <i class="fas fa-redo"></i>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Thread Details -->
+  <div *ngIf="!loading && !error && thread" class="thread-content">
+    <!-- Thread Information -->
+    <div class="thread-info-card">
+      <div class="card-header">
+        <h3>Informations de la discussion</h3>
+        <span class="thread-id">ID: {{ thread.id }}</span>
+      </div>
+
+      <div class="thread-details">
+        <div class="detail-row">
+          <span class="label">Titre:</span>
+          <span class="value">{{ thread.title }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Auteur:</span>
+          <span class="value">{{ thread.author.firstName }} {{ thread.author.lastName }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Catégorie:</span>
+          <span class="value">{{ thread.category.name }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Créée le:</span>
+          <span class="value">{{ formatDate(thread.createdAt) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Statut:</span>
+          <div class="status-badges">
+            <span class="badge" [class]="'badge-' + (thread.isPinned ? 'warning' : 'secondary')">
+              <i class="fas fa-thumbtack"></i>
+              {{ thread.isPinned ? 'Épinglée' : 'Non épinglée' }}
+            </span>
+            <span class="badge" [class]="'badge-' + (thread.isClosed ? 'danger' : 'success')">
+              <i class="fas" [class]="thread.isClosed ? 'fa-lock' : 'fa-unlock'"></i>
+              {{ thread.isClosed ? 'Fermée' : 'Ouverte' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="thread-content-preview">
+        <h4>Contenu de la discussion</h4>
+        <div class="content-text">
+          {{ thread.content }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Moderation Actions -->
+    <div class="moderation-card">
+      <div class="card-header">
+        <h3>Actions de modération</h3>
+      </div>
+
+      <form [formGroup]="moderationForm" (ngSubmit)="onSubmit()" class="moderation-form">
+        <!-- Action Selection -->
+        <div class="form-section">
+          <label for="action" class="form-label">
+            <i class="fas fa-tasks"></i>
+            Action à effectuer *
+          </label>
+          <div class="action-grid">
+            <div
+              *ngFor="let action of moderationActions"
+              class="action-card"
+              [class.selected]="moderationForm.get('action')?.value === action.value"
+              (click)="moderationForm.get('action')?.setValue(action.value); onActionChange()"
+            >
+              <div class="action-icon" [class]="'icon-' + action.color">
+                <i [class]="action.icon"></i>
+              </div>
+              <div class="action-content">
+                <h5>{{ action.label }}</h5>
+              </div>
+              <div class="action-radio">
+                <input
+                  type="radio"
+                  [value]="action.value"
+                  formControlName="action"
+                  (change)="onActionChange()"
+                >
+              </div>
+            </div>
+          </div>
+          <div *ngIf="isFieldInvalid('action')" class="error-text">
+            {{ getFieldError('action') }}
+          </div>
+        </div>
+
+        <!-- Category Selection (for move action) -->
+        <div class="form-section" *ngIf="moderationForm.get('action')?.value === 'move'">
+          <label for="moveToCategory" class="form-label">
+            <i class="fas fa-folder"></i>
+            Nouvelle catégorie *
+          </label>
+          <select
+            id="moveToCategory"
+            formControlName="moveToCategory"
+            class="form-select"
+            [class.error]="isFieldInvalid('moveToCategory')"
+          >
+            <option value="">Sélectionner une catégorie</option>
+            <option value="general">Général</option>
+            <option value="tech">Technologie</option>
+            <option value="help">Aide</option>
+            <option value="announcements">Annonces</option>
+          </select>
+          <div *ngIf="isFieldInvalid('moveToCategory')" class="error-text">
+            {{ getFieldError('moveToCategory') }}
+          </div>
+        </div>
+
+        <!-- Reason Field -->
+        <div class="form-section">
+          <label for="reason" class="form-label">
+            <i class="fas fa-comment"></i>
+            Raison de la modération *
+          </label>
+          <textarea
+            id="reason"
+            formControlName="reason"
+            class="form-textarea"
+            placeholder="Expliquez la raison de cette action de modération..."
+            rows="4"
+            [class.error]="isFieldInvalid('reason')"
+          ></textarea>
+          <div *ngIf="isFieldInvalid('reason')" class="error-text">
+            {{ getFieldError('reason') }}
+          </div>
+        </div>
+
+        <!-- Notification Option -->
+        <div class="form-section">
+          <div class="option-item">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                formControlName="notifyAuthor"
+                class="checkbox-input"
+              >
+              <span class="checkbox-mark"></span>
+              <span class="checkbox-text">
+                <i class="fas fa-bell"></i>
+                Notifier l'auteur de la discussion
+              </span>
+            </label>
+            <div class="option-info">
+              L'auteur recevra une notification expliquant l'action prise
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="goBack()">
+            <i class="fas fa-times"></i>
+            Annuler
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="submitting || moderationForm.invalid"
+          >
+            <i class="fas fa-gavel" *ngIf="!submitting"></i>
+            <div class="spinner small" *ngIf="submitting"></div>
+            {{ submitting ? 'Application en cours...' : 'Appliquer la modération' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,485 @@
+// Forum Report Form Component Styles
+.report-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 80vh;
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 3rem;
+
+  .form-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+
+    i {
+      color: #f39c12;
+      font-size: 2rem;
+    }
+  }
+
+  .form-subtitle {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    margin: 0;
+  }
+}
+
+// Error State
+.error-container {
+  margin-bottom: 2rem;
+
+  .error-message {
+    padding: 1rem;
+    background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+    border-radius: 8px;
+    border: 1px solid #fdcb6e;
+    text-align: center;
+
+    i {
+      font-size: 2rem;
+      color: #e17055;
+      margin-bottom: 0.5rem;
+    }
+
+    h4 {
+      color: #2d3436;
+      margin-bottom: 0.25rem;
+    }
+
+    p {
+      color: #636e72;
+      margin: 0;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Report Form
+.report-form {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid #ecf0f1;
+
+  .form-section {
+    margin-bottom: 2rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      i {
+        color: #3498db;
+      }
+    }
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      color: #3498db;
+      font-size: 1rem;
+    }
+  }
+
+  .form-textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #2c3e50;
+    background: white;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.5;
+
+    &:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    &.error {
+      border-color: #e74c3c;
+      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    }
+
+    &::placeholder {
+      color: #bdc3c7;
+    }
+  }
+
+  .input-info {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+
+    .char-count {
+      font-size: 0.8rem;
+      color: #7f8c8d;
+    }
+  }
+
+  .error-text {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    &:before {
+      content: '⚠️';
+    }
+  }
+}
+
+// Reason Grid
+.reason-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.reason-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #ecf0f1;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #3498db;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1);
+  }
+
+  &.selected {
+    border-color: #3498db;
+    background: linear-gradient(135deg, #ecf9ff 0%, #dbeafe 100%);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+  }
+
+  .reason-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .reason-content {
+    flex: 1;
+
+    h5 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+  }
+
+  .reason-radio {
+    input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #3498db;
+    }
+  }
+}
+
+// Options Grid
+.options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.option-item {
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+
+    .checkbox-input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .checkbox-mark {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #bdc3c7;
+      border-radius: 4px;
+      background: white;
+      position: relative;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.3s ease;
+
+      &:after {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: 1px;
+        width: 5px;
+        height: 9px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg) scale(0);
+        transition: all 0.3s ease;
+      }
+    }
+
+    .checkbox-text {
+      color: #2c3e50;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+
+      i {
+        color: #a29bfe;
+        font-size: 1rem;
+      }
+    }
+
+    .option-info {
+      color: #7f8c8d;
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+      margin-left: 26px;
+    }
+
+    &:hover .checkbox-mark {
+      border-color: #3498db;
+    }
+
+    input:checked ~ .checkbox-mark {
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      border-color: #3498db;
+
+      &:after {
+        transform: rotate(45deg) scale(1);
+      }
+    }
+  }
+}
+
+// Information Notice
+.info-notice {
+  margin: 2rem 0;
+
+  .notice-content {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #e8f4f8 0%, #d1ecf1 100%);
+    border-radius: 10px;
+    border: 1px solid #bee5eb;
+
+    i {
+      color: #17a2b8;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      margin-top: 0.25rem;
+    }
+
+    .notice-text {
+      flex: 1;
+
+      h5 {
+        margin: 0 0 0.75rem 0;
+        color: #0c5460;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 1.5rem;
+
+        li {
+          color: #0c5460;
+          margin-bottom: 0.5rem;
+          font-size: 0.9rem;
+          line-height: 1.4;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Form Actions
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 2rem;
+  border-top: 1px solid #ecf0f1;
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    border: none;
+
+    &.btn-outline {
+      background: transparent;
+      border: 2px solid #bdc3c7;
+      color: #7f8c8d;
+
+      &:hover {
+        background: #f8f9fa;
+        border-color: #95a5a6;
+        color: #2c3e50;
+      }
+    }
+
+    &.btn-primary {
+      background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+      color: white;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(243, 156, 18, 0.3);
+      }
+
+      &:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    .spinner.small {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .report-form-container {
+    padding: 1rem;
+  }
+
+  .form-header {
+    .form-title {
+      font-size: 2rem;
+
+      i {
+        font-size: 1.5rem;
+      }
+    }
+
+    .form-subtitle {
+      font-size: 1rem;
+    }
+  }
+
+  .reason-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .reason-card {
+    padding: 0.75rem;
+
+    .reason-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+    }
+
+    .reason-content h5 {
+      font-size: 0.9rem;
+    }
+  }
+
+  .report-form {
+    padding: 1.5rem;
+  }
+
+  .info-notice .notice-content {
+    flex-direction: column;
+    text-align: center;
+
+    i {
+      align-self: center;
+    }
+  }
+
+  .form-actions {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

@@ -1,0 +1,50 @@
+<div class="mentor-list-container">
+  <h2>Mentors Disponibles</h2>
+
+  <div class="loading" *ngIf="loading">
+    Chargement des mentors...
+  </div>
+
+  <div class="no-mentors" *ngIf="!loading && mentors.length === 0">
+    Aucun mentor disponible pour le moment.
+  </div>
+
+  <div class="mentors-grid" *ngIf="!loading && mentors.length > 0">
+    <div class="mentor-card" *ngFor="let mentor of mentors">
+      <div class="card-header">
+        <div class="avatar">
+          <span>{{ mentor.firstName.charAt(0) }}{{ mentor.lastName.charAt(0) }}</span>
+        </div>
+        <div class="mentor-info">
+          <h3>{{ mentor.firstName }} {{ mentor.lastName }}</h3>
+          <p class="expertise" *ngIf="mentor.mentorExpertise">{{ mentor.mentorExpertise }}</p>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <p class="bio" *ngIf="mentor.mentorBio">{{ mentor.mentorBio }}</p>
+
+        <div class="details">
+          <div class="detail-item" *ngIf="mentor.languages">
+            <strong>Langues:</strong> {{ mentor.languages }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn btn-outline" (click)="viewProfile(mentor)">
+          Voir le profil
+        </button>
+        <button class="btn btn-primary" (click)="contactMentor(mentor)">
+          Contacter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-secondary" routerLink="/mentorship/search">
+      Rechercher un mentor
+    </button>
+  </div>
+</div>

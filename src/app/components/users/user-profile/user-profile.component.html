@@ -1,0 +1,93 @@
+<app-navbar></app-navbar>
+
+<div class="user-profile" *ngIf="user">
+  <div class="profile-header">
+    <button class="back-btn" (click)="goBack()">
+      ← Retour
+    </button>
+    <div class="profile-summary">
+      <div class="profile-avatar">
+        <img [src]="user.profilePictureUrl || 'https://via.placeholder.com/120'" [alt]="user.firstName" />
+      </div>
+      <div class="profile-info">
+        <h1 class="user-name">{{ user.firstName }} {{ user.lastName }}</h1>
+        <p class="user-role">{{ getRoleLabel(user.role) }}</p>
+        <div class="user-status" [class]="user.banned ? 'banned' : 'active'">
+          {{ user.banned ? '🚫 Compte suspendu' : '✅ Compte actif' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-content">
+    <div class="info-section">
+      <h2 class="section-title">Informations Personnelles</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>📧 Contact</h3>
+          <p><strong>Email:</strong> {{ user.email }}</p>
+          <p *ngIf="user.phoneNumber"><strong>Téléphone:</strong> {{ user.phoneNumber }}</p>
+        </div>
+
+        <div class="info-card">
+          <h3>📅 Profil</h3>
+          <p><strong>Âge:</strong> {{ getAge() }} ans</p>
+          <p><strong>Membre depuis:</strong> {{ user.createdAt | date:'dd/MM/yyyy' }}</p>
+          <p *ngIf="user.lastLogin"><strong>Dernière connexion:</strong> {{ user.lastLogin | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+
+        <div class="info-card" *ngIf="user.isMentor">
+          <h3>👨‍🏫 Mentor</h3>
+          <p><strong>Expertise:</strong> {{ user.mentorExpertise }}</p>
+          <p><strong>Depuis:</strong> {{ user.mentorSince | date:'MM/yyyy' }}</p>
+          <p><strong>Disponibilité:</strong> {{ user.availability }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="details-section" *ngIf="user.mentorBio || user.expertise || user.languages || user.linkedinUrl">
+      <h2 class="section-title">Détails Supplémentaires</h2>
+      <div class="details-content">
+        <div class="detail-item" *ngIf="user.mentorBio">
+          <h4>Biographie Mentor</h4>
+          <p>{{ user.mentorBio }}</p>
+        </div>
+
+        <div class="detail-item" *ngIf="user.expertise">
+          <h4>Expertise</h4>
+          <p>{{ user.expertise }}</p>
+        </div>
+
+        <div class="detail-item" *ngIf="user.languages">
+          <h4>Langues</h4>
+          <p>{{ user.languages }}</p>
+        </div>
+
+        <div class="detail-item" *ngIf="user.linkedinUrl">
+          <h4>LinkedIn</h4>
+          <a [href]="user.linkedinUrl" target="_blank" class="linkedin-link">
+            🔗 Voir le profil LinkedIn
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="badges-section" *ngIf="badges.length > 0">
+      <h2 class="section-title">🏆 Badges et Récompenses</h2>
+      <div class="badges-grid">
+        <div class="badge-card" *ngFor="let badge of badges">
+          <div class="badge-icon">{{ badge.imageUrl || '🏆' }}</div>
+          <div class="badge-info">
+            <h4 class="badge-name">{{ badge.nom }}</h4>
+            <p class="badge-description">{{ badge.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Chargement du profil utilisateur...</p>
+  </div>
+</div>

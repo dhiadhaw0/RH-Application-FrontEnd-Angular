@@ -1,0 +1,79 @@
+<!-- Forum Post Create Component -->
+<div class="forum-post-create-container">
+  <div class="create-header">
+    <h3 class="create-title">
+      <i class="fas fa-reply"></i>
+      Répondre à cette discussion
+    </h3>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h4>Erreur</h4>
+      <p>{{ error }}</p>
+    </div>
+  </div>
+
+  <!-- Create Form -->
+  <form [formGroup]="postForm" (ngSubmit)="onSubmit()" class="create-form">
+    <!-- Content Textarea -->
+    <div class="form-group">
+      <label for="content" class="form-label">
+        <i class="fas fa-edit"></i>
+        Votre réponse *
+      </label>
+      <textarea
+        id="content"
+        formControlName="content"
+        class="form-textarea"
+        placeholder="Partagez votre réponse, votre expérience ou votre point de vue..."
+        rows="6"
+        [class.error]="isFieldInvalid('content')"
+      ></textarea>
+      <div class="input-info">
+        <span class="char-count">{{ postForm.get('content')?.value?.length || 0 }} caractères minimum</span>
+      </div>
+      <div *ngIf="isFieldInvalid('content')" class="error-text">
+        {{ getFieldError('content') }}
+      </div>
+    </div>
+
+    <!-- Anonymous Toggle -->
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          formControlName="anonymous"
+          class="checkbox-input"
+        >
+        <span class="checkbox-mark"></span>
+        <span class="checkbox-text">
+          <i class="fas fa-user-secret"></i>
+          Publier anonymement
+        </span>
+      </label>
+      <div class="checkbox-info">
+        Votre nom ne sera pas visible pour les autres utilisateurs
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline" (click)="cancel()">
+        <i class="fas fa-times"></i>
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="submitting || postForm.invalid"
+      >
+        <i class="fas fa-paper-plane" *ngIf="!submitting"></i>
+        <div class="spinner small" *ngIf="submitting"></div>
+        {{ submitting ? 'Publication...' : 'Publier la réponse' }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,82 @@
+<div class="session-list-container">
+  <h2>{{ isMentor ? 'Sessions de Mentorat' : 'Mes Sessions' }}</h2>
+
+  <div class="loading" *ngIf="loading">
+    Chargement des sessions...
+  </div>
+
+  <div class="no-sessions" *ngIf="!loading && sessions.length === 0">
+    Aucune session trouvée.
+  </div>
+
+  <div class="sessions-list" *ngIf="!loading && sessions.length > 0">
+    <div class="session-card" *ngFor="let session of sessions">
+      <div class="card-header">
+        <div class="session-info">
+          <h3>{{ session.mentorshipRequest.topic }}</h3>
+          <div class="meta-info">
+            <span class="date">{{ session.scheduledAt | date:'dd/MM/yyyy à HH:mm' }}</span>
+            <span class="duration">{{ session.durationMinutes }} min</span>
+            <span class="location">{{ session.location }}</span>
+          </div>
+        </div>
+        <div class="status-badge" [style.background-color]="getStatusColor(session.status)">
+          {{ getStatusText(session.status) }}
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="participants">
+          <div class="participant" *ngIf="!isMentor">
+            <strong>Mentor:</strong> {{ session.mentorshipRequest.mentor.firstName }} {{ session.mentorshipRequest.mentor.lastName }}
+          </div>
+          <div class="participant" *ngIf="isMentor">
+            <strong>Mentee:</strong> {{ session.mentorshipRequest.mentee.firstName }} {{ session.mentorshipRequest.mentee.lastName }}
+          </div>
+        </div>
+
+        <div class="agenda" *ngIf="session.agenda">
+          <strong>Ordre du jour:</strong>
+          <p>{{ session.agenda }}</p>
+        </div>
+
+        <div class="notes" *ngIf="session.mentorNotes || session.menteeNotes">
+          <div class="mentor-notes" *ngIf="session.mentorNotes">
+            <strong>Notes du mentor:</strong>
+            <p>{{ session.mentorNotes }}</p>
+          </div>
+          <div class="mentee-notes" *ngIf="session.menteeNotes">
+            <strong>Notes du mentee:</strong>
+            <p>{{ session.menteeNotes }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn btn-outline" routerLink="/mentorship/sessions/{{ session.id }}">
+          Voir détails
+        </button>
+        <button
+          class="btn btn-success"
+          (click)="completeSession(session)"
+          *ngIf="canComplete(session)"
+        >
+          Marquer terminée
+        </button>
+        <button
+          class="btn btn-primary"
+          routerLink="/mentorship/reviews/new/{{ session.id }}"
+          *ngIf="session.status === 'COMPLETED'"
+        >
+          Laisser un avis
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-secondary" routerLink="/mentorship/dashboard">
+      Tableau de bord
+    </button>
+  </div>
+</div>

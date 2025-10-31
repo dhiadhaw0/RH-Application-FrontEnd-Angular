@@ -1,0 +1,396 @@
+<div class="job-offers-container">
+  <!-- Hero Section with Animated Background -->
+  <div class="hero-section">
+    <div class="hero-background">
+      <div class="floating-elements">
+        <div class="floating-circle circle-1"></div>
+        <div class="floating-circle circle-2"></div>
+        <div class="floating-circle circle-3"></div>
+        <div class="floating-circle circle-4"></div>
+      </div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <i class="fas fa-briefcase"></i>
+          Découvrez les Meilleures
+          <span class="highlight">Offres d'Emploi</span>
+        </h1>
+        <p class="hero-subtitle">
+          Trouvez votre prochain poste dans notre sélection d'offres d'emploi de qualité,
+          adaptées à votre profil et à vos ambitions professionnelles.
+        </p>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-number">{{offers.length}}</div>
+          <div class="stat-label">Offres Disponibles</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{getActiveOffersCount()}}</div>
+          <div class="stat-label">Offres Actives</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{getRemoteOffersCount()}}</div>
+          <div class="stat-label">Télétravail</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-large" routerLink="/job-offers/create">
+          <i class="fas fa-plus-circle"></i>
+          Publier une Offre
+        </button>
+        <button class="btn btn-outline btn-large" routerLink="/job-offers/search">
+          <i class="fas fa-search"></i>
+          Recherche Avancée
+        </button>
+        <button class="btn btn-secondary btn-large" routerLink="/my-job-offers">
+          <i class="fas fa-user"></i>
+          Mes Candidatures
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced Search & Filters Section -->
+  <div class="search-filters-section">
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Rechercher par titre, entreprise, compétences..."
+          [(ngModel)]="searchTerm"
+          (input)="filterOffers()">
+        <button class="search-clear" *ngIf="searchTerm" (click)="clearSearch()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="filters-container">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-filter"></i>
+          Filtrer par statut
+        </label>
+        <div class="filter-buttons">
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'all'"
+            (click)="setFilter('all')">
+            <i class="fas fa-th-large"></i>
+            Toutes
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'active'"
+            (click)="setFilter('active')">
+            <i class="fas fa-check-circle"></i>
+            Actives
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'remote'"
+            (click)="setFilter('remote')">
+            <i class="fas fa-home"></i>
+            Télétravail
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'urgent'"
+            (click)="setFilter('urgent')">
+            <i class="fas fa-exclamation-triangle"></i>
+            Urgent
+          </button>
+        </div>
+      </div>
+
+      <div class="sort-group">
+        <label class="filter-label">
+          <i class="fas fa-sort"></i>
+          Trier par
+        </label>
+        <select class="sort-select" [(ngModel)]="sortBy" (change)="sortOffers()">
+          <option value="newest">Plus récent</option>
+          <option value="oldest">Plus ancien</option>
+          <option value="salary-high">Salaire décroissant</option>
+          <option value="salary-low">Salaire croissant</option>
+          <option value="title">Titre A-Z</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Job Offers Grid -->
+  <div class="job-offers-section">
+    <div class="job-offers-grid" *ngIf="!loading; else loadingTemplate">
+        <div class="job-offer-card" *ngFor="let offer of filteredOffers; trackBy: trackByOfferId">
+          <!-- Card Ribbon for Featured/Urgent Offers -->
+          <div class="card-ribbon" *ngIf="isUrgent(offer)">
+            <i class="fas fa-exclamation-triangle"></i>
+            Urgent
+          </div>
+  
+          <!-- Enhanced Card Header -->
+          <div class="card-header">
+            <div class="offer-info">
+              <div class="offer-badges">
+                <span class="badge status-badge" [class]="'status-' + offer.status.toLowerCase()">
+                  <i class="fas fa-circle" *ngIf="offer.status === 'PUBLIQUE'"></i>
+                  <i class="fas fa-clock" *ngIf="offer.status === 'EN_VALIDATION'"></i>
+                  <i class="fas fa-check" *ngIf="offer.status === 'VALIDEE'"></i>
+                  {{offer.status}}
+                </span>
+                <span class="badge remote-badge" *ngIf="offer.remote">
+                  <i class="fas fa-home"></i>
+                  Télétravail
+                </span>
+              </div>
+  
+              <h3 class="offer-title">{{offer.title}}</h3>
+  
+              <div class="offer-meta">
+                <div class="meta-item">
+                  <i class="fas fa-building"></i>
+                  <span>Entreprise {{offer.user}}</span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-calendar"></i>
+                  <span>Publié {{offer.publishedAt | date:'dd/MM/yyyy'}}</span>
+                </div>
+                <div class="meta-item" *ngIf="offer.expiresAt">
+                  <i class="fas fa-clock"></i>
+                  <span>Expire {{offer.expiresAt | date:'dd/MM/yyyy'}}</span>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Enhanced Actions -->
+            <div class="offer-actions">
+              <button class="btn btn-outline btn-sm" routerLink="/job-offers/{{offer.idJobOffer}}">
+                <i class="fas fa-eye"></i>
+                <span>Détails</span>
+              </button>
+              <button
+                class="btn btn-primary btn-sm"
+                (click)="applyToOffer(offer)"
+                *ngIf="canApply(offer)">
+                <i class="fas fa-paper-plane"></i>
+                <span>Postuler</span>
+              </button>
+              <button class="btn btn-outline btn-sm" (click)="toggleFavorite(offer)">
+                <i class="fas fa-heart" [class.filled]="isFavorite(offer)"></i>
+              </button>
+            </div>
+          </div>
+
+        <!-- Enhanced Card Content -->
+        <div class="card-content">
+          <p class="offer-description">
+            {{offer.description | slice:0:180}}
+            <span *ngIf="offer.description && offer.description.length > 180">...</span>
+          </p>
+
+          <!-- Salary Section -->
+          <div class="salary-section" *ngIf="offer.salaryMin || offer.salaryMax">
+            <div class="salary-display">
+              <i class="fas fa-euro-sign"></i>
+              <span class="salary-range">
+                {{offer.salaryMin ? (offer.salaryMin | currency:'EUR':'symbol':'1.0-0') : 'N/A'}} -
+                {{offer.salaryMax ? (offer.salaryMax | currency:'EUR':'symbol':'1.0-0') : 'N/A'}}
+              </span>
+              <span class="salary-period">/an</span>
+            </div>
+          </div>
+
+          <!-- Enhanced Skills Section -->
+          <div class="skills-section" *ngIf="offer.requirementsHardSkills?.length || offer.requirementsSoftSkills?.length">
+            <div class="skills-group" *ngIf="offer.requirementsHardSkills?.length">
+              <div class="skills-header">
+                <i class="fas fa-code"></i>
+                <span>Compétences Techniques</span>
+              </div>
+              <div class="skills-list">
+                <span class="skill-tag hard-skill" *ngFor="let skill of offer.requirementsHardSkills.slice(0, 4)">
+                  {{skill}}
+                </span>
+                <span class="skill-more" *ngIf="offer.requirementsHardSkills.length > 4">
+                  +{{offer.requirementsHardSkills.length - 4}} autres
+                </span>
+              </div>
+            </div>
+
+            <div class="skills-group" *ngIf="offer.requirementsSoftSkills?.length">
+              <div class="skills-header">
+                <i class="fas fa-users"></i>
+                <span>Compétences Comportementales</span>
+              </div>
+              <div class="skills-list">
+                <span class="skill-tag soft-skill" *ngFor="let skill of offer.requirementsSoftSkills.slice(0, 3)">
+                  {{skill}}
+                </span>
+                <span class="skill-more" *ngIf="offer.requirementsSoftSkills.length > 3">
+                  +{{offer.requirementsSoftSkills.length - 3}} autres
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enhanced Card Footer -->
+        <div class="card-footer">
+          <div class="footer-info">
+            <div class="offer-stats">
+              <span class="stat-item">
+                <i class="fas fa-eye"></i>
+                {{getRandomViews()}} vues
+              </span>
+              <span class="stat-item">
+                <i class="fas fa-user-friends"></i>
+                {{getRandomApplications()}} candidats
+              </span>
+            </div>
+
+            <div class="offer-timing">
+              <span class="posted-date">
+                <i class="fas fa-calendar"></i>
+                {{offer.publishedAt | date:'dd/MM/yyyy'}}
+              </span>
+              <span class="expiry-info" *ngIf="offer.expiresAt && isExpiringSoon(offer)">
+                <i class="fas fa-exclamation-triangle"></i>
+                Expire bientôt
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hover Overlay -->
+        <div class="card-hover-overlay">
+          <div class="overlay-actions">
+            <button class="overlay-btn primary" routerLink="/job-offers/{{offer.idJobOffer}}">
+              <i class="fas fa-eye"></i>
+              <span>Voir les détails</span>
+            </button>
+            <button
+              class="overlay-btn secondary"
+              (click)="applyToOffer(offer)"
+              *ngIf="canApply(offer)">
+              <i class="fas fa-paper-plane"></i>
+              <span>Postuler maintenant</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <!-- Enhanced Empty State -->
+      <div class="empty-state" *ngIf="filteredOffers.length === 0">
+        <div class="empty-icon">
+          <i class="fas fa-search"></i>
+        </div>
+        <h3 class="empty-title">Aucune offre trouvée</h3>
+        <p class="empty-description">
+          Essayez de modifier vos critères de recherche ou explorez toutes nos offres d'emploi.
+        </p>
+        <button class="btn btn-primary" (click)="resetFilters()">
+          <i class="fas fa-refresh"></i>
+          Réinitialiser les filtres
+        </button>
+      </div>
+  </div>
+
+    <!-- Enhanced Loading State -->
+    <ng-template #loadingTemplate>
+      <div class="loading-state">
+        <div class="loading-spinner">
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+        </div>
+        <h3>Chargement des offres d'emploi...</h3>
+        <p>Découvrez bientôt les meilleures opportunités</p>
+      </div>
+    </ng-template>
+
+  <!-- Application Modal -->
+  <div class="modal-overlay" *ngIf="showApplicationModal" (click)="closeApplicationModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Postuler à l'offre</h2>
+        <button class="close-btn" (click)="closeApplicationModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedOffer">
+        <div class="offer-summary">
+          <h3>{{selectedOffer.title}}</h3>
+          <p class="offer-description">{{selectedOffer.description}}</p>
+        </div>
+
+        <form class="application-form">
+          <div class="form-group">
+            <label for="motivationLetter">Lettre de motivation *</label>
+            <textarea
+              id="motivationLetter"
+              [(ngModel)]="applicationForm.motivationLetter"
+              name="motivationLetter"
+              placeholder="Expliquez pourquoi vous êtes intéressé par cette offre et pourquoi vous êtes le candidat idéal..."
+              rows="6"
+              required>
+            </textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="coverLetter">CV / Lettre de présentation</label>
+            <textarea
+              id="coverLetter"
+              [(ngModel)]="applicationForm.coverLetter"
+              name="coverLetter"
+              placeholder="Informations supplémentaires sur votre parcours, expériences, compétences..."
+              rows="4">
+            </textarea>
+          </div>
+
+          <!-- User Information Section -->
+          <div class="user-info-section">
+            <h4>Informations du candidat</h4>
+            <div class="user-info-grid">
+              <div class="info-item">
+                <label>Nom complet:</label>
+                <span>{{currentUser?.firstName || 'Non spécifié'}} {{currentUser?.lastName || ''}}</span>
+              </div>
+              <div class="info-item">
+                <label>Email:</label>
+                <span>{{currentUser?.email || 'Non spécifié'}}</span>
+              </div>
+              <div class="info-item">
+                <label>Téléphone:</label>
+                <span>{{currentUser?.phoneNumber || 'Non spécifié'}}</span>
+              </div>
+              <div class="info-item">
+                <label>Adresse:</label>
+                <span>123 Rue de la Paix, Paris</span>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeApplicationModal()">
+          Annuler
+        </button>
+        <button class="btn btn-primary" (click)="submitApplication()" [disabled]="!applicationForm?.motivationLetter?.trim()">
+          <i class="fas fa-paper-plane"></i> Envoyer ma candidature
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

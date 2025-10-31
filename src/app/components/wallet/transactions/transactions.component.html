@@ -1,0 +1,292 @@
+<div class="transactions-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1><i class="fas fa-history"></i> Transaction History</h1>
+      <p>View and manage all your financial transactions</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline-primary" (click)="exportTransactions()">
+        <i class="fas fa-download"></i> Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="filters-card">
+      <div class="search-group">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search transactions..." [(ngModel)]="searchTerm"
+               (input)="applyFilters()" class="search-input">
+      </div>
+
+      <div class="filter-group">
+        <select [(ngModel)]="selectedType" (change)="applyFilters()" class="filter-select">
+          <option value="">All Types</option>
+          <option value="PAYMENT">Payments</option>
+          <option value="REFUND">Refunds</option>
+          <option value="SUBSCRIPTION">Subscriptions</option>
+          <option value="TRANSFER">Transfers</option>
+        </select>
+
+        <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="filter-select">
+          <option value="">All Statuses</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="PENDING">Pending</option>
+          <option value="FAILED">Failed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+
+        <input type="date" [(ngModel)]="startDate" (change)="applyFilters()" class="filter-date">
+        <input type="date" [(ngModel)]="endDate" (change)="applyFilters()" class="filter-date">
+
+        <button class="btn btn-secondary" (click)="clearFilters()">
+          <i class="fas fa-times"></i> Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-section">
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Total Transactions</h3>
+          <p class="summary-value">{{ filteredTransactions.length }}</p>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-arrow-up"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Total Income</h3>
+          <p class="summary-value">{{ formatCurrency(totalIncome) }}</p>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-arrow-down"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Total Expenses</h3>
+          <p class="summary-value">{{ formatCurrency(totalExpenses) }}</p>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-balance-scale"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Net Balance</h3>
+          <p class="summary-value" [class]="netBalance >= 0 ? 'positive' : 'negative'">
+            {{ formatCurrency(netBalance) }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transactions List -->
+  <div class="transactions-section">
+    <div class="transactions-table-container">
+      <table class="transactions-table" *ngIf="filteredTransactions.length > 0">
+        <thead>
+          <tr>
+            <th (click)="sortBy('date')" class="sortable">
+              Date <i class="fas" [class]="getSortIcon('date')"></i>
+            </th>
+            <th (click)="sortBy('description')" class="sortable">
+              Description <i class="fas" [class]="getSortIcon('description')"></i>
+            </th>
+            <th (click)="sortBy('type')" class="sortable">
+              Type <i class="fas" [class]="getSortIcon('type')"></i>
+            </th>
+            <th (click)="sortBy('amount')" class="sortable">
+              Amount <i class="fas" [class]="getSortIcon('amount')"></i>
+            </th>
+            <th (click)="sortBy('status')" class="sortable">
+              Status <i class="fas" [class]="getSortIcon('status')"></i>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let transaction of paginatedTransactions" class="transaction-row">
+            <td class="transaction-date">
+              <div class="date-display">{{ formatDate(transaction.date) }}</div>
+              <div class="time-display">{{ formatTime(transaction.date) }}</div>
+            </td>
+            <td class="transaction-description">
+              <div class="description-main">{{ transaction.description }}</div>
+              <div class="description-secondary" *ngIf="transaction.reference">
+                Ref: {{ transaction.reference }}
+              </div>
+            </td>
+            <td class="transaction-type">
+              <span class="type-badge" [ngClass]="getTypeClass(transaction.type)">
+                {{ transaction.type.replace('_', ' ') }}
+              </span>
+            </td>
+            <td class="transaction-amount">
+              <span class="amount-value" [class]="transaction.amount >= 0 ? 'positive' : 'negative'">
+                {{ formatCurrency(Math.abs(transaction.amount)) }}
+              </span>
+              <div class="amount-direction">
+                <i class="fas" [class]="transaction.amount >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+                {{ transaction.amount >= 0 ? 'Credit' : 'Debit' }}
+              </div>
+            </td>
+            <td class="transaction-status">
+              <span class="status-badge" [ngClass]="getStatusClass(transaction.status)">
+                <i class="fas" [class]="getStatusIcon(transaction.status)"></i>
+                {{ transaction.status.replace('_', ' ') }}
+              </span>
+            </td>
+            <td class="transaction-actions">
+              <button class="btn-icon" (click)="viewTransactionDetails(transaction)" title="View Details">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="btn-icon" *ngIf="canRetry(transaction)" (click)="retryTransaction(transaction)" title="Retry">
+                <i class="fas fa-redo"></i>
+              </button>
+              <button class="btn-icon" *ngIf="canRefund(transaction)" (click)="refundTransaction(transaction)" title="Refund">
+                <i class="fas fa-undo"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredTransactions.length === 0 && !isLoading" class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-receipt"></i>
+        </div>
+        <h3>No Transactions Found</h3>
+        <p *ngIf="transactions.length === 0">You haven't made any transactions yet.</p>
+        <p *ngIf="transactions.length > 0 && filteredTransactions.length === 0">
+          No transactions match your current filters.
+        </p>
+        <button class="btn btn-primary" (click)="clearFilters()" *ngIf="transactions.length > 0">
+          Clear Filters
+        </button>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-section" *ngIf="totalPages > 1">
+      <div class="pagination-info">
+        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
+        {{ Math.min(currentPage * itemsPerPage, filteredTransactions.length) }}
+        of {{ filteredTransactions.length }} transactions
+      </div>
+
+      <div class="pagination-controls">
+        <button class="btn btn-outline-primary" (click)="goToPage(1)"
+                [disabled]="currentPage === 1">
+          <i class="fas fa-angle-double-left"></i>
+        </button>
+        <button class="btn btn-outline-primary" (click)="goToPage(currentPage - 1)"
+                [disabled]="currentPage === 1">
+          <i class="fas fa-angle-left"></i>
+        </button>
+
+        <span class="page-numbers">
+          <button *ngFor="let page of visiblePages" class="btn"
+                  [class.btn-primary]="page === currentPage"
+                  [class.btn-outline-primary]="page !== currentPage"
+                  (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        </span>
+
+        <button class="btn btn-outline-primary" (click)="goToPage(currentPage + 1)"
+                [disabled]="currentPage === totalPages">
+          <i class="fas fa-angle-right"></i>
+        </button>
+        <button class="btn btn-outline-primary" (click)="goToPage(totalPages)"
+                [disabled]="currentPage === totalPages">
+          <i class="fas fa-angle-double-right"></i>
+        </button>
+      </div>
+
+      <div class="items-per-page">
+        <label>Show:</label>
+        <select [(ngModel)]="itemsPerPage" (change)="changeItemsPerPage()">
+          <option [value]="10">10</option>
+          <option [value]="25">25</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transaction Details Modal -->
+  <div class="modal-overlay" *ngIf="selectedTransaction" (click)="closeTransactionDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Transaction Details</h3>
+        <button class="btn-close" (click)="closeTransactionDetails()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedTransaction">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <label>Transaction ID:</label>
+            <span>{{ selectedTransaction.id }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Date & Time:</label>
+            <span>{{ formatDateTime(selectedTransaction.date) }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Description:</label>
+            <span>{{ selectedTransaction.description }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Type:</label>
+            <span>{{ selectedTransaction.type.replace('_', ' ') }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Amount:</label>
+            <span class="amount-highlight" [class]="selectedTransaction.amount >= 0 ? 'positive' : 'negative'">
+              {{ formatCurrency(selectedTransaction.amount) }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Status:</label>
+            <span>{{ selectedTransaction.status.replace('_', ' ') }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedTransaction.reference">
+            <label>Reference:</label>
+            <span>{{ selectedTransaction.reference }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedTransaction.notes">
+            <label>Notes:</label>
+            <span>{{ selectedTransaction.notes }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p>Loading transactions...</p>
+  </div>
+</div>

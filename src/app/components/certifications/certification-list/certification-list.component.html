@@ -1,0 +1,51 @@
+<div class="certifications-container">
+  <div class="header-section">
+    <h1 class="main-title">🏆 Mes Certifications</h1>
+    <p class="subtitle">Découvrez toutes vos certifications obtenues</p>
+  </div>
+
+  <div class="certifications-grid" *ngIf="!loading">
+    <div class="certification-card" *ngFor="let cert of certifications; trackBy: trackByCertificationId">
+      <div class="card-header">
+        <div class="cert-icon">🎓</div>
+        <div class="status-badge" [ngClass]="getStatusClass(cert.status)">
+          {{ getStatusText(cert.status) }}
+        </div>
+      </div>
+
+      <div class="card-content">
+        <h3 class="formation-title">{{ cert.formation.title }}</h3>
+        <p class="provider">{{ cert.formation.provider }}</p>
+        <div class="formation-details">
+          <span class="domain">{{ cert.formation.domaine }}</span>
+          <span class="level">{{ cert.formation.niveau }}</span>
+        </div>
+        <div class="date-info">
+          <span class="date-label">Obtenu le:</span>
+          <span class="date-value">{{ cert.dateObtained | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="action-btn view-btn" (click)="viewCertification(cert)">
+          👁️ Voir
+        </button>
+        <button class="action-btn download-btn" (click)="downloadCertification(cert)">
+          📥 Télécharger
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && certifications.length === 0">
+    <div class="empty-icon">📜</div>
+    <h3>Aucune certification trouvée</h3>
+    <p>Vous n'avez pas encore obtenu de certifications.</p>
+    <p>Complétez des formations pour gagner vos premiers certificats !</p>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Chargement de vos certifications...</p>
+  </div>
+</div>

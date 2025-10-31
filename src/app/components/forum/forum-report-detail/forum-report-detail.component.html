@@ -1,0 +1,200 @@
+<!-- Forum Report Detail Component -->
+<div class="report-detail-container">
+  <div class="report-header">
+    <h2 class="report-title">
+      <i class="fas fa-flag"></i>
+      Détails du signalement
+    </h2>
+    <p class="report-subtitle">Examiner et traiter le signalement d'un contenu inapproprié</p>
+    <button class="btn btn-outline" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Retour au tableau de bord
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement du signalement...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h4>Erreur de chargement</h4>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadReport()">
+        <i class="fas fa-redo"></i>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Report Details -->
+  <div *ngIf="!loading && !error && report" class="report-content">
+    <!-- Report Information -->
+    <div class="report-info-card">
+      <div class="card-header">
+        <h3>Informations du signalement</h3>
+        <span class="report-id">ID: {{ report.id }}</span>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Signalé par:</span>
+          <span class="value">{{ report.reporter.firstName }} {{ report.reporter.lastName }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Date du signalement:</span>
+          <span class="value">{{ formatDate(report.createdAt) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Statut:</span>
+          <span class="status-badge" [class]="'status-' + getStatusColor(report.status)">
+            {{ getStatusLabel(report.status) }}
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="label">Action prise:</span>
+          <span class="action-badge" [class]="'action-' + getActionColor(report.actionTaken)">
+            {{ getActionLabel(report.actionTaken) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="reason-section">
+        <h4>Raison du signalement</h4>
+        <div class="reason-content">
+          {{ report.reason }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Reported Content -->
+    <div class="reported-content-card">
+      <div class="card-header">
+        <h3>Contenu signalé</h3>
+        <span class="content-type">
+          <i class="fas fa-comment"></i>
+          Post
+        </span>
+      </div>
+
+      <div class="content-preview" *ngIf="report.reportedPost">
+        <div class="post-header">
+          <div class="author-info">
+            <span class="author-name">
+              {{ report.reportedPost.author.firstName }} {{ report.reportedPost.author.lastName }}
+            </span>
+            <span class="post-date">{{ formatDate(report.reportedPost.createdAt) }}</span>
+          </div>
+        </div>
+        <div class="post-content">
+          {{ report.reportedPost.content }}
+        </div>
+      </div>
+
+      <div class="content-preview" *ngIf="report.reportedThread">
+        <div class="thread-header">
+          <div class="thread-info">
+            <span class="thread-title">{{ report.reportedThread.title }}</span>
+            <span class="thread-date">{{ formatDate(report.reportedThread.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Moderation Form -->
+    <div class="moderation-card">
+      <div class="card-header">
+        <h3>Actions de modération</h3>
+      </div>
+
+      <form [formGroup]="moderationForm" (ngSubmit)="onSubmit()" class="moderation-form">
+        <!-- Status Selection -->
+        <div class="form-group">
+          <label for="status" class="form-label">
+            <i class="fas fa-tasks"></i>
+            Statut du signalement *
+          </label>
+          <select
+            id="status"
+            formControlName="status"
+            class="form-select"
+            [class.error]="isFieldInvalid('status')"
+          >
+            <option *ngFor="let status of statusOptions" [value]="status.value">
+              {{ status.label }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('status')" class="error-text">
+            {{ getFieldError('status') }}
+          </div>
+        </div>
+
+        <!-- Action Taken -->
+        <div class="form-group">
+          <label for="actionTaken" class="form-label">
+            <i class="fas fa-gavel"></i>
+            Action prise *
+          </label>
+          <select
+            id="actionTaken"
+            formControlName="actionTaken"
+            class="form-select"
+            [class.error]="isFieldInvalid('actionTaken')"
+          >
+            <option *ngFor="let action of actionOptions" [value]="action.value">
+              {{ action.label }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('actionTaken')" class="error-text">
+            {{ getFieldError('actionTaken') }}
+          </div>
+        </div>
+
+        <!-- Moderator Comment -->
+        <div class="form-group">
+          <label for="moderatorComment" class="form-label">
+            <i class="fas fa-comment"></i>
+            Commentaire du modérateur *
+          </label>
+          <textarea
+            id="moderatorComment"
+            formControlName="moderatorComment"
+            class="form-textarea"
+            placeholder="Expliquez l'action prise et les raisons de votre décision..."
+            rows="4"
+            [class.error]="isFieldInvalid('moderatorComment')"
+          ></textarea>
+          <div class="input-info">
+            <span class="char-count">{{ moderationForm.get('moderatorComment')?.value?.length || 0 }} caractères</span>
+          </div>
+          <div *ngIf="isFieldInvalid('moderatorComment')" class="error-text">
+            {{ getFieldError('moderatorComment') }}
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="goBack()">
+            <i class="fas fa-times"></i>
+            Annuler
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="submitting || moderationForm.invalid"
+          >
+            <i class="fas fa-save" *ngIf="!submitting"></i>
+            <div class="spinner small" *ngIf="submitting"></div>
+            {{ submitting ? 'Sauvegarde...' : 'Sauvegarder les modifications' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

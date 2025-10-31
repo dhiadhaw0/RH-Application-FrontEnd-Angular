@@ -1,0 +1,63 @@
+<div class="favorites-container">
+  <h1>Mes Formations Favorites</h1>
+
+  <div *ngIf="isLoading" class="loading">
+    <p>Chargement de vos formations favorites...</p>
+  </div>
+
+  <div *ngIf="!isLoading && favoriteFormations.length === 0" class="empty-state">
+    <div class="empty-icon">❤️</div>
+    <h2>Aucune formation favorite</h2>
+    <p>Vous n'avez pas encore ajouté de formations à vos favoris.</p>
+    <button class="btn-explore" (click)="exploreFormations()">Explorer les formations</button>
+  </div>
+
+  <div *ngIf="!isLoading && favoriteFormations.length > 0" class="favorites-content">
+    <div class="favorites-stats">
+      <p>{{ favoriteFormations.length }} formation{{ favoriteFormations.length > 1 ? 's' : '' }} en favoris</p>
+    </div>
+
+    <div class="favorites-grid">
+      <div class="favorite-card" *ngFor="let formation of favoriteFormations">
+        <div class="card-header">
+          <img [src]="formation.imageUrl || 'assets/default-formation.jpg'" [alt]="formation.title" class="formation-image">
+          <button class="btn-remove-favorite" (click)="removeFromFavorites(formation.idFormation)" title="Retirer des favoris">
+            <i class="fas fa-heart-broken"></i>
+          </button>
+        </div>
+
+        <div class="card-content">
+          <h3>{{ formation.title }}</h3>
+          <p class="formation-description">{{ formation.description }}</p>
+
+          <div class="formation-meta">
+            <span class="category">{{ formation.domaine }}</span>
+            <span class="level">{{ formation.niveau }}</span>
+            <span class="duration">{{ formation.duree }}</span>
+            <span class="type">{{ formation.typeFormation }}</span>
+          </div>
+
+          <div class="formation-rating">
+            <span class="stars" [innerHTML]="getStars(formation.noteMoyenne || 0)"></span>
+            <span class="rating-value">({{ formation.noteMoyenne || 0 }})</span>
+          </div>
+
+          <div class="formation-price">
+            <span class="price" *ngIf="formation.prix">{{ formation.prix }} €</span>
+            <span class="free" *ngIf="!formation.prix">Gratuit</span>
+          </div>
+
+          <div class="formation-provider">
+            <strong>{{ formation.provider }}</strong>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn-details" (click)="viewDetails(formation.idFormation)">
+            Voir les détails
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,79 @@
+<div class="rating-hero">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="floating-stars">
+      <div class="star-shape star-1">⭐</div>
+      <div class="star-shape star-2">⭐</div>
+      <div class="star-shape star-3">⭐</div>
+      <div class="star-shape star-4">⭐</div>
+      <div class="star-shape star-5">⭐</div>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <div class="rating-header">
+      <h1><i class="fas fa-star"></i> Évaluez cette formation</h1>
+      <p class="rating-subtitle">Votre avis compte ! Aidez les autres apprenants à faire le bon choix.</p>
+    </div>
+
+    <div class="rating-form">
+      <div class="rating-stars-section">
+        <h2>Sélectionnez votre note</h2>
+        <div class="rating-stars">
+          <span
+            class="star"
+            *ngFor="let star of getStarArray()"
+            [class.active]="isStarActive(star)"
+            [class.hover]="star <= hoverRating"
+            (click)="setRating(star)"
+            (mouseenter)="setHoverRating(star)"
+            (mouseleave)="clearHoverRating()">
+            <i class="fas fa-star"></i>
+          </span>
+        </div>
+
+        <div class="rating-feedback" *ngIf="getRatingDisplay() > 0">
+          <div class="rating-display">
+            <span class="rating-number">{{ getRatingDisplay() }}</span>
+            <span class="rating-max">/5</span>
+          </div>
+          <div class="rating-text">
+            <span *ngIf="getRatingDisplay() === 1">Très insatisfait</span>
+            <span *ngIf="getRatingDisplay() === 2">Insatisfait</span>
+            <span *ngIf="getRatingDisplay() === 3">Moyen</span>
+            <span *ngIf="getRatingDisplay() === 4">Satisfait</span>
+            <span *ngIf="getRatingDisplay() === 5">Excellent</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rating-actions" *ngIf="showSubmitButton">
+        <button
+          class="btn-submit-rating"
+          (click)="submitRating()"
+          [disabled]="userRating === 0 || isSubmitting">
+          <i class="fas fa-paper-plane" *ngIf="!isSubmitting"></i>
+          <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+          {{ isSubmitting ? 'Envoi en cours...' : 'Soumettre ma note' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="rating-stats">
+      <div class="stat-item">
+        <div class="stat-icon">📊</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ currentRating | number:'1.1-1' }}</span>
+          <span class="stat-label">Note moyenne</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ formationId }}</span>
+          <span class="stat-label">Formation ID</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

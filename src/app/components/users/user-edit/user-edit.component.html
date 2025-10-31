@@ -1,0 +1,239 @@
+<div class="user-edit-container">
+  <div class="edit-header">
+    <h1 class="main-title">{{ isNewUser ? '➕ Créer un Utilisateur' : '✏️ Modifier l\'Utilisateur' }}</h1>
+    <p class="subtitle">{{ isNewUser ? 'Ajouter un nouveau compte utilisateur' : 'Modifier les informations de l\'utilisateur' }}</p>
+  </div>
+
+  <div class="edit-form" *ngIf="user && !loading">
+    <form (ngSubmit)="saveUser()" #userForm="ngForm">
+      <!-- Basic Information -->
+      <div class="form-section">
+        <h2 class="section-title">Informations de Base</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstName" class="form-label">Prénom *</label>
+            <input
+              type="text"
+              id="firstName"
+              class="form-input"
+              [(ngModel)]="user.firstName"
+              name="firstName"
+              required
+              [disabled]="saving"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="lastName" class="form-label">Nom *</label>
+            <input
+              type="text"
+              id="lastName"
+              class="form-input"
+              [(ngModel)]="user.lastName"
+              name="lastName"
+              required
+              [disabled]="saving"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email *</label>
+            <input
+              type="email"
+              id="email"
+              class="form-input"
+              [(ngModel)]="user.email"
+              name="email"
+              required
+              [disabled]="saving"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="phoneNumber" class="form-label">Téléphone</label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              class="form-input"
+              [(ngModel)]="user.phoneNumber"
+              name="phoneNumber"
+              [disabled]="saving"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="dateOfBirth" class="form-label">Date de Naissance</label>
+            <input
+              type="date"
+              id="dateOfBirth"
+              class="form-input"
+              [ngModel]="user.dateOfBirth | date:'yyyy-MM-dd'"
+              (ngModelChange)="user.dateOfBirth = $event"
+              name="dateOfBirth"
+              [disabled]="saving"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="role" class="form-label">Rôle</label>
+            <select
+              id="role"
+              class="form-select"
+              [(ngModel)]="user.role"
+              name="role"
+              [disabled]="saving"
+            >
+              <option *ngFor="let role of roles" [value]="role.value">
+                {{ role.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Status -->
+      <div class="form-section">
+        <h2 class="section-title">Statut du Compte</h2>
+        <div class="status-options">
+          <div class="status-option">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="user.banned"
+                name="banned"
+                [disabled]="saving"
+              >
+              <span class="checkmark"></span>
+              Compte suspendu
+            </label>
+          </div>
+
+          <div class="status-option">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="user.isModerator"
+                name="isModerator"
+                [disabled]="saving"
+              >
+              <span class="checkmark"></span>
+              Modérateur
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mentor Information -->
+      <div class="form-section">
+        <h2 class="section-title">Informations Mentor</h2>
+        <div class="mentor-toggle">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="user.isMentor"
+              (change)="toggleMentorStatus()"
+              [disabled]="saving"
+            >
+            <span class="checkmark"></span>
+            Cet utilisateur est un mentor
+          </label>
+        </div>
+
+        <div class="mentor-fields" *ngIf="user.isMentor">
+          <div class="form-group">
+            <label for="mentorBio" class="form-label">Biographie Mentor</label>
+            <textarea
+              id="mentorBio"
+              class="form-textarea"
+              [(ngModel)]="user.mentorBio"
+              name="mentorBio"
+              rows="3"
+              placeholder="Décrivez votre expérience et vos compétences..."
+              [disabled]="saving"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="mentorExpertise" class="form-label">Expertise</label>
+            <input
+              type="text"
+              id="mentorExpertise"
+              class="form-input"
+              [(ngModel)]="user.mentorExpertise"
+              name="mentorExpertise"
+              placeholder="Ex: JavaScript, Angular, Node.js"
+              [disabled]="saving"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="availability" class="form-label">Disponibilité</label>
+            <input
+              type="text"
+              id="availability"
+              class="form-input"
+              [(ngModel)]="user.availability"
+              name="availability"
+              placeholder="Ex: Disponible les weekends"
+              [disabled]="saving"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="languages" class="form-label">Langues</label>
+            <input
+              type="text"
+              id="languages"
+              class="form-input"
+              [(ngModel)]="user.languages"
+              name="languages"
+              placeholder="Ex: Français, Anglais"
+              [disabled]="saving"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="linkedinUrl" class="form-label">LinkedIn</label>
+            <input
+              type="url"
+              id="linkedinUrl"
+              class="form-input"
+              [(ngModel)]="user.linkedinUrl"
+              name="linkedinUrl"
+              placeholder="https://linkedin.com/in/username"
+              [disabled]="saving"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="cancel-btn"
+          (click)="cancel()"
+          [disabled]="saving"
+        >
+          Annuler
+        </button>
+        <button
+          type="submit"
+          class="save-btn"
+          [disabled]="saving || !userForm.form.valid"
+        >
+          <span *ngIf="!saving">{{ isNewUser ? 'Créer' : 'Enregistrer' }}</span>
+          <span *ngIf="saving" class="loading">
+            <span class="spinner"></span>
+            {{ isNewUser ? 'Création...' : 'Enregistrement...' }}
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Chargement des informations utilisateur...</p>
+  </div>
+</div>

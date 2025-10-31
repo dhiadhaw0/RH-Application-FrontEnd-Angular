@@ -1,0 +1,186 @@
+<!-- Forum Post Moderation Component -->
+<div class="forum-post-moderation-container">
+  <div class="moderation-header">
+    <h2 class="moderation-title">
+      <i class="fas fa-gavel"></i>
+      Modération du Post
+    </h2>
+    <p class="moderation-subtitle">Gérer le contenu et appliquer les actions de modération nécessaires</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement du post...</p>
+    </div>
+  </div>
+
+  <!-- Post Preview -->
+  <div *ngIf="!loading && post" class="post-preview">
+    <div class="preview-header">
+      <h3>Aperçu du post</h3>
+      <span class="post-id">ID: {{ post.id }}</span>
+    </div>
+    <div class="preview-content">
+      <app-forum-post-item
+        [post]="post"
+        [currentUser]="currentUser"
+        [showUpvote]="false"
+        [isCompact]="true">
+      </app-forum-post-item>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h4>Erreur de chargement</h4>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadPost()">
+        <i class="fas fa-redo"></i>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Moderation Form -->
+  <form *ngIf="!loading && !error" [formGroup]="moderationForm" (ngSubmit)="onSubmit()" class="moderation-form">
+    <!-- Moderation Action Selection -->
+    <div class="form-section">
+      <h4 class="section-title">
+        <i class="fas fa-list"></i>
+        Action de modération
+      </h4>
+      <div class="action-grid">
+        <div
+          *ngFor="let action of moderationActions"
+          class="action-card"
+          [class.selected]="moderationForm.get('action')?.value === action.value"
+          (click)="moderationForm.get('action')?.setValue(action.value); onActionChange()"
+        >
+          <div class="action-icon" [class]="'action-' + action.color">
+            <i [class]="action.icon"></i>
+          </div>
+          <div class="action-content">
+            <h5>{{ action.label }}</h5>
+            <div class="action-description" [class]="'text-' + action.color">
+              {{ getActionDescription(action.value) }}
+            </div>
+          </div>
+          <div class="action-radio">
+            <input
+              type="radio"
+              [value]="action.value"
+              formControlName="action"
+              (change)="onActionChange()"
+            >
+          </div>
+        </div>
+      </div>
+      <div *ngIf="isFieldInvalid('action')" class="error-text">
+        {{ getFieldError('action') }}
+      </div>
+    </div>
+
+    <!-- Reason Field -->
+    <div class="form-section">
+      <label for="reason" class="form-label">
+        <i class="fas fa-comment"></i>
+        Raison de la modération *
+      </label>
+      <textarea
+        id="reason"
+        formControlName="reason"
+        class="form-textarea"
+        placeholder="Expliquez la raison de cette action de modération..."
+        rows="4"
+        [class.error]="isFieldInvalid('reason')"
+      ></textarea>
+      <div class="input-info">
+        <span class="char-count">{{ moderationForm.get('reason')?.value?.length || 0 }} caractères</span>
+      </div>
+      <div *ngIf="isFieldInvalid('reason')" class="error-text">
+        {{ getFieldError('reason') }}
+      </div>
+    </div>
+
+    <!-- Duration Field (for bans/warnings) -->
+    <div class="form-section" *ngIf="moderationForm.get('action')?.value === 'ban' || moderationForm.get('action')?.value === 'warn'">
+      <label for="duration" class="form-label">
+        <i class="fas fa-clock"></i>
+        Durée *
+      </label>
+      <select
+        id="duration"
+        formControlName="duration"
+        class="form-select"
+        [class.error]="isFieldInvalid('duration')"
+      >
+        <option value="">Sélectionner une durée</option>
+        <option value="1h">1 heure</option>
+        <option value="24h">24 heures</option>
+        <option value="7d">7 jours</option>
+        <option value="30d">30 jours</option>
+        <option value="permanent">Permanent</option>
+      </select>
+      <div *ngIf="isFieldInvalid('duration')" class="error-text">
+        {{ getFieldError('duration') }}
+      </div>
+    </div>
+
+    <!-- Notification Options -->
+    <div class="form-section">
+      <div class="checkbox-group">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            formControlName="notifyUser"
+            class="checkbox-input"
+          >
+          <span class="checkbox-mark"></span>
+          <span class="checkbox-text">
+            <i class="fas fa-bell"></i>
+            Notifier l'utilisateur
+          </span>
+        </label>
+        <div class="checkbox-info">
+          Envoyer une notification à l'auteur du post
+        </div>
+      </div>
+    </div>
+
+    <!-- Private Note -->
+    <div class="form-section">
+      <label for="privateNote" class="form-label">
+        <i class="fas fa-sticky-note"></i>
+        Note privée (visible uniquement par les modérateurs)
+      </label>
+      <textarea
+        id="privateNote"
+        formControlName="privateNote"
+        class="form-textarea"
+        placeholder="Note interne pour les autres modérateurs..."
+        rows="3"
+      ></textarea>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline" (click)="cancel()">
+        <i class="fas fa-times"></i>
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="btn btn-danger"
+        [disabled]="submitting || moderationForm.invalid"
+      >
+        <i class="fas fa-gavel" *ngIf="!submitting"></i>
+        <div class="spinner small" *ngIf="submitting"></div>
+        {{ submitting ? 'Application...' : 'Appliquer la modération' }}
+      </button>
+    </div>
+  </form>
+</div>

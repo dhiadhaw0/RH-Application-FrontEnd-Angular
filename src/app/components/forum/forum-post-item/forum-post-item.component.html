@@ -1,0 +1,114 @@
+<!-- Forum Post Item Component -->
+<div class="forum-post-item" [class.compact]="isCompact" [class.anonymous]="post.anonymous">
+  <!-- Post Header -->
+  <div class="post-header">
+    <div class="author-info">
+      <img
+        [src]="getAuthorAvatar()"
+        [alt]="getAuthorDisplayName()"
+        class="author-avatar"
+        [class.anonymous-avatar]="post.anonymous"
+      >
+      <div class="author-details">
+        <span class="author-name">{{ getAuthorDisplayName() }}</span>
+        <span class="post-date">{{ formatDate(post.createdAt) }}</span>
+        <span *ngIf="post.anonymous" class="anonymous-badge">
+          <i class="fas fa-user-secret"></i>
+          Anonyme
+        </span>
+      </div>
+    </div>
+
+    <!-- Post Actions Menu -->
+    <div class="post-actions" *ngIf="!isCompact">
+      <button
+        class="action-btn menu-toggle"
+        (click)="toggleActions()"
+        [attr.aria-expanded]="showActions"
+        aria-label="Actions du post"
+      >
+        <i class="fas fa-ellipsis-v"></i>
+      </button>
+
+      <div class="actions-menu" [class.show]="showActions">
+        <button
+          *ngIf="canEditPost()"
+          class="action-item"
+          (click)="onEditPost()"
+        >
+          <i class="fas fa-edit"></i>
+          Modifier
+        </button>
+        <button
+          *ngIf="canDeletePost()"
+          class="action-item delete"
+          (click)="onDeletePost()"
+        >
+          <i class="fas fa-trash"></i>
+          Supprimer
+        </button>
+        <button
+          class="action-item report"
+          (click)="onReportPost()"
+        >
+          <i class="fas fa-flag"></i>
+          Signaler
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Content -->
+  <div class="post-content">
+    <div class="post-text" [innerHTML]="post.content | safeHtml"></div>
+
+    <!-- Attachments -->
+    <div class="post-attachments" *ngIf="post.attachments && post.attachments.length > 0">
+      <app-forum-attachment-list [attachments]="post.attachments"></app-forum-attachment-list>
+    </div>
+  </div>
+
+  <!-- Post Footer -->
+  <div class="post-footer" *ngIf="!isCompact">
+    <!-- Upvote Section -->
+    <div class="upvote-section" *ngIf="showUpvote">
+      <app-forum-upvote
+        [post]="post"
+        [currentUser]="currentUser"
+        (upvote)="onUpvote()"
+        (downvote)="onDownvote()"
+      ></app-forum-upvote>
+    </div>
+
+    <!-- Post Meta -->
+    <div class="post-meta">
+      <span class="meta-item" *ngIf="post.upvotes > 0">
+        <i class="fas fa-thumbs-up"></i>
+        {{ post.upvotes }} vote{{ post.upvotes > 1 ? 's' : '' }}
+      </span>
+      <span class="meta-item" *ngIf="post.repliesCount > 0">
+        <i class="fas fa-reply"></i>
+        {{ post.repliesCount }} réponse{{ post.repliesCount > 1 ? 's' : '' }}
+      </span>
+      <span class="meta-item" *ngIf="post.attachments && post.attachments.length > 0">
+        <i class="fas fa-paperclip"></i>
+        {{ post.attachments.length }} fichier{{ post.attachments.length > 1 ? 's' : '' }}
+      </span>
+    </div>
+
+    <!-- Answer Badge -->
+    <div class="answer-badge" *ngIf="post.isAnswer">
+      <i class="fas fa-check-circle"></i>
+      Réponse acceptée
+    </div>
+  </div>
+
+  <!-- Edit Mode -->
+  <div class="edit-mode" *ngIf="isEditing">
+    <app-forum-post-editor
+      [post]="post"
+      (postUpdated)="onSaveEdit($event)"
+      (editCancelled)="onCancelEdit()"
+    ></app-forum-post-editor>
+  </div>
+</div>

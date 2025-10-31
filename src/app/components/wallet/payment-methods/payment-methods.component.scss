@@ -1,0 +1,418 @@
+.payment-methods-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 25px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+
+  .header-content {
+    h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      font-weight: 600;
+
+      i {
+        margin-right: 15px;
+        opacity: 0.9;
+      }
+    }
+
+    p {
+      margin: 5px 0 0 0;
+      opacity: 0.8;
+      font-size: 1rem;
+    }
+  }
+}
+
+.form-section {
+  margin-bottom: 30px;
+
+  .form-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+
+      h3 {
+        margin: 0;
+        color: #333;
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+
+      .btn-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #666;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #f8f9fa;
+          color: #333;
+        }
+      }
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+        font-size: 0.9rem;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+        &:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        &::placeholder {
+          color: #adb5bd;
+        }
+      }
+
+      .field-error {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 5px;
+      }
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #f0f0f0;
+    }
+  }
+}
+
+.methods-section {
+  .methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+
+    .method-card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      }
+
+      .method-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+
+        .method-icon {
+          width: 60px;
+          height: 60px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.8rem;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+        }
+
+        .method-actions {
+          display: flex;
+          gap: 8px;
+
+          .btn-icon {
+            background: none;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+
+            &:hover {
+              background: #f8f9fa;
+            }
+
+            &.btn-danger:hover {
+              background: #f8d7da;
+              color: #721c24;
+            }
+          }
+        }
+      }
+
+      .method-details {
+        margin-bottom: 20px;
+
+        .method-name {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 5px;
+        }
+
+        .method-type {
+          color: #666;
+          font-size: 0.9rem;
+          margin-bottom: 10px;
+
+          .provider-badge {
+            background: #e9ecef;
+            color: #495057;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+          }
+        }
+
+        .method-info {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.9rem;
+          color: #666;
+
+          .card-number {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+          }
+
+          .expiry {
+            color: #28a745;
+            font-weight: 600;
+          }
+        }
+      }
+
+      .method-footer {
+        .method-status {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 15px;
+
+          .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+
+            &.verified {
+              background: #d4edda;
+              color: #155724;
+            }
+
+            &.unverified {
+              background: #fff3cd;
+              color: #856404;
+            }
+          }
+
+          .default-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+        }
+
+        .method-controls {
+          display: flex;
+          gap: 10px;
+        }
+      }
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+      .empty-icon {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 20px;
+      }
+
+      h3 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 1.5rem;
+      }
+
+      p {
+        color: #666;
+        margin-bottom: 25px;
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #666;
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 20px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+}
+
+// Button styles
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.btn-primary {
+    background: #667eea;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #5a67d8;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+  }
+
+  &.btn-secondary {
+    background: #6c757d;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #5a6268;
+    }
+  }
+
+  &.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .payment-methods-container {
+    padding: 15px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    padding: 20px;
+
+    .header-content h1 {
+      font-size: 1.8rem;
+    }
+  }
+
+  .form-section .form-card {
+    padding: 20px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .methods-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .method-card .method-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .method-footer .method-controls {
+    flex-direction: column;
+  }
+}

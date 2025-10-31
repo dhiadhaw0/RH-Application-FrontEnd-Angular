@@ -1,0 +1,328 @@
+// CSS Custom Properties for consistent theming
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.2);
+  --border-radius: 16px;
+  --border-radius-large: 24px;
+  --transition-smooth: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+// Favorites Container - Enhanced with modern grid
+.favorites-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 2rem;
+
+  h1 {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    position: relative;
+
+    &::after {
+      content: '💖';
+      position: absolute;
+      top: -10px;
+      right: 20%;
+      font-size: 2rem;
+      animation: float 3s ease-in-out infinite;
+    }
+  }
+
+  .loading, .empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius-large);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-medium);
+
+    p {
+      font-size: 1.2rem;
+      color: #666;
+    }
+  }
+
+  .empty-state {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 61, 84, 0.1));
+    border: 2px solid rgba(255, 107, 107, 0.2);
+
+    .empty-icon {
+      font-size: 5rem;
+      margin-bottom: 2rem;
+      opacity: 0.7;
+    }
+
+    h2 {
+      color: #666;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+    }
+
+    p {
+      color: #888;
+      margin-bottom: 2rem;
+    }
+
+    .btn-explore {
+      background: var(--warning-gradient);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: var(--transition-bounce);
+      box-shadow: var(--shadow-soft);
+
+      &:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: var(--shadow-medium);
+      }
+    }
+  }
+
+  .favorites-content {
+    margin-top: 2rem;
+
+    .favorites-stats {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 2rem;
+      text-align: center;
+      font-weight: bold;
+      color: #495057;
+      box-shadow: var(--shadow-soft);
+      font-size: 1.1rem;
+    }
+
+    .favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 2rem;
+
+      .favorite-card {
+        background: white;
+        border-radius: var(--border-radius-large);
+        box-shadow: var(--shadow-medium);
+        overflow: hidden;
+        transition: var(--transition-smooth);
+        position: relative;
+
+        &:hover {
+          transform: translateY(-10px) scale(1.02);
+          box-shadow: var(--shadow-strong);
+        }
+
+        .card-header {
+          position: relative;
+
+          .formation-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: var(--transition-smooth);
+
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+
+          .btn-remove-favorite {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: var(--transition-bounce);
+            box-shadow: var(--shadow-soft);
+
+            &:hover {
+              background: #dc3545;
+              transform: scale(1.1) rotate(10deg);
+              box-shadow: var(--shadow-medium);
+            }
+          }
+        }
+
+        .card-content {
+          padding: 2rem;
+
+          h3 {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.3em;
+            font-weight: 700;
+            line-height: 1.3;
+          }
+
+          .formation-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+
+          .formation-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+
+            span {
+              padding: 0.25rem 0.75rem;
+              background: var(--glass-bg);
+              backdrop-filter: blur(10px);
+              border-radius: 50px;
+              font-size: 0.8rem;
+              color: #666;
+              border: 1px solid rgba(255, 255, 255, 0.3);
+              transition: var(--transition-smooth);
+
+              &:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-soft);
+              }
+            }
+          }
+
+          .formation-rating {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+
+            .stars {
+              font-size: 1rem;
+              color: #ffd93d;
+              filter: drop-shadow(0 0 3px rgba(255, 217, 61, 0.3));
+            }
+
+            .rating-value {
+              font-weight: bold;
+              color: #666;
+              font-size: 0.9rem;
+            }
+          }
+
+          .formation-price {
+            .price {
+              font-size: 1.2rem;
+              font-weight: bold;
+              background: var(--primary-gradient);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+            }
+
+            .free {
+              font-size: 1rem;
+              background: var(--success-gradient);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+              font-weight: bold;
+            }
+          }
+
+          .formation-provider {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+          }
+        }
+
+        .card-actions {
+          padding: 0 2rem 2rem;
+
+          .btn-details {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            box-shadow: var(--shadow-soft);
+
+            &:hover {
+              transform: translateY(-3px) scale(1.02);
+              box-shadow: var(--shadow-medium);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@media (max-width: 768px) {
+  .favorites-container {
+    padding: 1rem;
+
+    h1 {
+      font-size: 2em;
+    }
+
+    .favorites-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+
+      .favorite-card {
+        &:hover {
+          transform: translateY(-5px) scale(1.01);
+        }
+
+        .card-content {
+          padding: 1.5rem;
+        }
+
+        .card-actions {
+          padding: 0 1.5rem 1.5rem;
+        }
+      }
+    }
+  }
+}

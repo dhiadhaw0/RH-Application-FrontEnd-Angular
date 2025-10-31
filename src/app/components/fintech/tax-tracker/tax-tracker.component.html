@@ -1,0 +1,261 @@
+<div class="tax-tracker-container">
+  <div class="header">
+    <h2>Tax Tracker</h2>
+    <div class="year-selector">
+      <label for="taxYear">Tax Year:</label>
+      <select
+        id="taxYear"
+        [(ngModel)]="selectedYear"
+        (change)="onYearChange()"
+        class="form-control">
+        <option *ngFor="let year of [2020, 2021, 2022, 2023, 2024, 2025]" [value]="year">
+          {{ year }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tracker-content">
+    <!-- Tax Records List -->
+    <div class="section">
+      <h3>Tax Records for {{ selectedYear }}</h3>
+      <div class="records-list" *ngIf="getRecordsForYear(selectedYear).length > 0; else noRecords">
+        <div
+          class="record-card"
+          *ngFor="let record of getRecordsForYear(selectedYear)"
+          [class.selected]="selectedRecord?.id === record.id"
+          (click)="selectRecord(record)">
+          <div class="record-header">
+            <h4>{{ getTypeLabel(record.taxType) }} - {{ record.taxYear }}</h4>
+            <span class="status-badge" [ngClass]="getStatusBadgeClass(record.status)">
+              {{ getStatusLabel(record.status) }}
+            </span>
+          </div>
+          <div class="record-summary">
+            <div class="summary-item">
+              <span class="label">Gross Income:</span>
+              <span class="value">{{ formatCurrency(record.grossIncome) }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Taxable Income:</span>
+              <span class="value">{{ formatCurrency(record.taxableIncome) }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Tax Owed:</span>
+              <span class="value">{{ formatCurrency(record.taxOwed) }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Tax Paid:</span>
+              <span class="value">{{ formatCurrency(record.taxPaid) }}</span>
+            </div>
+            <div class="summary-item" *ngIf="record.taxOwed > record.taxPaid">
+              <span class="label">Balance Due:</span>
+              <span class="value balance-due">{{ formatCurrency(record.taxOwed - record.taxPaid) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #noRecords>
+        <div class="no-records">
+          <i class="fas fa-file-invoice-dollar"></i>
+          <p>No tax records found for {{ selectedYear }}</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Create New Tax Record -->
+    <div class="section">
+      <h3>Create New Tax Record</h3>
+      <form [formGroup]="taxForm" (ngSubmit)="createTaxRecord()" class="tax-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taxYear">Tax Year:</label>
+            <input
+              type="number"
+              id="taxYear"
+              formControlName="taxYear"
+              class="form-control"
+              min="2020"
+              max="2030">
+          </div>
+          <div class="form-group">
+            <label for="taxType">Tax Type:</label>
+            <select id="taxType" formControlName="taxType" class="form-control">
+              <option *ngFor="let type of taxTypes" [value]="type.value">
+                {{ type.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="grossIncome">Gross Income:</label>
+            <input
+              type="number"
+              id="grossIncome"
+              formControlName="grossIncome"
+              class="form-control"
+              min="0"
+              step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="taxableIncome">Taxable Income:</label>
+            <input
+              type="number"
+              id="taxableIncome"
+              formControlName="taxableIncome"
+              class="form-control"
+              min="0"
+              step="0.01">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taxOwed">Tax Owed:</label>
+            <input
+              type="number"
+              id="taxOwed"
+              formControlName="taxOwed"
+              class="form-control"
+              min="0"
+              step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="taxPaid">Tax Paid:</label>
+            <input
+              type="number"
+              id="taxPaid"
+              formControlName="taxPaid"
+              class="form-control"
+              min="0"
+              step="0.01">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Notes:</label>
+          <textarea
+            id="notes"
+            formControlName="notes"
+            class="form-control"
+            rows="3"
+            placeholder="Additional notes..."></textarea>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="taxForm.invalid || isLoading">
+          <span *ngIf="isLoading">Creating...</span>
+          <span *ngIf="!isLoading">Create Tax Record</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Deductions Management -->
+    <div class="section" *ngIf="selectedRecord">
+      <h3>Deductions for {{ getTypeLabel(selectedRecord.taxType) }} - {{ selectedRecord.taxYear }}</h3>
+
+      <!-- Add Deduction Form -->
+      <form [formGroup]="deductionForm" (ngSubmit)="addDeduction()" class="deduction-form">
+        <div class="form-row">
+          <div class="form-group flex-3">
+            <label for="description">Description:</label>
+            <input
+              type="text"
+              id="description"
+              formControlName="description"
+              class="form-control"
+              placeholder="e.g., Home office deduction">
+          </div>
+          <div class="form-group">
+            <label for="amount">Amount:</label>
+            <input
+              type="number"
+              id="amount"
+              formControlName="amount"
+              class="form-control"
+              min="0"
+              step="0.01">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category">Category:</label>
+            <input
+              type="text"
+              id="category"
+              formControlName="category"
+              class="form-control"
+              placeholder="e.g., Business expense">
+          </div>
+          <div class="form-group">
+            <label for="date">Date:</label>
+            <input
+              type="date"
+              id="date"
+              formControlName="date"
+              class="form-control">
+          </div>
+          <div class="form-group flex-0">
+            <label>&nbsp;</label>
+            <button
+              type="submit"
+              class="btn btn-secondary btn-sm"
+              [disabled]="deductionForm.invalid">
+              Add Deduction
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Deductions List -->
+      <div class="deductions-list" *ngIf="selectedRecord.deductions.length > 0; else noDeductions">
+        <div class="deduction-item" *ngFor="let deduction of selectedRecord.deductions">
+          <div class="deduction-info">
+            <div class="deduction-description">{{ deduction.description }}</div>
+            <div class="deduction-details">
+              <span class="category">{{ deduction.category }}</span>
+              <span class="date">{{ formatDate(deduction.date) }}</span>
+            </div>
+          </div>
+          <div class="deduction-amount">
+            <span>{{ formatCurrency(deduction.amount) }}</span>
+            <button
+              class="btn btn-danger btn-sm"
+              (click)="removeDeduction(selectedRecord.id, deduction.id)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+        <div class="deductions-total">
+          <strong>Total Deductions: {{ formatCurrency(getTotalDeductions(selectedRecord)) }}</strong>
+        </div>
+      </div>
+      <ng-template #noDeductions>
+        <div class="no-deductions">
+          <p>No deductions added yet</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Tax Summary Stats -->
+  <div class="tax-stats" *ngIf="taxRecords.length > 0">
+    <div class="stat-card">
+      <div class="stat-value">{{ taxRecords.length }}</div>
+      <div class="stat-label">Total Records</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ getTotalTaxOwed() }}</div>
+      <div class="stat-label">Total Tax Owed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ getTotalTaxPaid() }}</div>
+      <div class="stat-label">Total Tax Paid</div>
+    </div>
+  </div>
+</div>

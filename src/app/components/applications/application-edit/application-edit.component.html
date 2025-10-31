@@ -1,0 +1,201 @@
+<app-navbar></app-navbar>
+
+<div class="application-edit-container">
+  <div class="header-section">
+    <div class="breadcrumb">
+      <a routerLink="/applications/{{application?.idApplication}}" class="breadcrumb-link">
+        <i class="fas fa-arrow-left"></i> Retour à la candidature
+      </a>
+    </div>
+    <div class="header-content">
+      <h1>Modifier la Candidature #{{application?.idApplication}}</h1>
+      <div class="application-status" [class]="'status-' + application?.status.toLowerCase()">
+        {{application?.status}}
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="applicationForm" (ngSubmit)="onSubmit()" class="application-form" *ngIf="application; else loadingTemplate">
+    <div class="form-grid">
+      <!-- Basic Information -->
+      <div class="form-section">
+        <h2>Informations de Base</h2>
+
+        <div class="info-display">
+          <div class="info-item">
+            <label>ID Candidature:</label>
+            <span>{{application.idApplication}}</span>
+          </div>
+          <div class="info-item">
+            <label>ID Utilisateur:</label>
+            <span>{{application.user}}</span>
+          </div>
+          <div class="info-item">
+            <label>ID Offre d'emploi:</label>
+            <span>{{application.jobOffer}}</span>
+          </div>
+          <div class="info-item">
+            <label>Date de création:</label>
+            <span>{{application.createdAt | date:'dd/MM/yyyy à HH:mm'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Motivation Section -->
+      <div class="form-section">
+        <h2>Lettres de Motivation</h2>
+
+        <div class="form-group">
+          <label for="motivationLetter">Lettre de Motivation</label>
+          <textarea id="motivationLetter" formControlName="motivationLetter" class="form-control"
+                    rows="8" placeholder="Rédigez votre lettre de motivation..."></textarea>
+          <div class="character-count">
+            {{applicationForm.get('motivationLetter')?.value?.length || 0}}/2000 caractères
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="coverLetter">Lettre de Couverture</label>
+          <textarea id="coverLetter" formControlName="coverLetter" class="form-control"
+                    rows="6" placeholder="Rédigez votre lettre de couverture..."></textarea>
+          <div class="character-count">
+            {{applicationForm.get('coverLetter')?.value?.length || 0}}/1500 caractères
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents Section -->
+      <div class="form-section">
+        <h2>Documents Attachés</h2>
+
+        <!-- Existing Documents -->
+        <div class="existing-documents" *ngIf="existingDocuments && existingDocuments.length > 0">
+          <h4>Documents Existants</h4>
+          <div class="documents-list">
+            <div class="document-item" *ngFor="let doc of existingDocuments">
+              <div class="document-icon">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              <div class="document-info">
+                <h5>{{doc.name}}</h5>
+                <span class="document-meta">{{doc.fileSize}} bytes • {{doc.type}} • {{doc.uploadedAt | date:'dd/MM/yyyy'}}</span>
+              </div>
+              <div class="document-actions">
+                <button type="button" class="btn btn-sm btn-outline" (click)="downloadDocument(doc)">
+                  <i class="fas fa-download"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="deleteDocument(doc)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload New Documents -->
+        <div class="upload-section">
+          <h4>Ajouter de Nouveaux Documents</h4>
+          <div class="upload-area" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+            <div class="upload-content">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p>Glissez-déposez vos fichiers ici ou</p>
+              <button type="button" class="btn btn-outline" (click)="fileInput.click()">
+                Parcourir les fichiers
+              </button>
+              <input #fileInput type="file" multiple (change)="onFileSelected($event)" style="display: none;">
+            </div>
+          </div>
+
+          <div class="uploaded-files" *ngIf="uploadedFiles.length > 0">
+            <h5>Nouveaux fichiers à ajouter:</h5>
+            <div class="file-item" *ngFor="let file of uploadedFiles; let i = index">
+              <div class="file-info">
+                <i class="fas fa-file-alt"></i>
+                <span>{{file.name}}</span>
+                <small>({{file.size}} bytes)</small>
+              </div>
+              <button type="button" class="btn btn-sm btn-danger" (click)="removeFile(i)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Management -->
+      <div class="form-section">
+        <h2>Gestion du Statut</h2>
+
+        <div class="status-management">
+          <div class="current-status">
+            <label>Statut Actuel:</label>
+            <span class="status-badge" [class]="'status-' + application.status.toLowerCase()">
+              {{application.status}}
+            </span>
+          </div>
+
+          <div class="status-change">
+            <label for="newStatus">Changer le Statut:</label>
+            <select id="newStatus" [(ngModel)]="selectedStatus" [ngModelOptions]="{standalone: true}" class="form-control">
+              <option *ngFor="let status of statusOptions" [value]="status" [selected]="status === application.status">
+                {{status}}
+              </option>
+            </select>
+            <button type="button" class="btn btn-primary" (click)="updateStatus()" [disabled]="selectedStatus === application.status">
+              Mettre à jour le Statut
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview Section -->
+      <div class="form-section">
+        <h2>Aperçu des Modifications</h2>
+        <div class="preview-card">
+          <h3>Résumé des Changements</h3>
+          <div class="changes-summary">
+            <div class="change-item" *ngIf="hasMotivationLetterChanged()">
+              <i class="fas fa-edit"></i>
+              <span>Lettre de motivation modifiée</span>
+            </div>
+            <div class="change-item" *ngIf="hasCoverLetterChanged()">
+              <i class="fas fa-edit"></i>
+              <span>Lettre de couverture modifiée</span>
+            </div>
+            <div class="change-item" *ngIf="uploadedFiles.length > 0">
+              <i class="fas fa-plus"></i>
+              <span>{{uploadedFiles.length}} nouveau(x) document(s)</span>
+            </div>
+            <div class="change-item" *ngIf="selectedStatus !== application.status">
+              <i class="fas fa-exchange-alt"></i>
+              <span>Statut changé: {{application.status}} → {{selectedStatus}}</span>
+            </div>
+            <div class="no-changes" *ngIf="!hasAnyChanges()">
+              <i class="fas fa-check"></i>
+              <span>Aucun changement détecté</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline" routerLink="/applications/{{application.idApplication}}">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="!hasAnyChanges() || isSubmitting">
+        <i class="fas fa-save" *ngIf="!isSubmitting"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+        {{isSubmitting ? 'Sauvegarde...' : 'Sauvegarder les Modifications'}}
+      </button>
+    </div>
+  </form>
+
+  <ng-template #loadingTemplate>
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Chargement de la candidature...</p>
+    </div>
+  </ng-template>
+</div>

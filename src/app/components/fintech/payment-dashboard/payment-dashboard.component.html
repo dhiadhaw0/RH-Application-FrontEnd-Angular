@@ -1,0 +1,146 @@
+<div class="payment-dashboard-container">
+  <div class="header">
+    <h2>Payment Dashboard</h2>
+  </div>
+
+  <div class="dashboard-content">
+    <!-- Payment History -->
+    <div class="section">
+      <h3>Payment History</h3>
+      <div class="payment-table-container" *ngIf="payments.length > 0; else noPayments">
+        <table class="payment-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Invoice</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Status</th>
+              <th>Transaction ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let payment of payments">
+              <td>{{ formatDate(payment.paymentDate) }}</td>
+              <td>{{ payment.invoiceId }}</td>
+              <td class="amount">{{ formatCurrency(payment.amount) }}</td>
+              <td>{{ getMethodLabel(payment.paymentMethod) }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusBadgeClass(payment.status)">
+                  {{ getStatusLabel(payment.status) }}
+                </span>
+              </td>
+              <td>{{ payment.transactionId || 'N/A' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noPayments>
+        <div class="no-data">
+          <i class="fas fa-credit-card"></i>
+          <p>No payment history found</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Pending Payments -->
+    <div class="section">
+      <h3>Pending Payments</h3>
+      <div class="pending-invoices" *ngIf="pendingInvoices.length > 0; else noPending">
+        <div class="invoice-card" *ngFor="let invoice of pendingInvoices">
+          <div class="invoice-header">
+            <h4>Invoice #{{ invoice.invoiceNumber }}</h4>
+            <span class="amount">{{ formatCurrency(invoice.totalAmount) }}</span>
+          </div>
+          <div class="invoice-details">
+            <p><strong>Client:</strong> {{ invoice.clientName }}</p>
+            <p><strong>Due Date:</strong> {{ formatDate(invoice.dueDate) }}</p>
+            <p><strong>Status:</strong>
+              <span class="status-badge" [ngClass]="invoice.status === 'OVERDUE' ? 'badge-overdue' : 'badge-sent'">
+                {{ invoice.status }}
+              </span>
+            </p>
+          </div>
+          <div class="invoice-actions">
+            <button class="btn btn-primary" (click)="selectInvoiceForPayment(invoice)">
+              Pay Now
+            </button>
+          </div>
+        </div>
+      </div>
+      <ng-template #noPending>
+        <div class="no-data">
+          <i class="fas fa-check-circle"></i>
+          <p>All invoices are paid!</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Payment Form Modal -->
+    <div class="payment-modal" *ngIf="selectedInvoice" (click)="cancelPayment()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Process Payment</h3>
+          <button class="close-btn" (click)="cancelPayment()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="invoice-summary">
+            <h4>Invoice #{{ selectedInvoice.invoiceNumber }}</h4>
+            <p><strong>Client:</strong> {{ selectedInvoice.clientName }}</p>
+            <p><strong>Total Amount:</strong> {{ formatCurrency(selectedInvoice.totalAmount) }}</p>
+          </div>
+
+          <form class="payment-form">
+            <div class="form-group">
+              <label for="paymentAmount">Payment Amount:</label>
+              <input
+                type="number"
+                id="paymentAmount"
+                [(ngModel)]="paymentAmount"
+                [max]="selectedInvoice.totalAmount"
+                min="0.01"
+                step="0.01"
+                class="form-control"
+                required>
+            </div>
+
+            <!-- Stripe Card Element -->
+            <div class="form-group">
+              <label>Card Information:</label>
+              <div id="card-element" class="card-element"></div>
+              <div id="card-errors" class="card-errors" role="alert"></div>
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="cancelPayment()">Cancel</button>
+          <button
+            class="btn btn-primary"
+            (click)="createPaymentIntent()"
+            [disabled]="paymentAmount <= 0 || paymentAmount > selectedInvoice.totalAmount || isLoading">
+            <span *ngIf="isLoading">Processing...</span>
+            <span *ngIf="!isLoading">Process Payment</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Statistics -->
+  <div class="payment-stats" *ngIf="payments.length > 0">
+    <div class="stat-card">
+      <div class="stat-value">{{ payments.length }}</div>
+      <div class="stat-label">Total Payments</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ getSuccessfulPaymentsCount() }}</div>
+      <div class="stat-label">Successful</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ getTotalPaidAmount() }}</div>
+      <div class="stat-label">Total Paid</div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,164 @@
+<app-navbar></app-navbar>
+
+<div class="user-badges-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h1>Mes Badges</h1>
+    <p>Suivez vos accomplissements et récompenses gagnées</p>
+  </div>
+
+  <!-- User Profile Section -->
+  <div *ngIf="user" class="user-profile-section">
+    <div class="user-avatar">
+      {{ getUserInitials() }}
+    </div>
+    <div class="user-info">
+      <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
+      <div class="user-email">{{ user.email }}</div>
+      <div class="user-stats">
+        <div class="stat-item">
+          <div class="stat-value">{{ getTotalBadges() }}</div>
+          <div class="stat-label">Badges</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ getRecentBadges() }}</div>
+          <div class="stat-label">Ce mois</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ getCompletedAchievements() }}</div>
+          <div class="stat-label">Accomplissements</div>
+        </div>
+      </div>
+    </div>
+    <div class="user-actions">
+      <a routerLink="/profile" class="btn btn-outline">
+        <i class="fas fa-user"></i>
+        Profil
+      </a>
+      <a routerLink="/badges" class="btn btn-outline">
+        <i class="fas fa-medal"></i>
+        Tous les Badges
+      </a>
+    </div>
+  </div>
+
+  <!-- Badges Section -->
+  <div class="badges-section">
+    <div class="section-header">
+      <h2>Mes Badges Gagnés</h2>
+      <div class="badge-count">{{ getTotalBadges() }} badges</div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Chargement de vos badges...</p>
+    </div>
+
+    <!-- Badges Grid -->
+    <div *ngIf="!loading" class="badges-grid">
+      <div
+        *ngFor="let userBadge of userBadges; trackBy: trackByBadgeId"
+        class="badge-card"
+      >
+        <div class="badge-earned-date">
+          {{ userBadge.earnedAt | date:'dd/MM/yyyy' }}
+        </div>
+
+        <div class="badge-header">
+          <div class="badge-icon">
+            <i [class]="getBadgeIcon(userBadge.badge)"></i>
+          </div>
+          <h3>{{ userBadge.badge.nom }}</h3>
+          <div class="badge-category">{{ getBadgeCategory(userBadge.badge) }}</div>
+        </div>
+
+        <div class="badge-content">
+          <div class="badge-description">
+            {{ userBadge.badge.description }}
+          </div>
+
+          <div class="badge-progress" *ngIf="userBadge.progress !== undefined">
+            <div class="progress-label">
+              <span>Progression</span>
+              <span>{{ userBadge.progress }}%</span>
+            </div>
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                [style.width.%]="userBadge.progress"
+              ></div>
+            </div>
+          </div>
+
+          <div class="badge-actions">
+            <button class="btn btn-outline" (click)="viewBadgeDetails(userBadge.badge)">
+              <i class="fas fa-eye"></i>
+              Détails
+            </button>
+            <button class="btn btn-primary" (click)="shareBadge(userBadge)">
+              <i class="fas fa-share"></i>
+              Partager
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Badges State -->
+    <div *ngIf="!loading && userBadges.length === 0" class="no-badges">
+      <i class="fas fa-medal"></i>
+      <h3>Aucun badge gagné</h3>
+      <p>Vous n'avez pas encore gagné de badges. Commencez par compléter des formations !</p>
+      <a routerLink="/formations" class="btn">
+        <i class="fas fa-graduation-cap"></i>
+        Explorer les Formations
+      </a>
+    </div>
+
+    <!-- Recent Activity -->
+    <div *ngIf="!loading && userBadges.length > 0" class="recent-activity">
+      <h3>Activité Récente</h3>
+      <div class="activity-list">
+        <div *ngFor="let badge of userBadges.slice(0, 5)" class="activity-item">
+          <div class="activity-icon">
+            <i [class]="getBadgeIcon(badge.badge)"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">Badge gagné : {{ badge.badge.nom }}</div>
+            <div class="activity-description">Vous avez obtenu ce badge pour vos accomplissements.</div>
+          </div>
+          <div class="activity-time">{{ badge.earnedAt | date:'dd/MM/yyyy' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievements Section -->
+  <div class="achievements-section">
+    <h2>Accomplissements à Venir</h2>
+    <div class="achievements-grid">
+      <div
+        *ngFor="let achievement of achievements; trackBy: trackByAchievementId"
+        class="achievement-item"
+        [class.completed]="achievement.status === 'completed'"
+        [class.in-progress]="achievement.status === 'in-progress'"
+        [class.locked]="achievement.status === 'locked'"
+      >
+        <div class="achievement-icon">
+          <i [class]="achievement.icon"></i>
+        </div>
+        <div class="achievement-content">
+          <h4>{{ achievement.title }}</h4>
+          <p>{{ achievement.description }}</p>
+          <div *ngIf="achievement.progress !== undefined" class="progress-text">
+            Progression: {{ achievement.progress }}%
+          </div>
+          <div *ngIf="achievement.requirements && achievement.requirements.length > 0" class="progress-text">
+            Prochaines étapes: {{ achievement.requirements[0] }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

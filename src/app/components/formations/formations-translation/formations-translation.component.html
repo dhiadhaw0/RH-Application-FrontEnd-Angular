@@ -1,0 +1,199 @@
+<div class="translation-hero">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="floating-elements">
+      <div class="globe globe-1">🌍</div>
+      <div class="globe globe-2">🌎</div>
+      <div class="globe globe-3">🌏</div>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <div class="translation-header">
+      <h1><i class="fas fa-language"></i> Gestion des traductions</h1>
+      <p class="translation-subtitle">Élargissez votre audience en traduisant vos formations dans plusieurs langues</p>
+    </div>
+
+    <div class="translation-actions">
+      <button class="btn-add" (click)="createTraduction()">
+        <i class="fas fa-plus-circle"></i>
+        <span>Ajouter une traduction</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="translation-main">
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-spinner">
+      <div class="spinner-ring"></div>
+      <div class="spinner-ring"></div>
+      <div class="spinner-ring"></div>
+    </div>
+    <h3>Chargement des traductions...</h3>
+    <p>Découvrez bientôt vos traductions disponibles</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="translation-content">
+    <!-- Liste des traductions existantes -->
+    <div class="translations-section" *ngIf="traductions.length > 0">
+      <div class="section-header">
+        <h2><i class="fas fa-list"></i> Traductions existantes</h2>
+        <div class="section-count">{{ traductions.length }}</div>
+      </div>
+
+      <div class="translation-grid">
+        <div class="translation-card" *ngFor="let traduction of traductions; trackBy: trackByLangue">
+          <div class="card-header">
+            <div class="language-badge">
+              <div class="flag-icon">{{ traduction.langue.toUpperCase() }}</div>
+              <div class="language-info">
+                <span class="language-code">{{ traduction.langue.toUpperCase() }}</span>
+                <span class="language-name">{{ getLanguageName(traduction.langue) }}</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn-edit" (click)="selectTraduction(traduction)" title="Modifier">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn-delete" (click)="deleteTraduction(traduction)" title="Supprimer">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-content">
+            <h3 class="translated-title">{{ traduction.titreTraduit }}</h3>
+            <p class="translated-description" *ngIf="traduction.descriptionTraduite">{{ traduction.descriptionTraduite }}</p>
+            <div class="translation-status" *ngIf="traduction.contenuTraduit">
+              <i class="fas fa-check-circle"></i>
+              <span>Contenu complet traduit</span>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="translation-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="getTranslationProgress(traduction)"></div>
+              </div>
+              <span class="progress-text">{{ getTranslationProgress(traduction) }}% complété</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulaire d'édition/ajout -->
+    <div class="form-section" *ngIf="selectedTraduction || newTraduction.langue !== ''">
+      <div class="section-header">
+        <h2><i class="fas fa-edit"></i> {{ selectedTraduction ? 'Modifier la traduction' : 'Ajouter une traduction' }}</h2>
+      </div>
+
+      <div class="form-container">
+        <form (ngSubmit)="saveTraduction()" #translationForm="ngForm" class="translation-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="langue" class="form-label">
+                <i class="fas fa-globe"></i>
+                Langue *
+              </label>
+              <select
+                id="langue"
+                name="langue"
+                [(ngModel)]="newTraduction.langue"
+                required
+                #langue="ngModel"
+                class="form-control"
+                [disabled]="!!selectedTraduction">
+                <option value="">Sélectionnez une langue</option>
+                <option *ngFor="let lang of getAvailableLanguages()" [value]="lang">
+                  {{ getLanguageName(lang) }} ({{ lang.toUpperCase() }})
+                </option>
+              </select>
+              <div class="error-message" *ngIf="langue.invalid && langue.touched">
+                <i class="fas fa-exclamation-triangle"></i>
+                La langue est requise
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="titreTraduit" class="form-label">
+                <i class="fas fa-heading"></i>
+                Titre traduit *
+              </label>
+              <input
+                type="text"
+                id="titreTraduit"
+                name="titreTraduit"
+                [(ngModel)]="newTraduction.titreTraduit"
+                required
+                #titreTraduit="ngModel"
+                class="form-control"
+                placeholder="Entrez le titre traduit">
+              <div class="error-message" *ngIf="titreTraduit.invalid && titreTraduit.touched">
+                <i class="fas fa-exclamation-triangle"></i>
+                Le titre traduit est requis
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="descriptionTraduite" class="form-label">
+              <i class="fas fa-align-left"></i>
+              Description traduite
+            </label>
+            <textarea
+              id="descriptionTraduite"
+              name="descriptionTraduite"
+              [(ngModel)]="newTraduction.descriptionTraduite"
+              class="form-control"
+              rows="4"
+              placeholder="Entrez la description traduite">
+            </textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="contenuTraduit" class="form-label">
+              <i class="fas fa-file-alt"></i>
+              Contenu traduit
+            </label>
+            <textarea
+              id="contenuTraduit"
+              name="contenuTraduit"
+              [(ngModel)]="newTraduction.contenuTraduit"
+              class="form-control"
+              rows="6"
+              placeholder="Entrez le contenu traduit (programme, etc.)">
+            </textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="cancelEdit()">
+              <i class="fas fa-times"></i>
+              <span>Annuler</span>
+            </button>
+            <button type="submit" class="btn-save" [disabled]="translationForm.invalid || isSubmitting">
+              <i class="fas" [class]="isSubmitting ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+              <span>{{ isSubmitting ? 'Enregistrement...' : (selectedTraduction ? 'Mettre à jour' : 'Enregistrer') }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- État vide -->
+    <div *ngIf="traductions.length === 0 && !selectedTraduction && newTraduction.langue === ''" class="empty-section">
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-language"></i>
+        </div>
+        <h2>Aucune traduction</h2>
+        <p>Cette formation n'a pas encore de traductions. Commencez par en ajouter une !</p>
+        <button class="btn-add-primary" (click)="createTraduction()">
+          <i class="fas fa-plus-circle"></i>
+          <span>Ajouter la première traduction</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

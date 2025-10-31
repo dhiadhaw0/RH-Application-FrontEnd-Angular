@@ -1,0 +1,71 @@
+<div class="calendar-container">
+  <h2>Calendrier des Disponibilités</h2>
+
+  <div class="calendar-header">
+    <button class="nav-btn" (click)="previousMonth()">&larr;</button>
+    <h3>{{ getMonthName() }}</h3>
+    <button class="nav-btn" (click)="nextMonth()">&rarr;</button>
+  </div>
+
+  <div class="calendar-grid" *ngIf="!loading">
+    <div class="weekday" *ngFor="let day of getWeekDays()">
+      {{ day }}
+    </div>
+
+    <div
+      class="day"
+      *ngFor="let date of getDaysInMonth(currentDate)"
+      [class.current-month]="isCurrentMonth(date)"
+      [class.today]="isToday(date)"
+      [class.selected]="isSelected(date)"
+      [class.has-availability]="getAvailabilitiesForDate(date).length > 0"
+      (click)="selectDate(date)"
+    >
+      <span class="day-number">{{ date.getDate() }}</span>
+      <div class="availability-indicators" *ngIf="getAvailabilitiesForDate(date).length > 0">
+        <span class="indicator" *ngFor="let availability of getAvailabilitiesForDate(date)">
+          <span class="time">{{ availability.startDateTime | date:'HH:mm' }}</span>
+          <span class="status" [class.booked]="availability.isBooked"></span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    Chargement du calendrier...
+  </div>
+
+  <div class="selected-date-details" *ngIf="selectedDate">
+    <h4>Disponibilités pour le {{ selectedDate | date:'dd/MM/yyyy' }}</h4>
+
+    <div class="availabilities-list">
+      <div class="availability-item" *ngFor="let availability of getAvailabilitiesForDate(selectedDate)">
+        <div class="time-slot">
+          <strong>{{ availability.startDateTime | date:'HH:mm' }} - {{ availability.endDateTime | date:'HH:mm' }}</strong>
+        </div>
+        <div class="status">
+          <span [class]="availability.isBooked ? 'booked' : 'available'">
+            {{ availability.isBooked ? 'Réservé' : 'Disponible' }}
+          </span>
+        </div>
+        <div class="actions" *ngIf="!availability.isBooked">
+          <button class="btn btn-edit" (click)="editAvailability(availability)">Modifier</button>
+          <button class="btn btn-delete" (click)="deleteAvailability(availability)">Supprimer</button>
+        </div>
+      </div>
+
+      <div class="no-availabilities" *ngIf="getAvailabilitiesForDate(selectedDate).length === 0">
+        Aucune disponibilité pour cette date.
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" routerLink="/mentor-availability/add">
+      Ajouter une disponibilité
+    </button>
+    <button class="btn btn-secondary" routerLink="/mentor-availability">
+      Voir la liste
+    </button>
+  </div>
+</div>

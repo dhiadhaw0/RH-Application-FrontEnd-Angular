@@ -1,0 +1,284 @@
+<!-- Forum Search Component -->
+<div class="forum-search-container">
+  <div class="search-header">
+    <h1 class="search-title">
+      <i class="fas fa-search"></i>
+      Recherche dans le forum
+    </h1>
+    <p class="search-subtitle">Trouvez des discussions, des posts et des réponses pertinentes</p>
+  </div>
+
+  <!-- Search Form -->
+  <div class="search-form-container">
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
+      <div class="search-input-group">
+        <div class="search-input-wrapper">
+          <i class="fas fa-search search-icon"></i>
+          <input
+            type="text"
+            formControlName="query"
+            class="search-input"
+            placeholder="Rechercher des discussions, des posts..."
+            autocomplete="off"
+          >
+        </div>
+        <button
+          type="submit"
+          class="search-btn"
+          [disabled]="!searchForm.value.query?.trim()"
+        >
+          <i class="fas fa-search"></i>
+          Rechercher
+        </button>
+      </div>
+
+      <!-- Advanced Filters (Collapsible) -->
+      <div class="advanced-filters">
+        <button type="button" class="filter-toggle" (click)="toggleFilters()">
+          <i class="fas fa-sliders-h"></i>
+          Filtres avancés
+          <i class="fas fa-chevron-down" [class.rotated]="showFilters"></i>
+        </button>
+
+        <div class="filter-options" [class.expanded]="showFilters">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label class="filter-label">Catégorie</label>
+              <select formControlName="category" class="filter-select">
+                <option value="">Toutes les catégories</option>
+                <option value="general">Général</option>
+                <option value="tech">Technologie</option>
+                <option value="help">Aide</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Période</label>
+              <select formControlName="dateRange" class="filter-select">
+                <option value="">Toutes les périodes</option>
+                <option value="today">Aujourd'hui</option>
+                <option value="week">Cette semaine</option>
+                <option value="month">Ce mois</option>
+                <option value="year">Cette année</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Auteur</label>
+              <input
+                type="text"
+                formControlName="author"
+                class="filter-input"
+                placeholder="Nom d'utilisateur..."
+              >
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Trier par</label>
+              <select formControlName="sortBy" class="filter-select">
+                <option value="relevance">Pertinence</option>
+                <option value="date">Date</option>
+                <option value="replies">Réponses</option>
+                <option value="views">Vues</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Search Results -->
+  <div *ngIf="searchResults" class="search-results">
+    <!-- Results Header -->
+    <div class="results-header">
+      <div class="results-info">
+        <h2>Résultats pour "<span class="search-query">{{ searchQuery }}</span>"</h2>
+        <p class="results-count">
+          {{ getResultCount() }} résultat{{ getResultCount() > 1 ? 's' : '' }} trouvé{{ getResultCount() > 1 ? 's' : '' }}
+        </p>
+      </div>
+      <button class="clear-search-btn" (click)="clearSearch()">
+        <i class="fas fa-times"></i>
+        Effacer
+      </button>
+    </div>
+
+    <!-- Results Tabs -->
+    <div class="results-tabs">
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'threads'"
+        (click)="setActiveTab('threads')"
+      >
+        <i class="fas fa-comments"></i>
+        Discussions ({{ searchResults.threads.length }})
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'posts'"
+        (click)="setActiveTab('posts')"
+      >
+        <i class="fas fa-comment"></i>
+        Posts ({{ searchResults.posts.length }})
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'users'"
+        (click)="setActiveTab('users')"
+      >
+        <i class="fas fa-users"></i>
+        Utilisateurs ({{ searchResults.users?.length || 0 }})
+      </button>
+    </div>
+
+    <!-- Threads Results -->
+    <div *ngIf="activeTab === 'threads'" class="results-content">
+      <div *ngFor="let thread of searchResults.threads" class="result-item thread-result">
+        <div class="result-icon">
+          <i class="fas fa-comments"></i>
+        </div>
+        <div class="result-content">
+          <h3 class="result-title">
+            <a [routerLink]="['/forum', 'thread', thread.id]">{{ thread.title }}</a>
+          </h3>
+          <p class="result-excerpt">{{ thread.content | truncate:150 }}</p>
+          <div class="result-meta">
+            <span class="result-author">
+              <i class="fas fa-user"></i>
+              {{ thread.author.firstName }} {{ thread.author.lastName }}
+            </span>
+            <span class="result-date">
+              <i class="fas fa-calendar"></i>
+              {{ formatDate(thread.createdAt) }}
+            </span>
+            <span class="result-category">
+              <i class="fas fa-tag"></i>
+              {{ thread.category.name }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="searchResults.threads.length === 0" class="no-results">
+        <i class="fas fa-search"></i>
+        <h3>Aucune discussion trouvée</h3>
+        <p>Essayez avec des termes différents ou vérifiez l'orthographe.</p>
+      </div>
+    </div>
+
+    <!-- Posts Results -->
+    <div *ngIf="activeTab === 'posts'" class="results-content">
+      <div *ngFor="let post of searchResults.posts" class="result-item post-result">
+        <div class="result-icon">
+          <i class="fas fa-comment"></i>
+        </div>
+        <div class="result-content">
+          <p class="result-excerpt">{{ post.content | truncate:200 }}</p>
+          <div class="result-meta">
+            <span class="result-author">
+              <i class="fas fa-user"></i>
+              {{ post.author.firstName }} {{ post.author.lastName }}
+            </span>
+            <span class="result-date">
+              <i class="fas fa-calendar"></i>
+              {{ formatDate(post.createdAt) }}
+            </span>
+            <span class="result-thread" *ngIf="post.thread">
+              <i class="fas fa-reply"></i>
+              Dans: {{ post.thread.title }}
+            </span>
+          </div>
+          <div class="result-actions">
+            <button class="action-btn" (click)="viewPost(post)">
+              <i class="fas fa-eye"></i>
+              Voir
+            </button>
+            <button class="action-btn" (click)="reportPost(post)">
+              <i class="fas fa-flag"></i>
+              Signaler
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="searchResults.posts.length === 0" class="no-results">
+        <i class="fas fa-search"></i>
+        <h3>Aucun post trouvé</h3>
+        <p>Essayez avec des termes différents ou vérifiez l'orthographe.</p>
+      </div>
+    </div>
+
+    <!-- Users Results -->
+    <div *ngIf="activeTab === 'users'" class="results-content">
+      <div *ngFor="let user of searchResults.users" class="result-item user-result">
+        <div class="result-icon">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="result-content">
+          <h3 class="result-title">
+            <a [routerLink]="['/users', user.id]">{{ user.firstName }} {{ user.lastName }}</a>
+          </h3>
+          <div class="result-meta">
+            <span class="result-role" *ngIf="user.role">
+              <i class="fas fa-crown" *ngIf="user.role === 'ADMIN'"></i>
+              <i class="fas fa-shield-alt" *ngIf="user.role === 'MODERATOR'"></i>
+              <i class="fas fa-user" *ngIf="user.role === 'USER'"></i>
+              {{ getRoleLabel(user.role) }}
+            </span>
+            <span class="result-date">
+              <i class="fas fa-calendar"></i>
+              Membre depuis {{ formatDate(user.createdAt) }}
+            </span>
+          </div>
+          <div class="result-actions">
+            <button class="action-btn" (click)="viewUserProfile(user)">
+              <i class="fas fa-eye"></i>
+              Voir profil
+            </button>
+            <button class="action-btn" (click)="sendMessage(user)">
+              <i class="fas fa-envelope"></i>
+              Message
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!searchResults.users || searchResults.users.length === 0" class="no-results">
+        <i class="fas fa-users"></i>
+        <h3>Aucun utilisateur trouvé</h3>
+        <p>Essayez avec un nom d'utilisateur différent.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Recherche en cours...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h4>Erreur de recherche</h4>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="onSearch()">
+        <i class="fas fa-redo"></i>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty State (No Search Yet) -->
+  <div *ngIf="!searchResults && !loading && !error" class="empty-state">
+    <div class="empty-content">
+      <i class="fas fa-search empty-icon"></i>
+      <h3>Recherchez dans le forum</h3>
+      <p>Utilisez la barre de recherche ci-dessus pour trouver des discussions et des posts.</p>
+    </div>
+  </div>
+</div>

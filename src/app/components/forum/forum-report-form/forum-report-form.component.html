@@ -1,0 +1,154 @@
+<!-- Forum Report Form Component -->
+<div class="report-form-container">
+  <div class="form-header">
+    <h2 class="form-title">
+      <i class="fas fa-flag"></i>
+      Signaler un contenu
+    </h2>
+    <p class="form-subtitle">Aidez-nous à maintenir un environnement respectueux en signalant les contenus inappropriés</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h4>Erreur</h4>
+      <p>{{ error }}</p>
+    </div>
+  </div>
+
+  <!-- Report Form -->
+  <form [formGroup]="reportForm" (ngSubmit)="onSubmit()" class="report-form">
+    <!-- Report Reason Selection -->
+    <div class="form-section">
+      <h4 class="section-title">
+        <i class="fas fa-question-circle"></i>
+        Raison du signalement *
+      </h4>
+      <div class="reason-grid">
+        <div
+          *ngFor="let reason of reportReasons"
+          class="reason-card"
+          [class.selected]="reportForm.get('reason')?.value === reason.value"
+          (click)="reportForm.get('reason')?.setValue(reason.value); onReasonChange()"
+        >
+          <div class="reason-icon">
+            <i [class]="reason.icon"></i>
+          </div>
+          <div class="reason-content">
+            <h5>{{ reason.label }}</h5>
+          </div>
+          <div class="reason-radio">
+            <input
+              type="radio"
+              [value]="reason.value"
+              formControlName="reason"
+              (change)="onReasonChange()"
+            >
+          </div>
+        </div>
+      </div>
+      <div *ngIf="isFieldInvalid('reason')" class="error-text">
+        {{ getFieldError('reason') }}
+      </div>
+    </div>
+
+    <!-- Description Field -->
+    <div class="form-section">
+      <label for="description" class="form-label">
+        <i class="fas fa-comment"></i>
+        Description détaillée *
+      </label>
+      <textarea
+        id="description"
+        formControlName="description"
+        class="form-textarea"
+        placeholder="Veuillez décrire précisément le problème avec ce contenu. Plus de détails nous aideront à traiter votre signalement plus efficacement..."
+        rows="6"
+        [class.error]="isFieldInvalid('description')"
+      ></textarea>
+      <div class="input-info">
+        <span class="char-count">{{ reportForm.get('description')?.value?.length || 0 }}/500 caractères</span>
+      </div>
+      <div *ngIf="isFieldInvalid('description')" class="error-text">
+        {{ getFieldError('description') }}
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="form-section">
+      <div class="options-grid">
+        <!-- Anonymous Reporting -->
+        <div class="option-item">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              formControlName="anonymous"
+              class="checkbox-input"
+            >
+            <span class="checkbox-mark"></span>
+            <span class="checkbox-text">
+              <i class="fas fa-user-secret"></i>
+              Signaler anonymement
+            </span>
+          </label>
+          <div class="option-info">
+            Votre identité ne sera pas visible pour les autres utilisateurs
+          </div>
+        </div>
+
+        <!-- Contact Moderator -->
+        <div class="option-item">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              formControlName="contactModerator"
+              class="checkbox-input"
+            >
+            <span class="checkbox-mark"></span>
+            <span class="checkbox-text">
+              <i class="fas fa-envelope"></i>
+              Me contacter pour plus d'informations
+            </span>
+          </label>
+          <div class="option-info">
+            Les modérateurs pourront vous contacter si nécessaire
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Information Notice -->
+    <div class="info-notice">
+      <div class="notice-content">
+        <i class="fas fa-info-circle"></i>
+        <div class="notice-text">
+          <h5>Comment traitons-nous les signalements ?</h5>
+          <ul>
+            <li>Tous les signalements sont examinés par notre équipe de modération</li>
+            <li>Nous nous engageons à traiter chaque signalement dans les 24-48 heures</li>
+            <li>Les signalements abusifs peuvent entraîner des sanctions</li>
+            <li>Votre confidentialité est respectée selon notre politique de confidentialité</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline" (click)="cancel()">
+        <i class="fas fa-times"></i>
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="submitting || reportForm.invalid"
+      >
+        <i class="fas fa-paper-plane" *ngIf="!submitting"></i>
+        <div class="spinner small" *ngIf="submitting"></div>
+        {{ submitting ? 'Envoi en cours...' : 'Envoyer le signalement' }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,227 @@
+<app-navbar></app-navbar>
+
+<div class="search-container">
+  <div class="header-section">
+    <h1>Recherche avancée d'offres d'emploi</h1>
+    <p>Utilisez les filtres ci-dessous pour trouver l'offre idéale</p>
+  </div>
+
+  <!-- Search Filters -->
+  <div class="filters-section">
+    <div class="filters-card">
+      <h2><i class="fas fa-filter"></i> Filtres de recherche</h2>
+
+      <div class="filters-grid">
+        <!-- Text Search -->
+        <div class="filter-group">
+          <label for="searchQuery">Recherche par mots-clés</label>
+          <div class="search-input-wrapper">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="searchQuery"
+              [(ngModel)]="searchQuery"
+              class="form-control"
+              placeholder="Titre, description, compétences..."
+              (keyup.enter)="performSearch()">
+          </div>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="filter-group">
+          <label for="status">Statut de l'offre</label>
+          <select
+            id="status"
+            [(ngModel)]="selectedStatus"
+            class="form-control">
+            <option value="">Tous les statuts</option>
+            <option *ngFor="let status of statusOptions" [value]="status.value">
+              {{status.label}}
+            </option>
+          </select>
+        </div>
+
+        <!-- Remote Work -->
+        <div class="filter-group">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="remoteOnly">
+            <span class="checkmark"></span>
+            Télétravail uniquement
+          </label>
+        </div>
+
+        <!-- Salary Range -->
+        <div class="filter-group salary-group">
+          <label>Fourchette salariale (€)</label>
+          <div class="salary-inputs">
+            <input
+              type="number"
+              [(ngModel)]="salaryMin"
+              class="form-control"
+              placeholder="Min"
+              min="0">
+            <span class="separator">-</span>
+            <input
+              type="number"
+              [(ngModel)]="salaryMax"
+              class="form-control"
+              placeholder="Max"
+              min="0">
+          </div>
+        </div>
+
+        <!-- Publication Date -->
+        <div class="filter-group date-group">
+          <label>Date de publication</label>
+          <div class="date-inputs">
+            <div class="date-input">
+              <label for="publishedAfter">Du</label>
+              <input
+                type="date"
+                id="publishedAfter"
+                [(ngModel)]="publishedAfter"
+                class="form-control">
+            </div>
+            <div class="date-input">
+              <label for="publishedBefore">Au</label>
+              <input
+                type="date"
+                id="publishedBefore"
+                [(ngModel)]="publishedBefore"
+                class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="filter-actions">
+        <button class="btn btn-primary" (click)="performSearch()" [disabled]="loading">
+          <i class="fas fa-search" *ngIf="!loading"></i>
+          <i class="fas fa-spinner fa-spin" *ngIf="loading"></i>
+          {{loading ? 'Recherche...' : 'Rechercher'}}
+        </button>
+        <button class="btn btn-secondary" (click)="clearFilters()">
+          <i class="fas fa-times"></i> Effacer les filtres
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  <div class="results-section" *ngIf="searchResults.length > 0 || (hasActiveFilters() && !loading)">
+    <div class="results-header">
+      <h2>Résultats de recherche</h2>
+      <span class="results-count">{{searchResults.length}} offre(s) trouvée(s)</span>
+    </div>
+
+    <div class="search-results" *ngIf="!loading; else loadingTemplate">
+      <div class="job-offer-card" *ngFor="let offer of searchResults">
+        <div class="card-header">
+          <div class="offer-info">
+            <h3 class="offer-title">{{offer.title}}</h3>
+            <div class="offer-meta">
+              <span class="offer-id">#{{offer.idJobOffer}}</span>
+              <span class="offer-status" [style.background-color]="getStatusColor(offer.status)">
+                {{offer.status}}
+              </span>
+              <span class="workflow-status" [style.background-color]="getWorkflowStatusColor(offer.workflowStatus)">
+                {{offer.workflowStatus}}
+              </span>
+            </div>
+          </div>
+          <div class="offer-actions">
+            <button class="btn btn-sm btn-outline" routerLink="/job-offers/{{offer.idJobOffer}}">
+              <i class="fas fa-eye"></i> Voir
+            </button>
+            <button class="btn btn-sm btn-outline" (click)="toggleFavorite(offer)">
+              <i class="fas fa-heart" [class.filled]="isFavorite(offer)"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="card-content">
+          <p class="offer-description" *ngIf="offer.description">
+            {{offer.description | slice:0:150}}...
+          </p>
+
+          <div class="offer-details">
+            <div class="detail-row">
+              <div class="detail-item" *ngIf="offer.salaryMin || offer.salaryMax">
+                <label>Salaire:</label>
+                <span>
+                  {{offer.salaryMin ? (offer.salaryMin | currency:'EUR':'symbol':'1.0-0') : 'N/A'}} -
+                  {{offer.salaryMax ? (offer.salaryMax | currency:'EUR':'symbol':'1.0-0') : 'N/A'}}
+                </span>
+              </div>
+              <div class="detail-item">
+                <label>Remote:</label>
+                <span [class]="offer.remote ? 'remote-yes' : 'remote-no'">
+                  <i class="fas" [class]="offer.remote ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                  {{offer.remote ? 'Oui' : 'Non'}}
+                </span>
+              </div>
+              <div class="detail-item">
+                <label>Publié:</label>
+                <span>{{offer.publishedAt | date:'dd/MM/yyyy'}}</span>
+              </div>
+            </div>
+
+            <div class="skills-section" *ngIf="offer.requirementsHardSkills?.length || offer.requirementsSoftSkills?.length">
+              <div class="skills-group" *ngIf="offer.requirementsHardSkills?.length">
+                <label>Compétences Techniques:</label>
+                <div class="skills-list">
+                  <span class="skill-tag" *ngFor="let skill of offer.requirementsHardSkills">{{skill}}</span>
+                </div>
+              </div>
+              <div class="skills-group" *ngIf="offer.requirementsSoftSkills?.length">
+                <label>Compétences Comportementales:</label>
+                <div class="skills-list">
+                  <span class="skill-tag soft-skill" *ngFor="let skill of offer.requirementsSoftSkills">{{skill}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="offer-dates">
+              <span class="expiry-date" *ngIf="offer.expiresAt">
+                Expire le: {{offer.expiresAt | date:'dd/MM/yyyy'}}
+              </span>
+              <span class="created-date">
+                Créé le: {{offer.createdAt | date:'dd/MM/yyyy'}}
+              </span>
+            </div>
+            <button class="btn btn-primary" (click)="applyToOffer(offer)" *ngIf="canApply(offer)">
+              <i class="fas fa-paper-plane"></i> Postuler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #loadingTemplate>
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Recherche en cours...</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- No Results -->
+  <div class="no-results" *ngIf="hasActiveFilters() && searchResults.length === 0 && !loading">
+    <i class="fas fa-search"></i>
+    <h3>Aucun résultat trouvé</h3>
+    <p>Essayez de modifier vos critères de recherche</p>
+    <button class="btn btn-secondary" (click)="clearFilters()">
+      Effacer les filtres
+    </button>
+  </div>
+
+  <!-- Initial State -->
+  <div class="initial-state" *ngIf="!hasActiveFilters()">
+    <i class="fas fa-search-plus"></i>
+    <h3>Recherche avancée</h3>
+    <p>Utilisez les filtres ci-dessus pour trouver des offres d'emploi spécifiques</p>
+  </div>
+</div>

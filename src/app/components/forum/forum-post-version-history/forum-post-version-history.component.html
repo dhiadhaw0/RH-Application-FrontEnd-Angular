@@ -1,0 +1,121 @@
+<!-- Forum Post Version History Component -->
+<div class="version-history-container">
+  <div class="history-header">
+    <h2 class="history-title">
+      <i class="fas fa-history"></i>
+      Historique des versions
+    </h2>
+    <p class="history-subtitle">Suivez l'évolution de ce post au fil des modifications</p>
+    <button class="btn btn-outline" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Retour au post
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement de l'historique...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h4>Erreur de chargement</h4>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadVersionHistory()">
+        <i class="fas fa-redo"></i>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Version Timeline -->
+  <div *ngIf="!loading && !error" class="version-timeline">
+    <div class="timeline-header">
+      <h3>Versions du post</h3>
+      <button class="btn btn-secondary" (click)="compareVersions()">
+        <i class="fas fa-exchange-alt"></i>
+        Comparer
+      </button>
+    </div>
+
+    <div class="timeline">
+      <div
+        *ngFor="let version of versions; let i = index; trackBy: trackByVersionId"
+        class="timeline-item"
+        [class.current]="isCurrentVersion(version)"
+        (click)="selectVersion(version)"
+      >
+        <div class="timeline-marker" [class.current]="isCurrentVersion(version)">
+          <div class="marker-dot"></div>
+          <div class="marker-line" *ngIf="i < versions.length - 1"></div>
+        </div>
+
+        <div class="timeline-content">
+          <div class="version-header">
+            <div class="version-info">
+              <span class="version-number">Version {{ version.versionNumber }}</span>
+              <span class="version-date">{{ formatDate(version.editedAt) }}</span>
+              <span class="version-editor" *ngIf="!isCurrentVersion(version)">
+                Modifié par {{ getEditorName(version) }}
+              </span>
+              <span class="current-badge" *ngIf="isCurrentVersion(version)">
+                <i class="fas fa-star"></i>
+                Version actuelle
+              </span>
+            </div>
+          </div>
+
+          <div class="version-content">
+            <div class="content-preview" [innerHTML]="version.content | truncate:200"></div>
+            <button class="expand-btn" *ngIf="version.content.length > 200">
+              Voir plus
+            </button>
+          </div>
+
+          <div class="version-actions" *ngIf="selectedVersion?.id === version.id">
+            <button class="btn btn-sm btn-outline">
+              <i class="fas fa-eye"></i>
+              Voir complète
+            </button>
+            <button class="btn btn-sm btn-primary" *ngIf="!isCurrentVersion(version)">
+              <i class="fas fa-undo"></i>
+              Restaurer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Version Comparison Modal (simplified) -->
+  <div *ngIf="selectedVersion" class="version-modal" (click)="selectedVersion = null">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h4>Version {{ selectedVersion.versionNumber }}</h4>
+        <button class="close-btn" (click)="selectedVersion = null">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="version-details">
+          <div class="detail-row">
+            <span class="label">Modifié le:</span>
+            <span class="value">{{ formatDate(selectedVersion.editedAt) }}</span>
+          </div>
+          <div class="detail-row" *ngIf="!isCurrentVersion(selectedVersion)">
+            <span class="label">Par:</span>
+            <span class="value">{{ getEditorName(selectedVersion) }}</span>
+          </div>
+        </div>
+        <div class="version-text">
+          <pre>{{ selectedVersion.content }}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

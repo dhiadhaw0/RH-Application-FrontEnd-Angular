@@ -1,0 +1,102 @@
+<!-- Forum Attachment Upload Component -->
+<div class="attachment-upload-container">
+  <!-- Upload Area -->
+  <div
+    class="upload-area"
+    [class.drag-over]="dragOver"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <div class="upload-content">
+      <div class="upload-icon">
+        <i class="fas fa-cloud-upload-alt"></i>
+      </div>
+
+      <div class="upload-text">
+        <h4>Glissez-déposez vos fichiers ici</h4>
+        <p>ou <label for="file-input" class="file-input-label">parcourez vos fichiers</label></p>
+      </div>
+
+      <input
+        type="file"
+        id="file-input"
+        class="file-input"
+        multiple
+        [accept]="allowedTypes.join(',')"
+        (change)="onFileSelected($event)"
+      >
+
+      <div class="upload-info">
+        <small>
+          Formats acceptés: {{ allowedExtensions.join(', ') }}<br>
+          Taille max: {{ formatFileSize(maxFileSize) }} par fichier<br>
+          Maximum {{ maxFiles }} fichiers
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Progress -->
+  <div *ngIf="uploading" class="upload-progress">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+    </div>
+    <div class="progress-text">
+      Téléchargement en cours... {{ uploadProgress.toFixed(0) }}%
+    </div>
+  </div>
+
+  <!-- Selected Files Preview -->
+  <div *ngIf="selectedFiles.length > 0" class="selected-files">
+    <h5 class="files-title">
+      <i class="fas fa-paperclip"></i>
+      Fichiers sélectionnés ({{ selectedFiles.length }})
+    </h5>
+
+    <div class="files-list">
+      <div
+        *ngFor="let file of selectedFiles; let i = index"
+        class="file-item"
+        [class.uploading]="uploading"
+      >
+        <div class="file-icon">
+          <i [class]="getFileIcon(file.name)"></i>
+        </div>
+
+        <div class="file-info">
+          <div class="file-name" [title]="file.name">{{ file.name }}</div>
+          <div class="file-size">{{ formatFileSize(file.size) }}</div>
+        </div>
+
+        <button
+          class="remove-btn"
+          (click)="removeFile(i)"
+          [disabled]="uploading"
+          title="Retirer le fichier"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Actions -->
+  <div *ngIf="selectedFiles.length > 0 && !uploading" class="upload-actions">
+    <button
+      class="btn btn-primary"
+      (click)="uploadFiles(selectedFiles)"
+    >
+      <i class="fas fa-upload"></i>
+      Télécharger {{ selectedFiles.length }} fichier(s)
+    </button>
+
+    <button
+      class="btn btn-outline"
+      (click)="selectedFiles = []"
+    >
+      <i class="fas fa-trash"></i>
+      Tout supprimer
+    </button>
+  </div>
+</div>

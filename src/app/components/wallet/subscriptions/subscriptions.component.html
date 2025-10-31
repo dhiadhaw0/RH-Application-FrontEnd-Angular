@@ -1,0 +1,276 @@
+<div class="subscriptions-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1><i class="fas fa-sync-alt"></i> Subscription Management</h1>
+      <p>Manage your recurring payments and subscriptions</p>
+    </div>
+    <button class="btn btn-primary" (click)="showAddSubscription()" *ngIf="!showAddForm">
+      <i class="fas fa-plus"></i> New Subscription
+    </button>
+  </div>
+
+  <!-- Add/Edit Form -->
+  <div class="form-section" *ngIf="showAddForm">
+    <div class="form-card">
+      <div class="form-header">
+        <h3>{{ editingSubscription ? 'Edit Subscription' : 'Create New Subscription' }}</h3>
+        <button class="btn-close" (click)="cancelEdit()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form [formGroup]="subscriptionForm" (ngSubmit)="saveSubscription()">
+        <!-- Service Selection -->
+        <div class="form-group">
+          <label for="name">Service Name</label>
+          <input type="text" id="name" formControlName="name" class="form-control"
+                 placeholder="e.g., Premium Formation Access, Mentorship Program">
+        </div>
+
+        <!-- Amount and Currency -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="amount">Amount</label>
+            <input type="number" id="amount" formControlName="amount" class="form-control"
+                   placeholder="0.00" step="0.01" min="0">
+          </div>
+          <div class="form-group">
+            <label for="currency">Currency</label>
+            <select id="currency" formControlName="currency" class="form-control">
+              <option *ngFor="let currency of currencies" [value]="currency">
+                {{ currency }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Frequency and Billing Cycle -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="frequency">Billing Frequency</label>
+            <select id="frequency" formControlName="frequency" class="form-control">
+              <option value="DAILY">Daily</option>
+              <option value="WEEKLY">Weekly</option>
+              <option value="MONTHLY">Monthly</option>
+              <option value="QUARTERLY">Quarterly</option>
+              <option value="YEARLY">Yearly</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="nextBillingDate">Next Billing Date</label>
+            <input type="date" id="nextBillingDate" formControlName="nextBillingDate" class="form-control">
+          </div>
+        </div>
+
+        <!-- Trial Period -->
+        <div class="form-group">
+          <label for="trialDays">Trial Period (Days)</label>
+          <input type="number" id="trialDays" formControlName="trialDays" class="form-control"
+                 placeholder="0" min="0" max="365">
+          <small class="form-text">Leave as 0 for no trial period</small>
+        </div>
+
+        <!-- Payment Method Selection -->
+        <div class="form-group">
+          <label for="paymentMethodId">Payment Method</label>
+          <select id="paymentMethodId" formControlName="paymentMethodId" class="form-control">
+            <option value="">Select a payment method</option>
+            <option *ngFor="let method of paymentMethods" [value]="method.id">
+              {{ method.nickname || method.provider + ' ****' + method.lastFour }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Auto Renewal -->
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="autoRenew">
+            <span class="checkmark"></span>
+            Auto-renew subscription
+          </label>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">Description (Optional)</label>
+          <textarea id="description" formControlName="description" class="form-control"
+                    rows="3" placeholder="Additional details about this subscription"></textarea>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="subscriptionForm.invalid">
+            {{ editingSubscription ? 'Update' : 'Create' }} Subscription
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Subscriptions List -->
+  <div class="subscriptions-section">
+    <!-- Active Subscriptions -->
+    <div class="subscriptions-group" *ngIf="activeSubscriptions.length > 0">
+      <h2><i class="fas fa-play-circle text-success"></i> Active Subscriptions</h2>
+      <div class="subscriptions-grid">
+        <div *ngFor="let subscription of activeSubscriptions" class="subscription-card active">
+          <div class="subscription-header">
+            <div class="subscription-icon">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="subscription-actions">
+              <button class="btn-icon" (click)="editSubscription(subscription)" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn-icon btn-danger" (click)="cancelSubscription(subscription)" title="Cancel">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="subscription-details">
+            <h3 class="subscription-name">{{ subscription.name }}</h3>
+            <div class="subscription-amount">
+              {{ formatCurrency(subscription.amount, subscription.currency) }}
+              <span class="frequency">/ {{ subscription.frequency.toLowerCase() }}</span>
+            </div>
+            <div class="subscription-info">
+              <div class="info-item">
+                <i class="fas fa-calendar"></i>
+                <span>Next billing: {{ formatDate(subscription.nextBillingDate) }}</span>
+              </div>
+              <div class="info-item" *ngIf="subscription.trialDays > 0">
+                <i class="fas fa-clock"></i>
+                <span>Trial ends: {{ formatDate(subscription.trialEndDate) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="subscription-footer">
+            <div class="subscription-status">
+              <span class="status-badge active">
+                <i class="fas fa-check-circle"></i> Active
+              </span>
+            </div>
+            <div class="subscription-controls">
+              <button class="btn btn-sm btn-outline-primary" (click)="pauseSubscription(subscription)"
+                      *ngIf="subscription.autoRenew">
+                <i class="fas fa-pause"></i> Pause
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" (click)="viewBillingHistory(subscription)">
+                <i class="fas fa-history"></i> History
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paused Subscriptions -->
+    <div class="subscriptions-group" *ngIf="pausedSubscriptions.length > 0">
+      <h2><i class="fas fa-pause-circle text-warning"></i> Paused Subscriptions</h2>
+      <div class="subscriptions-grid">
+        <div *ngFor="let subscription of pausedSubscriptions" class="subscription-card paused">
+          <div class="subscription-header">
+            <div class="subscription-icon">
+              <i class="fas fa-pause"></i>
+            </div>
+            <div class="subscription-actions">
+              <button class="btn-icon" (click)="resumeSubscription(subscription)" title="Resume">
+                <i class="fas fa-play"></i>
+              </button>
+              <button class="btn-icon btn-danger" (click)="cancelSubscription(subscription)" title="Cancel">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="subscription-details">
+            <h3 class="subscription-name">{{ subscription.name }}</h3>
+            <div class="subscription-amount">
+              {{ formatCurrency(subscription.amount, subscription.currency) }}
+              <span class="frequency">/ {{ subscription.frequency.toLowerCase() }}</span>
+            </div>
+            <div class="subscription-info">
+              <div class="info-item">
+                <i class="fas fa-calendar"></i>
+                <span>Resumes: {{ formatDate(subscription.nextBillingDate) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="subscription-footer">
+            <div class="subscription-status">
+              <span class="status-badge paused">
+                <i class="fas fa-pause-circle"></i> Paused
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancelled Subscriptions -->
+    <div class="subscriptions-group" *ngIf="cancelledSubscriptions.length > 0">
+      <h2><i class="fas fa-times-circle text-danger"></i> Cancelled Subscriptions</h2>
+      <div class="subscriptions-grid">
+        <div *ngFor="let subscription of cancelledSubscriptions" class="subscription-card cancelled">
+          <div class="subscription-header">
+            <div class="subscription-icon">
+              <i class="fas fa-times"></i>
+            </div>
+            <div class="subscription-actions">
+              <button class="btn-icon" (click)="reactivateSubscription(subscription)" title="Reactivate">
+                <i class="fas fa-redo"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="subscription-details">
+            <h3 class="subscription-name">{{ subscription.name }}</h3>
+            <div class="subscription-amount">
+              {{ formatCurrency(subscription.amount, subscription.currency) }}
+              <span class="frequency">/ {{ subscription.frequency.toLowerCase() }}</span>
+            </div>
+            <div class="subscription-info">
+              <div class="info-item">
+                <i class="fas fa-calendar-times"></i>
+                <span>Cancelled: {{ formatDate(subscription.cancelledAt) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="subscription-footer">
+            <div class="subscription-status">
+              <span class="status-badge cancelled">
+                <i class="fas fa-times-circle"></i> Cancelled
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="allSubscriptions.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-calendar-alt"></i>
+      </div>
+      <h3>No Subscriptions</h3>
+      <p>You haven't set up any subscriptions yet</p>
+      <button class="btn btn-primary" (click)="showAddSubscription()">
+        <i class="fas fa-plus"></i> Create Your First Subscription
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p>Loading subscriptions...</p>
+  </div>
+</div>

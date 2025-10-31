@@ -1,0 +1,140 @@
+<div class="invoice-list-container">
+  <div class="header">
+    <h2>My Invoices</h2>
+    <button class="btn btn-primary" (click)="createNewInvoice()">
+      <i class="fas fa-plus"></i> Create Invoice
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filter-group">
+      <label for="statusFilter">Status:</label>
+      <select
+        id="statusFilter"
+        [(ngModel)]="statusFilter"
+        (change)="onStatusFilterChange()"
+        class="form-control">
+        <option *ngFor="let status of invoiceStatuses" [value]="status.value">
+          {{ status.label }}
+        </option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="searchTerm">Search:</label>
+      <input
+        type="text"
+        id="searchTerm"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+        placeholder="Search by invoice number, client name, or email..."
+        class="form-control">
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading invoices...</p>
+  </div>
+
+  <!-- Invoice List -->
+  <div *ngIf="!isLoading" class="invoice-table-container">
+    <table class="invoice-table" *ngIf="filteredInvoices.length > 0; else noInvoices">
+      <thead>
+        <tr>
+          <th>Invoice #</th>
+          <th>Client</th>
+          <th>Issue Date</th>
+          <th>Due Date</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let invoice of filteredInvoices" [class.overdue]="isOverdue(invoice)">
+          <td>{{ invoice.invoiceNumber }}</td>
+          <td>
+            <div class="client-info">
+              <div class="client-name">{{ invoice.clientName }}</div>
+              <div class="client-email">{{ invoice.clientEmail }}</div>
+            </div>
+          </td>
+          <td>{{ formatDate(invoice.issueDate) }}</td>
+          <td>{{ formatDate(invoice.dueDate) }}</td>
+          <td class="amount">{{ formatCurrency(invoice.totalAmount) }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusBadgeClass(invoice.status)">
+              {{ getStatusLabel(invoice.status) }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="btn btn-sm btn-outline-primary" (click)="viewInvoice(invoice)" title="View">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button
+              class="btn btn-sm btn-outline-secondary"
+              (click)="editInvoice(invoice)"
+              [disabled]="invoice.status === 'PAID' || invoice.status === 'CANCELLED'"
+              title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button
+              class="btn btn-sm btn-outline-info"
+              (click)="sendInvoice(invoice)"
+              [disabled]="invoice.status !== 'DRAFT'"
+              title="Send to Client">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+            <button
+              class="btn btn-sm btn-outline-success"
+              (click)="markAsPaid(invoice)"
+              [disabled]="invoice.status === 'PAID' || invoice.status === 'CANCELLED'"
+              title="Mark as Paid">
+              <i class="fas fa-check"></i>
+            </button>
+            <button
+              class="btn btn-sm btn-outline-danger"
+              (click)="deleteInvoice(invoice)"
+              [disabled]="invoice.status === 'PAID'"
+              title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noInvoices>
+      <div class="no-invoices">
+        <i class="fas fa-file-invoice-dollar"></i>
+        <h3>No invoices found</h3>
+        <p *ngIf="invoices.length === 0">You haven't created any invoices yet.</p>
+        <p *ngIf="invoices.length > 0 && filteredInvoices.length === 0">No invoices match your current filters.</p>
+        <button class="btn btn-primary" (click)="createNewInvoice()">Create Your First Invoice</button>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Summary Stats -->
+  <div *ngIf="!isLoading && invoices.length > 0" class="summary-stats">
+    <div class="stat-card">
+      <div class="stat-value">{{ invoices.length }}</div>
+      <div class="stat-label">Total Invoices</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ getPaidInvoicesCount() }}</div>
+      <div class="stat-label">Paid</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ getSentInvoicesCount() }}</div>
+      <div class="stat-label">Sent</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ getTotalRevenue() }}</div>
+      <div class="stat-label">Total Revenue</div>
+    </div>
+  </div>
+</div>

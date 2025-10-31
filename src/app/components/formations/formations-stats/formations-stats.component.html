@@ -1,0 +1,190 @@
+<div class="stats-hero">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="floating-charts">
+      <div class="chart-icon chart-1">📊</div>
+      <div class="chart-icon chart-2">📈</div>
+      <div class="chart-icon chart-3">📉</div>
+      <div class="chart-icon chart-4">📋</div>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <div class="stats-header">
+      <h1><i class="fas fa-chart-line"></i> Statistiques des Formations</h1>
+      <p class="stats-subtitle">Analysez les performances et l'engagement de vos formations</p>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      <h3>Chargement des statistiques...</h3>
+      <p>Analyse en cours de vos données de formation</p>
+    </div>
+  </div>
+</div>
+
+<div class="stats-main" *ngIf="!isLoading">
+  <div class="stats-content">
+    <!-- Statistiques générales -->
+    <div class="stats-overview">
+      <div class="stat-card" *ngFor="let stat of getOverviewStats(); trackBy: trackByStat">
+        <div class="stat-icon">
+          <i [class]="stat.icon"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ stat.value }}</h3>
+          <p>{{ stat.label }}</p>
+        </div>
+        <div class="stat-trend" *ngIf="stat.trend">
+          <i [class]="stat.trend.icon" [style.color]="stat.trend.color"></i>
+          <span>{{ stat.trend.value }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top 5 des formations -->
+    <div class="top-formations-section">
+      <div class="section-header">
+        <h2><i class="fas fa-trophy"></i> Top 5 des formations</h2>
+        <div class="section-badge">{{ stats.top5Formations?.length || 0 }}</div>
+      </div>
+
+      <div class="top-formations-grid">
+        <div class="top-formation-card" *ngFor="let formation of stats.top5Formations; let i = index; trackBy: trackByFormation">
+          <div class="rank-badge">
+            <span class="rank-number">#{{ i + 1 }}</span>
+            <div class="rank-icon">
+              <i class="fas" [class]="getRankIcon(i)"></i>
+            </div>
+          </div>
+
+          <div class="formation-content">
+            <h3 class="formation-title">{{ formation.title }}</h3>
+            <p class="formation-description">{{ formation.description }}</p>
+
+            <div class="formation-meta">
+              <span class="meta-item">
+                <i class="fas fa-tag"></i>
+                {{ formation.domaine }}
+              </span>
+              <span class="meta-item">
+                <i class="fas fa-building"></i>
+                {{ formation.provider }}
+              </span>
+            </div>
+
+            <div class="formation-rating">
+              <div class="stars" [innerHTML]="getStars(formation.noteMoyenne || 0)"></div>
+              <span class="rating-value">{{ formation.noteMoyenne || 0 | number:'1.1-1' }}</span>
+            </div>
+          </div>
+
+          <div class="formation-stats">
+            <div class="stat-item">
+              <i class="fas fa-users"></i>
+              <span>{{ getFormationInscrits(formation.idFormation) }}</span>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-euro-sign"></i>
+              <span>{{ formation.prix || 'Gratuit' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graphique des inscriptions par formation -->
+    <div class="chart-section">
+      <div class="section-header">
+        <h2><i class="fas fa-chart-bar"></i> Répartition des inscriptions</h2>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-color"></div>
+            <span>Nombre d'inscrits</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-bars">
+          <div class="chart-bar" *ngFor="let item of getInscriptionsEntries(); trackBy: trackByItem">
+            <div class="bar-header">
+              <span class="bar-label">Formation {{ item.formationId }}</span>
+              <span class="bar-value">{{ item.count }}</span>
+            </div>
+            <div class="bar-container">
+              <div
+                class="bar-fill"
+                [style.width.%]="(item.count / getMaxInscriptions()) * 100"
+                [style.background]="getBarColor(item.count)">
+              </div>
+            </div>
+            <div class="bar-percentage">
+              {{ ((item.count / getTotalInscrits()) * 100).toFixed(1) }}%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiques détaillées -->
+    <div class="table-section">
+      <div class="section-header">
+        <h2><i class="fas fa-table"></i> Statistiques détaillées</h2>
+        <div class="table-info">
+          <span>{{ getInscriptionsEntries().length }} formations</span>
+        </div>
+      </div>
+
+      <div class="stats-table-container">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>
+                <i class="fas fa-hashtag"></i>
+                ID Formation
+              </th>
+              <th>
+                <i class="fas fa-users"></i>
+                Inscrits
+              </th>
+              <th>
+                <i class="fas fa-percentage"></i>
+                Pourcentage
+              </th>
+              <th>
+                <i class="fas fa-chart-line"></i>
+                Tendance
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of getInscriptionsEntries(); trackBy: trackByItem">
+              <td class="formation-id">{{ item.formationId }}</td>
+              <td class="inscrits-count">{{ item.count }}</td>
+              <td class="percentage">
+                <div class="percentage-bar">
+                  <div
+                    class="percentage-fill"
+                    [style.width.%]="(item.count / getMaxInscriptions()) * 100">
+                  </div>
+                </div>
+                <span class="percentage-text">{{ ((item.count / getTotalInscrits()) * 100).toFixed(1) }}%</span>
+              </td>
+              <td class="trend">
+                <div class="trend-indicator" [class]="getTrendClass(item)">
+                  <i [class]="getTrendIcon(item)"></i>
+                  <span>{{ getTrendValue(item) }}</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

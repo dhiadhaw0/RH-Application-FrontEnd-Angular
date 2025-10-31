@@ -1,0 +1,88 @@
+<div class="request-detail-container">
+  <div class="loading" *ngIf="loading">
+    Chargement des détails de la demande...
+  </div>
+
+  <div class="request-content" *ngIf="!loading && request">
+    <div class="request-header">
+      <h1>{{ request.topic }}</h1>
+      <div class="status-badges">
+        <span class="status-badge" [style.background-color]="getStatusColor(request.status)">
+          {{ getStatusText(request.status) }}
+        </span>
+        <span class="urgency-badge" [style.background-color]="getUrgencyColor(request.urgency)">
+          {{ getUrgencyText(request.urgency) }}
+        </span>
+      </div>
+    </div>
+
+    <div class="request-meta">
+      <div class="meta-item">
+        <strong>Date de demande:</strong> {{ request.requestedAt | date:'dd/MM/yyyy à HH:mm' }}
+      </div>
+    </div>
+
+    <div class="users-section">
+      <div class="user-card">
+        <h3>Mentee</h3>
+        <div class="user-info">
+          <div class="avatar">
+            <span>{{ request.mentee.firstName.charAt(0) }}{{ request.mentee.lastName.charAt(0) }}</span>
+          </div>
+          <div class="user-details">
+            <h4>{{ request.mentee.firstName }} {{ request.mentee.lastName }}</h4>
+            <p>{{ request.mentee.email }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <h3>Mentor</h3>
+        <div class="user-info">
+          <div class="avatar">
+            <span>{{ request.mentor.firstName.charAt(0) }}{{ request.mentor.lastName.charAt(0) }}</span>
+          </div>
+          <div class="user-details">
+            <h4>{{ request.mentor.firstName }} {{ request.mentor.lastName }}</h4>
+            <p>{{ request.mentor.email }}</p>
+            <p *ngIf="request.mentor.mentorExpertise" class="expertise">
+              {{ request.mentor.mentorExpertise }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="request-description">
+      <h3>Description détaillée</h3>
+      <div class="description-content">
+        {{ request.description }}
+      </div>
+    </div>
+
+    <div class="request-actions" *ngIf="isMentor && request.status === 'PENDING'">
+      <button class="btn btn-success" (click)="respondToRequest(true)">
+        Accepter la demande
+      </button>
+      <button class="btn btn-danger" (click)="respondToRequest(false)">
+        Rejeter la demande
+      </button>
+    </div>
+
+    <div class="request-actions" *ngIf="!isMentor && request.status === 'ACCEPTED'">
+      <button class="btn btn-primary" (click)="scheduleSession()">
+        Planifier une session
+      </button>
+    </div>
+  </div>
+
+  <div class="error" *ngIf="!loading && !request">
+    Impossible de charger les détails de la demande.
+  </div>
+
+  <div class="back-action">
+    <button class="btn btn-secondary" routerLink="/mentorship/requests">
+      Retour à la liste
+    </button>
+  </div>
+</div>

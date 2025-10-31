@@ -1,0 +1,126 @@
+<!-- Forum Report List Component -->
+<div class="forum-reports-container">
+  <div class="reports-header">
+    <h1 class="reports-title">
+      <i class="fas fa-flag"></i>
+      Signalements du Forum
+    </h1>
+    <p class="reports-subtitle">Gérez les signalements et modérez le contenu de la communauté</p>
+  </div>
+
+  <!-- Status Filter -->
+  <div class="status-filter">
+    <label for="status-select">Filtrer par statut :</label>
+    <select
+      id="status-select"
+      [(ngModel)]="selectedStatus"
+      (change)="onStatusChange()"
+      class="status-select"
+    >
+      <option *ngFor="let status of statusOptions" [value]="status">
+        {{ getStatusLabel(status) }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement des signalements...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h3>Erreur de chargement</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadReports()">
+        <i class="fas fa-redo"></i>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Reports List -->
+  <div *ngIf="!loading && !error" class="reports-list">
+    <div
+      *ngFor="let report of reports"
+      class="report-card"
+      [class.expanded]="report.id === expandedReportId"
+    >
+      <div class="report-header">
+        <div class="report-type">
+          <i class="fas" [class.fa-comments]="report.reportedThread" [class.fa-comment]="report.reportedPost"></i>
+          <span>{{ report.reportedThread ? 'Discussion' : 'Post' }}</span>
+        </div>
+        <div class="report-status">
+          <span class="status-badge {{ getStatusBadgeClass(report.status) }}">
+            {{ getStatusLabel(report.status) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="report-content">
+        <div class="report-info">
+          <div class="reporter-info">
+            <strong>Signalé par :</strong>
+            {{ report.reporter.firstName }} {{ report.reporter.lastName }}
+          </div>
+          <div class="report-date">
+            <i class="fas fa-calendar"></i>
+            {{ formatDate(report.createdAt) }}
+          </div>
+        </div>
+
+        <div class="report-reason">
+          <strong>Raison :</strong>
+          <p>{{ report.reason }}</p>
+        </div>
+
+        <div class="reported-content" *ngIf="report.reportedThread">
+          <strong>Discussion signalée :</strong>
+          <p class="content-preview">{{ report.reportedThread.title }}</p>
+        </div>
+
+        <div class="reported-content" *ngIf="report.reportedPost">
+          <strong>Post signalé :</strong>
+          <p class="content-preview">{{ report.reportedPost.content.substring(0, 100) }}...</p>
+        </div>
+
+        <div class="moderation-info" *ngIf="report.moderator">
+          <div class="moderator-details">
+            <strong>Modéré par :</strong>
+            {{ report.moderator.firstName }} {{ report.moderator.lastName }}
+          </div>
+          <div class="action-taken">
+            <strong>Action :</strong>
+            <span class="action-badge">{{ getActionTakenLabel(report.actionTaken) }}</span>
+          </div>
+          <div class="moderator-comment" *ngIf="report.moderatorComment">
+            <strong>Commentaire du modérateur :</strong>
+            <p>{{ report.moderatorComment }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-actions" *ngIf="report.status === 'PENDING'">
+        <button class="btn btn-outline btn-sm" (click)="reviewReport(report)">
+          <i class="fas fa-eye"></i>
+          Examiner
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && reports.length === 0" class="empty-state">
+    <div class="empty-content">
+      <i class="fas fa-flag empty-icon"></i>
+      <h3>Aucun signalement</h3>
+      <p>Il n'y a pas de signalements {{ getStatusLabel(selectedStatus).toLowerCase() }}s pour le moment.</p>
+    </div>
+  </div>
+</div>

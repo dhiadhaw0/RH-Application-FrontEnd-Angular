@@ -1,0 +1,10 @@
+<div class="badge-container" *ngIf="!loading">
+  <div class="badge" [style.background-color]="getBadgeColor()">
+    <span class="badge-icon">{{ getBadgeIcon() }}</span>
+    <span class="badge-text">{{ badge }}</span>
+  </div>
+</div>
+
+<div class="loading" *ngIf="loading">
+  <span>Chargement...</span>
+</div>

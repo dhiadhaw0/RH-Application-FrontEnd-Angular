@@ -1,0 +1,214 @@
+<app-navbar></app-navbar>
+
+<!-- Forum Category List Component -->
+<div class="forum-categories-container">
+  <div class="forum-header">
+    <h1 class="forum-title">
+      <i class="fas fa-comments"></i>
+      Forum de Discussion
+    </h1>
+    <p class="forum-subtitle">Découvrez et participez aux discussions de la communauté</p>
+
+    <!-- Navigation Buttons -->
+    <div class="forum-navigation">
+      <button class="nav-btn" (click)="showSection('categories')" [class.active]="currentSection === 'categories'">
+        <i class="fas fa-list"></i>
+        Catégories
+      </button>
+      <button class="nav-btn" (click)="navigateToCreateThread()" [class.active]="currentSection === 'create-thread'">
+        <i class="fas fa-plus"></i>
+        Nouvelle Discussion
+      </button>
+      <button class="nav-btn" (click)="navigateToSearch()" [class.active]="currentSection === 'search'">
+        <i class="fas fa-search"></i>
+        Recherche
+      </button>
+      <button class="nav-btn" (click)="navigateToModeration()" [class.active]="currentSection === 'moderation'">
+        <i class="fas fa-shield-alt"></i>
+        Modération
+      </button>
+      <button class="nav-btn" (click)="navigateToReports()" [class.active]="currentSection === 'reports'">
+        <i class="fas fa-flag"></i>
+        Signalements
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement des catégories...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h3>Erreur de chargement</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadCategories()">
+        <i class="fas fa-redo"></i>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Categories Grid -->
+  <div class="categories-grid" *ngIf="currentSection === 'categories'">
+    <!-- Always show sample categories -->
+    <div class="category-card sample-card" style="border-left-color: #FF6B6B;" (click)="navigateToCategory(1)">
+      <div class="category-icon" style="background-color: #FF6B6B;">
+        <i class="fas fa-code"></i>
+      </div>
+      <div class="category-content">
+        <h3 class="category-name">Développement</h3>
+        <p class="category-description">Discussions sur le développement web, mobile et logiciel</p>
+        <div class="category-meta">
+          <span class="anonymous-badge">
+            <i class="fas fa-user-secret"></i>
+            Anonyme autorisé
+          </span>
+        </div>
+      </div>
+      <div class="category-arrow">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+
+    <div class="category-card sample-card" style="border-left-color: #4ECDC4;" (click)="navigateToCategory(2)">
+      <div class="category-icon" style="background-color: #4ECDC4;">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <div class="category-content">
+        <h3 class="category-name">Formations</h3>
+        <p class="category-description">Questions et retours sur les formations disponibles</p>
+        <div class="category-meta">
+          <span class="anonymous-badge">
+            <i class="fas fa-user-secret"></i>
+            Anonyme autorisé
+          </span>
+        </div>
+      </div>
+      <div class="category-arrow">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+
+    <div class="category-card sample-card" style="border-left-color: #45B7D1;" (click)="navigateToCategory(3)">
+      <div class="category-icon" style="background-color: #45B7D1;">
+        <i class="fas fa-briefcase"></i>
+      </div>
+      <div class="category-content">
+        <h3 class="category-name">Emploi</h3>
+        <p class="category-description">Conseils carrière, recherche d'emploi et opportunités</p>
+        <div class="category-meta">
+          <span class="anonymous-badge">
+            <i class="fas fa-user-secret"></i>
+            Anonyme autorisé
+          </span>
+        </div>
+      </div>
+      <div class="category-arrow">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+
+    <div class="category-card sample-card" style="border-left-color: #96CEB4;" (click)="navigateToCategory(4)">
+      <div class="category-icon" style="background-color: #96CEB4;">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="category-content">
+        <h3 class="category-name">Communauté</h3>
+        <p class="category-description">Discussions générales et échanges entre membres</p>
+        <div class="category-meta">
+          <span class="anonymous-badge">
+            <i class="fas fa-user-secret"></i>
+            Anonyme autorisé
+          </span>
+        </div>
+      </div>
+      <div class="category-arrow">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dynamic Content Sections -->
+  <div class="dynamic-content" *ngIf="currentSection !== 'categories'">
+    <!-- Thread Creation Section -->
+    <div *ngIf="currentSection === 'create-thread'" class="content-section">
+      <app-forum-thread-create></app-forum-thread-create>
+    </div>
+
+    <!-- Search Section -->
+    <div *ngIf="currentSection === 'search'" class="content-section">
+      <app-forum-search></app-forum-search>
+    </div>
+
+    <!-- Moderation Section -->
+    <div *ngIf="currentSection === 'moderation'" class="content-section">
+      <app-forum-moderation-dashboard></app-forum-moderation-dashboard>
+    </div>
+
+    <!-- Reports Section -->
+    <div *ngIf="currentSection === 'reports'" class="content-section">
+      <app-forum-report-list></app-forum-report-list>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <div class="actions-grid">
+      <button class="action-card" (click)="navigateToCreateThread()">
+        <div class="action-icon">
+          <i class="fas fa-plus-circle"></i>
+        </div>
+        <div class="action-content">
+          <h4>Nouvelle Discussion</h4>
+          <p>Créer une nouvelle discussion</p>
+        </div>
+      </button>
+
+      <button class="action-card" (click)="navigateToSearch()">
+        <div class="action-icon">
+          <i class="fas fa-search"></i>
+        </div>
+        <div class="action-content">
+          <h4>Rechercher</h4>
+          <p>Trouver des discussions</p>
+        </div>
+      </button>
+
+      <button class="action-card" (click)="navigateToModeration()">
+        <div class="action-icon">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="action-content">
+          <h4>Modération</h4>
+          <p>Gérer le forum</p>
+        </div>
+      </button>
+
+      <button class="action-card" (click)="navigateToReports()">
+        <div class="action-icon">
+          <i class="fas fa-flag"></i>
+        </div>
+        <div class="action-content">
+          <h4>Signalements</h4>
+          <p>Voir les rapports</p>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && categories.length === 0" class="empty-state">
+    <div class="empty-content">
+      <i class="fas fa-comments empty-icon"></i>
+      <h3>Aucune catégorie disponible</h3>
+      <p>Les catégories du forum seront bientôt disponibles.</p>
+    </div>
+  </div>
+</div>

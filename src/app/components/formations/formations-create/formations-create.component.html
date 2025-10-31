@@ -1,0 +1,226 @@
+<app-navbar></app-navbar>
+
+<div class="formation-create-container">
+  <div class="header-section">
+    <button class="btn btn-back" routerLink="/formations">
+      <i class="fas fa-arrow-left"></i> Retour aux formations
+    </button>
+    <h1>Créer une nouvelle formation</h1>
+  </div>
+
+  <form class="formation-form" (ngSubmit)="onSubmit()" #formationForm="ngForm">
+    <div class="form-section">
+      <h2>Informations générales</h2>
+
+      <div class="form-group">
+        <label for="title">Titre *</label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          [(ngModel)]="formation.title"
+          required
+          #title="ngModel"
+          class="form-control"
+          placeholder="Entrez le titre de la formation">
+        <div class="error-message" *ngIf="title.invalid && title.touched">
+          Le titre est requis
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea
+          id="description"
+          name="description"
+          [(ngModel)]="formation.description"
+          required
+          #description="ngModel"
+          class="form-control"
+          rows="4"
+          placeholder="Décrivez la formation">
+        </textarea>
+        <div class="error-message" *ngIf="description.invalid && description.touched">
+          La description est requise
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="domaine">Domaine *</label>
+          <select
+            id="domaine"
+            name="domaine"
+            [(ngModel)]="formation.domaine"
+            required
+            #domaine="ngModel"
+            class="form-control">
+            <option value="">Sélectionnez un domaine</option>
+            <option *ngFor="let domaine of domaineOptions" [value]="domaine">{{ domaine }}</option>
+          </select>
+          <div class="error-message" *ngIf="domaine.invalid && domaine.touched">
+            Le domaine est requis
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="niveau">Niveau *</label>
+          <select
+            id="niveau"
+            name="niveau"
+            [(ngModel)]="formation.niveau"
+            required
+            #niveau="ngModel"
+            class="form-control">
+            <option value="">Sélectionnez un niveau</option>
+            <option *ngFor="let niv of niveauOptions" [value]="niv">{{ niv }}</option>
+          </select>
+          <div class="error-message" *ngIf="niveau.invalid && niveau.touched">
+            Le niveau est requis
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="typeFormation">Type de formation *</label>
+          <select
+            id="typeFormation"
+            name="typeFormation"
+            [(ngModel)]="formation.typeFormation"
+            required
+            #typeFormation="ngModel"
+            class="form-control"
+            (change)="onTypeFormationChange()">
+            <option value="">Sélectionnez un type</option>
+            <option *ngFor="let type of typeFormationOptions" [value]="type">{{ type }}</option>
+          </select>
+          <div class="error-message" *ngIf="typeFormation.invalid && typeFormation.touched">
+            Le type de formation est requis
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="statutFormation">Statut *</label>
+          <select
+            id="statutFormation"
+            name="statutFormation"
+            [(ngModel)]="formation.statutFormation"
+            required
+            #statutFormation="ngModel"
+            class="form-control"
+            (change)="onStatutFormationChange()">
+            <option value="">Sélectionnez un statut</option>
+            <option *ngFor="let statut of statutFormationOptions" [value]="statut">{{ statut }}</option>
+          </select>
+          <div class="error-message" *ngIf="statutFormation.invalid && statutFormation.touched">
+            Le statut est requis
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>Détails pratiques</h2>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="duree">Durée</label>
+          <input
+            type="text"
+            id="duree"
+            name="duree"
+            [(ngModel)]="formation.duree"
+            class="form-control"
+            placeholder="Ex: 2 semaines, 40 heures">
+        </div>
+
+        <div class="form-group">
+          <label for="prix">Prix (€)</label>
+          <input
+            type="number"
+            id="prix"
+            name="prix"
+            [(ngModel)]="formation.prix"
+            class="form-control"
+            placeholder="0 pour gratuit"
+            min="0"
+            step="0.01">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="lieu">Lieu</label>
+        <input
+          type="text"
+          id="lieu"
+          name="lieu"
+          [(ngModel)]="formation.lieu"
+          class="form-control"
+          placeholder="En ligne, Paris, etc.">
+      </div>
+
+      <div class="form-group">
+        <label for="provider">Fournisseur *</label>
+        <input
+          type="text"
+          id="provider"
+          name="provider"
+          [(ngModel)]="formation.provider"
+          required
+          #provider="ngModel"
+          class="form-control"
+          placeholder="Nom du fournisseur">
+        <div class="error-message" *ngIf="provider.invalid && provider.touched">
+          Le fournisseur est requis
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>Contenu détaillé</h2>
+
+      <div class="form-group">
+        <label for="prerequis">Prérequis</label>
+        <textarea
+          id="prerequis"
+          name="prerequis"
+          [(ngModel)]="formation.prerequis"
+          class="form-control"
+          rows="3"
+          placeholder="Liste des prérequis nécessaires">
+        </textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="programme">Programme</label>
+        <textarea
+          id="programme"
+          name="programme"
+          [(ngModel)]="formation.programme"
+          class="form-control"
+          rows="5"
+          placeholder="Détail du programme de formation">
+        </textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="certification">Certification</label>
+        <input
+          type="text"
+          id="certification"
+          name="certification"
+          [(ngModel)]="formation.certification"
+          class="form-control"
+          placeholder="Certification obtenue à la fin">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()">Annuler</button>
+      <button type="submit" class="btn-submit" [disabled]="formationForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Création en cours...' : 'Créer la formation' }}
+      </button>
+    </div>
+  </form>
+</div>

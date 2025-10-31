@@ -1,0 +1,268 @@
+<!-- Forum Thread Create Component -->
+<div class="forum-thread-create-container">
+  <!-- Hero Section -->
+  <div class="create-hero">
+    <div class="hero-background">
+      <div class="hero-overlay"></div>
+      <div class="floating-elements">
+        <div class="forum-icon icon-1">💬</div>
+        <div class="forum-icon icon-2">📝</div>
+        <div class="forum-icon icon-3">✨</div>
+        <div class="forum-icon icon-4">💭</div>
+      </div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <i class="fas fa-plus-circle"></i>
+          Nouvelle Discussion
+        </h1>
+        <p class="hero-subtitle">
+          Partagez vos questions, idées et expériences avec la communauté
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-outline btn-large" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i>
+          Retour aux discussions
+        </button>
+        <button class="btn btn-primary btn-large" (click)="navigateToSearch()">
+          <i class="fas fa-search"></i>
+          Rechercher
+        </button>
+        <button class="btn btn-secondary btn-large" (click)="navigateToModeration()">
+          <i class="fas fa-shield-alt"></i>
+          Modération
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement des catégories...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h3>Erreur</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadCategories()">
+        <i class="fas fa-redo"></i>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Sections -->
+  <div class="content-sections">
+    <div class="content-section">
+      <div class="section-header">
+        <h2><i class="fas fa-edit"></i> Créer une nouvelle discussion</h2>
+      </div>
+      <div class="section-content">
+        <!-- Success Message -->
+        <div *ngIf="successMessage" class="success-message">
+          <i class="fas fa-check-circle"></i>
+          <span>{{ successMessage }}</span>
+        </div>
+
+        <!-- Create Form -->
+        <form *ngIf="!loading && !error" [formGroup]="threadForm" (ngSubmit)="onSubmit()" class="create-form">
+    <!-- Category Selection -->
+    <div class="form-group">
+      <label for="categoryId" class="form-label">
+        <i class="fas fa-folder"></i>
+        Catégorie *
+      </label>
+      <select
+        id="categoryId"
+        formControlName="categoryId"
+        class="form-select"
+        [class.error]="isFieldInvalid('categoryId')"
+      >
+        <option value="">Sélectionnez une catégorie</option>
+        <option *ngFor="let category of categories" [value]="category.id">
+          {{ category.name }}
+          <span *ngIf="category.allowAnonymous" class="anonymous-indicator">(Anonyme autorisé)</span>
+        </option>
+      </select>
+      <div *ngIf="isFieldInvalid('categoryId')" class="error-text">
+        {{ getFieldError('categoryId') }}
+      </div>
+    </div>
+
+    <!-- Title Input -->
+    <div class="form-group">
+      <label for="title" class="form-label">
+        <i class="fas fa-heading"></i>
+        Titre de la discussion *
+      </label>
+      <input
+        type="text"
+        id="title"
+        formControlName="title"
+        class="form-input"
+        placeholder="Entrez un titre clair et descriptif..."
+        [class.error]="isFieldInvalid('title')"
+      >
+      <div class="input-info">
+        <span class="char-count">{{ threadForm.get('title')?.value?.length || 0 }}/200</span>
+      </div>
+      <div *ngIf="isFieldInvalid('title')" class="error-text">
+        {{ getFieldError('title') }}
+      </div>
+    </div>
+
+    <!-- Content Textarea -->
+    <div class="form-group">
+      <label for="content" class="form-label">
+        <i class="fas fa-edit"></i>
+        Contenu de la discussion *
+      </label>
+      <div class="textarea-container">
+        <textarea
+          id="content"
+          formControlName="content"
+          class="form-textarea"
+          placeholder="Décrivez votre question ou sujet de discussion en détail...
+
+💡 Conseils pour une bonne discussion :
+• Soyez clair et précis dans votre question
+• Fournissez un contexte suffisant
+• Mentionnez les technologies utilisées
+• Indiquez ce que vous avez déjà essayé"
+          rows="10"
+          [class.error]="isFieldInvalid('content')"
+        ></textarea>
+        <div class="textarea-toolbar">
+          <div class="toolbar-left">
+            <button type="button" class="toolbar-btn" title="Gras">
+              <i class="fas fa-bold"></i>
+            </button>
+            <button type="button" class="toolbar-btn" title="Italique">
+              <i class="fas fa-italic"></i>
+            </button>
+            <button type="button" class="toolbar-btn" title="Code">
+              <i class="fas fa-code"></i>
+            </button>
+            <button type="button" class="toolbar-btn" title="Lien">
+              <i class="fas fa-link"></i>
+            </button>
+          </div>
+          <div class="toolbar-right">
+            <span class="char-count" [class.warning]="(threadForm.get('content')?.value?.length || 0) < 10">
+              {{ threadForm.get('content')?.value?.length || 0 }}/500 caractères
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="input-info">
+        <span class="help-text">
+          <i class="fas fa-lightbulb"></i>
+          Minimum 10 caractères. Soyez descriptif pour obtenir de meilleures réponses.
+        </span>
+      </div>
+      <div *ngIf="isFieldInvalid('content')" class="error-text">
+        {{ getFieldError('content') }}
+      </div>
+    </div>
+
+    <!-- Anonymous Toggle -->
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          formControlName="anonymous"
+          class="checkbox-input"
+        >
+        <span class="checkbox-mark"></span>
+        <span class="checkbox-text">
+          <i class="fas fa-user-secret"></i>
+          Publier anonymement
+        </span>
+      </label>
+      <div class="checkbox-info">
+        <i class="fas fa-info-circle"></i>
+        Votre nom ne sera pas visible pour les autres utilisateurs. Utile pour les questions sensibles.
+      </div>
+    </div>
+
+    <!-- Tags/Keywords Input -->
+    <div class="form-group">
+      <label for="tags" class="form-label">
+        <i class="fas fa-tags"></i>
+        Mots-clés (optionnel)
+      </label>
+      <input
+        type="text"
+        id="tags"
+        class="form-input"
+        placeholder="Ex: javascript, react, api, débutant..."
+        formControlName="tags"
+      >
+      <div class="input-info">
+        <span class="help-text">
+          <i class="fas fa-lightbulb"></i>
+          Séparez les mots-clés par des virgules pour améliorer la recherche
+        </span>
+      </div>
+    </div>
+
+    <!-- Preview Section -->
+    <div class="form-group">
+      <div class="preview-toggle">
+        <button type="button" class="btn btn-outline btn-sm" (click)="togglePreview()">
+          <i class="fas fa-eye"></i>
+          {{ showPreview ? 'Masquer' : 'Aperçu' }}
+        </button>
+      </div>
+      <div *ngIf="showPreview" class="preview-container">
+        <h4>Aperçu de votre discussion</h4>
+        <div class="preview-content">
+          <h3>{{ threadForm.get('title')?.value || 'Titre de la discussion' }}</h3>
+          <div class="preview-meta">
+            <span class="preview-category">
+              <i class="fas fa-folder"></i>
+              {{ getCategoryName(threadForm.get('categoryId')?.value) || 'Catégorie' }}
+            </span>
+            <span class="preview-author">
+              <i class="fas fa-user"></i>
+              {{ threadForm.get('anonymous')?.value ? 'Anonyme' : 'Votre nom' }}
+            </span>
+          </div>
+          <div class="preview-text">
+            {{ threadForm.get('content')?.value || 'Contenu de votre discussion...' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline" (click)="goBack()">
+        <i class="fas fa-times"></i>
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="submitting || threadForm.invalid"
+      >
+        <i class="fas fa-paper-plane" *ngIf="!submitting"></i>
+        <div class="spinner small" *ngIf="submitting"></div>
+        {{ submitting ? 'Création...' : 'Créer la discussion' }}
+      </button>
+    </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

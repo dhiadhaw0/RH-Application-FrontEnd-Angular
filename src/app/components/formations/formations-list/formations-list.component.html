@@ -1,0 +1,300 @@
+<app-navbar></app-navbar>
+
+<div class="formations-list-container">
+  <!-- Hero Section with Animated Background -->
+  <div class="hero-section">
+    <div class="hero-background">
+      <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+      </div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <i class="fas fa-graduation-cap"></i>
+          Découvrez Notre Catalogue
+          <span class="highlight">de Formations</span>
+        </h1>
+        <p class="hero-subtitle">
+          Élevez vos compétences avec nos programmes d'excellence conçus par des experts
+        </p>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-number">{{ formations.length }}</div>
+          <div class="stat-label">Formations Disponibles</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ categories.length }}</div>
+          <div class="stat-label">Domaines d'Expertise</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">4.8</div>
+          <div class="stat-label">Note Moyenne</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-large" routerLink="/formations/create">
+          <i class="fas fa-plus-circle"></i>
+          Créer une Formation
+        </button>
+        <button class="btn btn-outline btn-large" routerLink="/formations/favorites">
+          <i class="fas fa-heart"></i>
+          Mes Favoris
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced Search & Filters Section -->
+  <div class="search-filters-section">
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Rechercher par titre, domaine, fournisseur..."
+          [(ngModel)]="searchTerm"
+          (input)="filterFormations()">
+        <button class="search-clear" *ngIf="searchTerm" (click)="clearSearch()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="filters-container">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-filter"></i>
+          Filtrer par statut
+        </label>
+        <div class="filter-buttons">
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'all'"
+            (click)="setFilter('all')">
+            <i class="fas fa-th-large"></i>
+            Toutes
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'active'"
+            (click)="setFilter('active')">
+            <i class="fas fa-check-circle"></i>
+            Actives
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'top-rated'"
+            (click)="setFilter('top-rated')">
+            <i class="fas fa-star"></i>
+            Top Notées
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'free'"
+            (click)="setFilter('free')">
+            <i class="fas fa-gift"></i>
+            Gratuites
+          </button>
+        </div>
+      </div>
+
+      <div class="sort-group">
+        <label class="filter-label">
+          <i class="fas fa-sort"></i>
+          Trier par
+        </label>
+        <select class="sort-select" [(ngModel)]="sortBy" (change)="sortFormations()">
+          <option value="title">Titre A-Z</option>
+          <option value="rating">Note</option>
+          <option value="price-low">Prix croissant</option>
+          <option value="price-high">Prix décroissant</option>
+          <option value="newest">Plus récent</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formations Grid with Enhanced Cards -->
+  <div class="formations-section">
+    <div class="formations-grid" *ngIf="!loading; else loadingTemplate">
+      <div
+        class="formation-card"
+        *ngFor="let formation of filteredFormations; trackBy: trackByFormationId"
+        [class.featured]="formation.featured">
+
+        <!-- Card Ribbon for Special Status -->
+        <div class="card-ribbon" *ngIf="formation.featured">
+          <i class="fas fa-star"></i>
+          Recommandé
+        </div>
+
+        <!-- Card Header with Badges -->
+        <div class="card-header">
+          <div class="badge-group">
+            <span class="badge type-badge" [class]="'type-' + formation.typeFormation?.toLowerCase()">
+              <i class="fas fa-play-circle" *ngIf="formation.typeFormation === 'VIDEO'"></i>
+              <i class="fas fa-file-pdf" *ngIf="formation.typeFormation === 'PDF'"></i>
+              <i class="fas fa-video" *ngIf="formation.typeFormation === 'WEBINAIR'"></i>
+              {{ formation.typeFormation }}
+            </span>
+            <span class="badge status-badge" [class]="'status-' + formation.statutFormation?.toLowerCase()">
+              {{ formation.statutFormation }}
+            </span>
+          </div>
+
+          <button class="favorite-btn" (click)="toggleFavorite(formation)">
+            <i class="fas fa-heart" [class.filled]="isFavorite(formation)"></i>
+          </button>
+        </div>
+
+        <!-- Card Image with Overlay -->
+        <div class="card-image">
+          <img
+            [src]="formation.imageUrl || 'assets/default-formation.jpg'"
+            [alt]="formation.title"
+            class="formation-image">
+          <div class="image-overlay">
+            <div class="overlay-content">
+              <button class="btn-quick-view" (click)="quickView(formation)">
+                <i class="fas fa-eye"></i>
+                Aperçu
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Content -->
+        <div class="card-content">
+          <div class="formation-category">
+            <span class="category-tag">{{ formation.domaine }}</span>
+          </div>
+
+          <h3 class="formation-title">{{ formation.title }}</h3>
+
+          <div class="formation-meta">
+            <div class="meta-item">
+              <i class="fas fa-building"></i>
+              <span class="meta-text">{{ formation.provider }}</span>
+            </div>
+            <div class="meta-item" *ngIf="formation.duree">
+              <i class="fas fa-clock"></i>
+              <span class="meta-text">{{ formation.duree }}</span>
+            </div>
+            <div class="meta-item" *ngIf="formation.niveau">
+              <i class="fas fa-graduation-cap"></i>
+              <span class="meta-text">{{ formation.niveau }}</span>
+            </div>
+          </div>
+
+          <p class="formation-description">
+            {{ formation.description | slice:0:150 }}
+            <span *ngIf="formation.description && formation.description.length > 150">...</span>
+          </p>
+
+          <!-- Enhanced Rating Section -->
+          <div class="rating-section" *ngIf="formation.noteMoyenne">
+            <div class="rating-stars">
+              <i
+                class="fas fa-star"
+                *ngFor="let star of [1,2,3,4,5]; let i = index"
+                [class.filled]="i < Math.floor(formation.noteMoyenne)"
+                [class.half]="i === Math.floor(formation.noteMoyenne) && formation.noteMoyenne % 1 !== 0">
+              </i>
+              <span class="rating-value">{{ formation.noteMoyenne | number:'1.1-1' }}</span>
+            </div>
+            <span class="rating-count">({{ formation.notesUsers?.length || 0 }} avis)</span>
+          </div>
+
+          <!-- Price Section -->
+          <div class="price-section">
+            <div class="price-display" *ngIf="formation.prix">
+              <span class="price-amount">{{ formation.prix | currency:'EUR':'symbol':'1.0-0' }}</span>
+              <span class="price-period">/formation</span>
+            </div>
+            <div class="free-badge" *ngIf="!formation.prix">
+              <i class="fas fa-gift"></i>
+              <span>100% Gratuit</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Footer with Actions -->
+        <div class="card-footer">
+          <div class="action-buttons">
+            <button class="btn btn-outline btn-sm" routerLink="/formations/{{formation.idFormation}}">
+              <i class="fas fa-eye"></i>
+              <span>Détails</span>
+            </button>
+            <button
+              class="btn btn-primary btn-sm"
+              *ngIf="formation.active"
+              (click)="startFormation(formation)">
+              <i class="fas fa-play"></i>
+              <span>Commencer</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hover Effect Overlay -->
+        <div class="card-hover-overlay">
+          <div class="overlay-actions">
+            <button class="overlay-btn primary" (click)="startFormation(formation)">
+              <i class="fas fa-play-circle"></i>
+              <span>Commencer Maintenant</span>
+            </button>
+            <button class="overlay-btn secondary" routerLink="/formations/{{formation.idFormation}}">
+              <i class="fas fa-info-circle"></i>
+              <span>Plus d'Infos</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredFormations.length === 0">
+        <div class="empty-icon">
+          <i class="fas fa-search"></i>
+        </div>
+        <h3 class="empty-title">Aucune formation trouvée</h3>
+        <p class="empty-description">
+          Essayez de modifier vos critères de recherche ou explorez toutes nos formations.
+        </p>
+        <button class="btn btn-primary" (click)="resetFilters()">
+          <i class="fas fa-refresh"></i>
+          Réinitialiser les filtres
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Template -->
+    <ng-template #loadingTemplate>
+      <div class="loading-state">
+        <div class="loading-spinner">
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+        </div>
+        <h3>Chargement des formations...</h3>
+        <p>Découvrez bientôt nos programmes d'excellence</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Load More Button -->
+  <div class="load-more-section" *ngIf="hasMoreFormations && !loading">
+    <button class="btn btn-outline btn-large" (click)="loadMoreFormations()">
+      <i class="fas fa-plus"></i>
+      Charger Plus de Formations
+    </button>
+  </div>
+</div>

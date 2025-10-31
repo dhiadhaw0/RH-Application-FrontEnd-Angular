@@ -1,0 +1,69 @@
+<!-- Forum Attachment List Component -->
+<div class="attachment-list-container" *ngIf="attachments.length > 0">
+  <div class="attachment-header">
+    <h4 class="attachment-title">
+      <i class="fas fa-paperclip"></i>
+      Pièces jointes ({{ attachments.length }})
+    </h4>
+  </div>
+
+  <div class="attachment-grid">
+    <div
+      *ngFor="let attachment of displayedAttachments"
+      class="attachment-item"
+      [class.image-attachment]="isImage(attachment.filename)"
+    >
+      <div class="attachment-icon" [class]="getFileIcon(attachment.filename)">
+      </div>
+
+      <div class="attachment-info">
+        <div class="attachment-name" [title]="attachment.filename">
+          {{ attachment.filename }}
+        </div>
+        <div class="attachment-meta">
+          <span class="file-size">{{ getFileSize(attachment.fileSize) }}</span>
+          <span class="separator">•</span>
+          <span class="upload-date">{{ formatDate(attachment.uploadedAt) }}</span>
+        </div>
+      </div>
+
+      <div class="attachment-actions">
+        <button
+          class="action-btn download-btn"
+          (click)="downloadAttachment(attachment)"
+          title="Télécharger"
+        >
+          <i class="fas fa-download"></i>
+        </button>
+
+        <button
+          *ngIf="canDelete"
+          class="action-btn delete-btn"
+          (click)="deleteAttachment(attachment)"
+          title="Supprimer"
+        >
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Show more/less button -->
+  <div *ngIf="hiddenCount > 0" class="show-more-container">
+    <button
+      class="show-more-btn"
+      (click)="toggleShowAll()"
+    >
+      <i class="fas" [class]="showAll ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+      {{ showAll ? 'Voir moins' : `Voir ${hiddenCount} de plus` }}
+    </button>
+  </div>
+</div>
+
+<!-- Empty state -->
+<div *ngIf="attachments.length === 0" class="empty-attachments">
+  <div class="empty-content">
+    <i class="fas fa-paperclip empty-icon"></i>
+    <p>Aucune pièce jointe</p>
+  </div>
+</div>

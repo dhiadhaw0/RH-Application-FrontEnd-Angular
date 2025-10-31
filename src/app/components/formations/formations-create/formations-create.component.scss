@@ -1,0 +1,323 @@
+// CSS Custom Properties for consistent theming
+:root {
+  --primary-gradient: linear-gradient(135deg, #87ceeb 0%, #add8e6 100%);
+  --secondary-gradient: linear-gradient(135deg, #98fb98 0%, #90ee90 100%);
+  --accent-gradient: linear-gradient(135deg, #dda0dd 0%, #ba55d3 100%);
+  --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.03);
+  --shadow-medium: 0 12px 40px rgba(0, 0, 0, 0.08);
+  --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.12);
+  --border-radius: 16px;
+  --border-radius-large: 24px;
+  --transition-smooth: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+// Formation Create Container - Enhanced with glassmorphism
+.formation-create-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  min-height: calc(100vh - 70px);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: var(--primary-gradient);
+    opacity: 0.05;
+    animation: rotate 20s linear infinite;
+    z-index: -1;
+  }
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
+      }
+
+      i {
+        font-size: 14px;
+      }
+    }
+
+    h1 {
+      color: white;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      position: relative;
+      margin: 0;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        background: white;
+        border-radius: 2px;
+      }
+    }
+  }
+
+  .formation-form {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    padding: 3rem;
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-medium);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary-gradient);
+    }
+
+    .form-section {
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+
+      &:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      h2 {
+        color: white;
+        margin-bottom: 2rem;
+        font-size: 1.4em;
+        font-weight: 700;
+        position: relative;
+        display: inline-block;
+
+        &::before {
+          content: '✨';
+          position: absolute;
+          left: -30px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 1.2em;
+          animation: sparkle 2s ease-in-out infinite;
+        }
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        position: relative;
+      }
+
+      .form-group {
+        margin-bottom: 2rem;
+        position: relative;
+
+        label {
+          display: block;
+          margin-bottom: 0.75rem;
+          font-weight: 600;
+          color: white;
+          font-size: 1.1em;
+          transition: var(--transition-smooth);
+        }
+
+        .form-control {
+          width: 100%;
+          padding: 1rem 1.25rem;
+          border: 2px solid #e0e0e0;
+          border-radius: 12px;
+          font-size: 1rem;
+          background: white;
+          color: #333;
+          transition: var(--transition-smooth);
+
+          &:focus {
+            outline: none;
+            border-color: #87ceeb;
+            box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.3), var(--shadow-soft);
+            transform: translateY(-2px);
+            background: white;
+          }
+
+          &:invalid:not(:placeholder-shown) {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+          }
+
+          &::placeholder {
+            color: #999;
+            font-style: italic;
+          }
+        }
+
+        textarea.form-control {
+          resize: vertical;
+          min-height: 100px;
+          line-height: 1.6;
+        }
+
+        select.form-control {
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2387ceeb' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+          background-position: right 1rem center;
+          background-repeat: no-repeat;
+          background-size: 1.5em 1.5em;
+          padding-right: 3rem;
+          appearance: none;
+          cursor: pointer;
+        }
+
+        .error-message {
+          color: #ff6b6b;
+          font-size: 0.875rem;
+          margin-top: 0.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          &::before {
+            content: '⚠️';
+            font-size: 0.8em;
+          }
+        }
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1.5rem;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 2px solid rgba(255, 255, 255, 0.2);
+
+      .btn-cancel, .btn-submit {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition-bounce);
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+          transition: left 0.5s;
+        }
+
+        &:hover::before {
+          left: 100%;
+        }
+      }
+
+      .btn-cancel {
+        background: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+        border: 2px solid rgba(108, 117, 125, 0.3);
+
+        &:hover {
+          background: rgba(108, 117, 125, 0.2);
+          transform: translateY(-3px);
+          box-shadow: var(--shadow-soft);
+        }
+      }
+
+      .btn-submit {
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: var(--shadow-soft);
+
+        &:hover:not(:disabled) {
+          transform: translateY(-3px) scale(1.05);
+          box-shadow: var(--shadow-medium);
+        }
+
+        &:disabled {
+          background: #6c757d;
+          cursor: not-allowed;
+          opacity: 0.6;
+          transform: none;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: translateY(-50%) scale(1); opacity: 1; }
+  50% { transform: translateY(-50%) scale(1.2); opacity: 0.7; }
+}
+
+@media (max-width: 768px) {
+  .formation-create-container {
+    padding: 1rem;
+
+    .formation-form {
+      padding: 2rem;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .form-actions {
+      flex-direction: column;
+
+      .btn-cancel, .btn-submit {
+        width: 100%;
+      }
+    }
+  }
+}

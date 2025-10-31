@@ -1,0 +1,30 @@
+<!-- Forum Anonymous Toggle Component -->
+<div class="anonymous-toggle-container">
+  <div
+    [class]="getToggleClasses()"
+    (click)="onToggle()"
+    [attr.aria-pressed]="isAnonymous"
+    [attr.aria-disabled]="disabled"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="onToggle()"
+    (keydown.space)="onToggle(); $event.preventDefault()"
+  >
+    <div class="toggle-track">
+      <div class="toggle-thumb">
+        <i class="fas" [class]="isAnonymous ? 'fa-user-secret' : 'fa-user'"></i>
+      </div>
+    </div>
+
+    <span class="toggle-label" *ngIf="showLabel">
+      <i class="fas fa-user-secret"></i>
+      {{ isAnonymous ? 'Anonyme' : 'Public' }}
+    </span>
+  </div>
+
+  <div class="toggle-info" *ngIf="showLabel">
+    <small class="info-text">
+      {{ isAnonymous ? 'Votre identité sera masquée' : 'Votre nom sera visible par tous' }}
+    </small>
+  </div>
+</div>

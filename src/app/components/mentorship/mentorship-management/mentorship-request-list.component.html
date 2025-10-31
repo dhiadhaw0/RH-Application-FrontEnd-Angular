@@ -1,0 +1,67 @@
+<div class="request-list-container">
+  <h2>{{ isMentor ? 'Demandes reçues' : 'Mes demandes' }}</h2>
+
+  <div class="loading" *ngIf="loading">
+    Chargement des demandes...
+  </div>
+
+  <div class="no-requests" *ngIf="!loading && requests.length === 0">
+    Aucune demande trouvée.
+  </div>
+
+  <div class="requests-list" *ngIf="!loading && requests.length > 0">
+    <div class="request-card" *ngFor="let request of requests">
+      <div class="card-header">
+        <div class="request-info">
+          <h3>{{ request.topic }}</h3>
+          <div class="meta-info">
+            <span class="date">{{ request.requestedAt | date:'dd/MM/yyyy à HH:mm' }}</span>
+            <span class="urgency" [style.background-color]="getUrgencyColor(request.urgency)">
+              {{ getUrgencyText(request.urgency) }}
+            </span>
+          </div>
+        </div>
+        <div class="status-badge" [style.background-color]="getStatusColor(request.status)">
+          {{ getStatusText(request.status) }}
+        </div>
+      </div>
+
+      <div class="card-body">
+        <p class="description">{{ request.description }}</p>
+
+        <div class="user-info">
+          <div class="user-detail" *ngIf="!isMentor">
+            <strong>Mentor:</strong> {{ request.mentor.firstName }} {{ request.mentor.lastName }}
+          </div>
+          <div class="user-detail" *ngIf="isMentor">
+            <strong>Mentee:</strong> {{ request.mentee.firstName }} {{ request.mentee.lastName }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions" *ngIf="isMentor && request.status === 'PENDING'">
+        <button class="btn btn-success" (click)="respondToRequest(request, true)">
+          Accepter
+        </button>
+        <button class="btn btn-danger" (click)="respondToRequest(request, false)">
+          Rejeter
+        </button>
+      </div>
+
+      <div class="card-actions" *ngIf="!isMentor && request.status === 'ACCEPTED'">
+        <button class="btn btn-primary" routerLink="/mentorship/sessions/schedule/{{ request.id }}">
+          Planifier une session
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-secondary" routerLink="/mentorship/requests/new" *ngIf="!isMentor">
+      Nouvelle demande
+    </button>
+    <button class="btn btn-secondary" routerLink="/mentorship/dashboard">
+      Tableau de bord
+    </button>
+  </div>
+</div>

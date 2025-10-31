@@ -1,0 +1,97 @@
+<div class="document-upload-container">
+  <div class="upload-header">
+    <h2 class="upload-title">📤 Télécharger un Document</h2>
+    <p class="upload-subtitle">Ajoutez des documents à votre candidature</p>
+  </div>
+
+  <div class="upload-form">
+    <div class="form-group">
+      <label for="document-type" class="form-label">Type de Document</label>
+      <select
+        id="document-type"
+        class="form-select"
+        [(ngModel)]="selectedType"
+        [disabled]="uploading"
+      >
+        <option value="">-- Sélectionner un type --</option>
+        <option *ngFor="let type of documentTypes" [value]="type.value">
+          {{ type.icon }} {{ type.label }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="file-input" class="form-label">Fichier</label>
+      <div class="file-input-container">
+        <input
+          type="file"
+          id="file-input"
+          class="file-input"
+          (change)="onFileSelected($event)"
+          [disabled]="uploading"
+          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif"
+        >
+        <label for="file-input" class="file-input-label">
+          <span class="file-icon">📎</span>
+          <span class="file-text">
+            {{ selectedFile ? selectedFile.name : 'Choisir un fichier...' }}
+          </span>
+        </label>
+      </div>
+      <div class="file-info" *ngIf="selectedFile">
+        <span class="file-size">Taille: {{ getFileSizeDisplay(selectedFile.size) }}</span>
+        <span class="file-type">Type: {{ selectedFile.type }}</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description" class="form-label">Description (optionnel)</label>
+      <textarea
+        id="description"
+        class="form-textarea"
+        [(ngModel)]="description"
+        [disabled]="uploading"
+        placeholder="Ajoutez une description pour ce document..."
+        rows="3"
+      ></textarea>
+    </div>
+
+    <div class="upload-actions">
+      <button
+        class="upload-btn"
+        [disabled]="!selectedFile || !selectedType || uploading"
+        (click)="uploadDocument()"
+      >
+        <span *ngIf="!uploading">🚀 Télécharger</span>
+        <span *ngIf="uploading" class="loading">
+          <span class="spinner"></span>
+          Téléchargement...
+        </span>
+      </button>
+    </div>
+
+    <div class="upload-status">
+      <div class="success-message" *ngIf="uploadSuccess">
+        ✅ Document téléchargé avec succès !
+      </div>
+      <div class="error-message" *ngIf="uploadError">
+        ❌ {{ uploadError }}
+      </div>
+    </div>
+  </div>
+
+  <div class="upload-info">
+    <div class="info-card">
+      <h3>📋 Formats acceptés</h3>
+      <ul>
+        <li>PDF (.pdf)</li>
+        <li>Documents Word (.doc, .docx)</li>
+        <li>Images (.jpg, .jpeg, .png, .gif)</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h3>📏 Taille maximale</h3>
+      <p>10 MB par fichier</p>
+    </div>
+  </div>
+</div>

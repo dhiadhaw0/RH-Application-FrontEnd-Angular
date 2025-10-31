@@ -1,0 +1,10 @@
+<!-- Forum Upvote Component -->
+<button
+  class="upvote-button {{ getUpvoteButtonClass() }}"
+  (click)="toggleUpvote()"
+  [disabled]="loading || !userId"
+  [title]="hasUpvoted ? 'Retirer le vote' : 'Voter pour ce post'"
+>
+  <i class="fas fa-thumbs-up"></i>
+  <span class="upvote-count">{{ upvotesCount }}</span>
+</button>

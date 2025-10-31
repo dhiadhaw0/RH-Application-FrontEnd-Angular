@@ -1,0 +1,187 @@
+<app-navbar></app-navbar>
+
+<div class="versions-container">
+  <div class="header-section" *ngIf="offer">
+    <button class="btn btn-back" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Retour
+    </button>
+    <div class="header-content">
+      <h1>Versions de l'offre</h1>
+      <p class="offer-title">{{offer.title}}</p>
+      <div class="offer-meta">
+        <span class="offer-id">#{{offer.idJobOffer}}</span>
+        <span class="current-status" [style.background-color]="getWorkflowStatusColor(offer.workflowStatus)">
+          {{offer.workflowStatus}}
+        </span>
+      </div>
+    </div>
+    <div class="header-actions" *ngIf="isOwner">
+      <button class="btn btn-outline" (click)="createVersion(false)">
+        <i class="fas fa-save"></i> Sauvegarder version
+      </button>
+      <button class="btn btn-outline" (click)="createVersion(true)">
+        <i class="fas fa-edit"></i> Sauvegarder brouillon
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Chargement des versions...</p>
+    </div>
+  </div>
+
+  <div class="versions-content" *ngIf="!loading && offer">
+    <!-- Current Version -->
+    <div class="current-version-card" *ngIf="offer">
+      <div class="card-header">
+        <h2>Version actuelle</h2>
+        <span class="version-badge current">ACTUELLE</span>
+      </div>
+      <div class="version-content">
+        <div class="version-info">
+          <div class="info-item">
+            <label>Statut:</label>
+            <span class="status-badge" [style.background-color]="getStatusColor(offer.status)">
+              {{offer.status}}
+            </span>
+          </div>
+          <div class="info-item">
+            <label>Workflow:</label>
+            <span class="status-badge" [style.background-color]="getWorkflowStatusColor(offer.workflowStatus)">
+              {{offer.workflowStatus}}
+            </span>
+          </div>
+          <div class="info-item">
+            <label>Dernière modification:</label>
+            <span>{{offer.updatedAt | date:'dd/MM/yyyy à HH:mm'}}</span>
+          </div>
+        </div>
+        <div class="version-preview">
+          <h4>Aperçu</h4>
+          <p class="description">{{offer.description | slice:0:200}}...</p>
+          <div class="skills-preview" *ngIf="offer.requirementsHardSkills?.length">
+            <strong>Compétences:</strong>
+            <span class="skill-tag" *ngFor="let skill of offer.requirementsHardSkills.slice(0,3)">{{skill}}</span>
+            <span *ngIf="offer.requirementsHardSkills.length > 3">+{{offer.requirementsHardSkills.length - 3}} autres</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Versions List -->
+    <div class="versions-list">
+      <div class="list-header">
+        <h2>Historique des versions</h2>
+        <span class="versions-count">{{versions.length}} version(s)</span>
+      </div>
+
+      <div class="versions-timeline" *ngIf="versions.length > 0; else noVersions">
+        <div class="version-item" *ngFor="let version of versions; let i = index">
+          <div class="timeline-connector" *ngIf="i < versions.length - 1"></div>
+          <div class="version-node" [class]="getVersionTypeColor(version)">
+            <i class="fas" [class]="version.draft ? 'fa-edit' : 'fa-save'"></i>
+          </div>
+          <div class="version-card" (click)="selectVersion(version)">
+            <div class="card-header">
+              <div class="version-info">
+                <h3>Version {{version.versionNumber}}</h3>
+                <span class="version-type" [style.color]="getVersionTypeColor(version)">
+                  {{getVersionTypeLabel(version)}}
+                </span>
+              </div>
+              <div class="version-date">
+                {{formatVersionDate(version.savedAt)}}
+              </div>
+            </div>
+            <div class="version-preview">
+              <div class="changes-summary" *ngIf="getVersionChanges(version).length > 0">
+                <span class="changes-count">{{getVersionChanges(version).length}} modification(s)</span>
+                <ul class="changes-list">
+                  <li *ngFor="let change of getVersionChanges(version).slice(0,2)">{{change}}</li>
+                  <li *ngIf="getVersionChanges(version).length > 2">+{{getVersionChanges(version).length - 2}} autres...</li>
+                </ul>
+              </div>
+            </div>
+            <div class="version-actions">
+              <button class="btn btn-sm btn-primary" (click)="restoreVersion(version); $event.stopPropagation()">
+                <i class="fas fa-undo"></i> Restaurer
+              </button>
+              <button class="btn btn-sm btn-outline" (click)="compareVersions(version, versions[i+1]); $event.stopPropagation()" *ngIf="i < versions.length - 1">
+                <i class="fas fa-exchange-alt"></i> Comparer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noVersions>
+        <div class="no-versions">
+          <i class="fas fa-history"></i>
+          <h3>Aucune version sauvegardée</h3>
+          <p>Les versions sont automatiquement sauvegardées lors des modifications importantes.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Version Details Modal -->
+  <div class="version-modal" *ngIf="showVersionDetails && selectedVersion" (click)="closeVersionDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Version {{selectedVersion.versionNumber}}</h2>
+        <button class="btn btn-close" (click)="closeVersionDetails()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="version-details">
+          <div class="detail-section">
+            <h3>Informations</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>Type:</label>
+                <span>{{getVersionTypeLabel(selectedVersion)}}</span>
+              </div>
+              <div class="detail-item">
+                <label>Sauvegardée le:</label>
+                <span>{{formatVersionDate(selectedVersion.savedAt)}}</span>
+              </div>
+              <div class="detail-item">
+                <label>Numéro de version:</label>
+                <span>{{selectedVersion.versionNumber}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>Contenu de la version</h3>
+            <div class="version-snapshot">
+              <!-- TODO: Parse and display the offerSnapshotJson -->
+              <p class="snapshot-placeholder">
+                Aperçu détaillé de la version sauvegardée.
+                Cette fonctionnalité afficherait le contenu complet de l'offre à cette version.
+              </p>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>Modifications apportées</h3>
+            <ul class="changes-detailed">
+              <li *ngFor="let change of getVersionChanges(selectedVersion)">
+                <i class="fas fa-check-circle"></i> {{change}}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeVersionDetails()">Fermer</button>
+        <button class="btn btn-primary" (click)="restoreVersion(selectedVersion)">
+          <i class="fas fa-undo"></i> Restaurer cette version
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

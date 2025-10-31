@@ -1,0 +1,74 @@
+<div class="progression-dashboard">
+  <div class="dashboard-header">
+    <h1 class="main-title">📊 Tableau de Bord de Progression</h1>
+    <p class="subtitle">Suivez votre avancement dans les formations</p>
+  </div>
+
+  <div class="stats-overview" *ngIf="!loading">
+    <div class="stat-card">
+      <div class="stat-icon">📚</div>
+      <div class="stat-content">
+        <h3>{{ totalFormations }}</h3>
+        <p>Formations totales</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <h3>{{ completedFormations }}</h3>
+        <p>Formations terminées</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-content">
+        <h3>{{ averageProgress }}%</h3>
+        <p>Progression moyenne</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏱️</div>
+      <div class="stat-content">
+        <h3>{{ formatTime(totalTimeSpent) }}</h3>
+        <p>Temps total passé</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="formations-progress" *ngIf="!loading">
+    <h2 class="section-title">Progression par Formation</h2>
+    <div class="formations-grid">
+      <div class="formation-card" *ngFor="let formation of formations">
+        <div class="card-header">
+          <h3 class="formation-title">{{ formation.title }}</h3>
+          <span class="formation-provider">{{ formation.provider }}</span>
+        </div>
+
+        <div class="progress-section">
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              [style.width.%]="getFormationProgress(formation.idFormation)"
+              [style.background-color]="getProgressColor(getFormationProgress(formation.idFormation))"
+            ></div>
+          </div>
+          <div class="progress-text">
+            <span class="progress-percentage">{{ getFormationProgress(formation.idFormation) }}%</span>
+            <span class="progress-status">{{ getProgressStatus(getFormationProgress(formation.idFormation)) }}</span>
+          </div>
+        </div>
+
+        <div class="formation-meta">
+          <span class="meta-item">📖 {{ formation.domaine }}</span>
+          <span class="meta-item">🎯 {{ formation.niveau }}</span>
+          <span class="meta-item">⏰ {{ formation.duree }}h</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Chargement de vos statistiques...</p>
+  </div>
+</div>
