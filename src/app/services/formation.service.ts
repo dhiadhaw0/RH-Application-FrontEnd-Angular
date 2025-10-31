@@ -1,18 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { Formation, StatutFormation, TypeFormation } from '../models/formation.model';
 import { Certification } from '../models/certification.model';
 import { Lecon } from '../models/lecon.model';
 import { ProgressionFormation } from '../models/progression-formation.model';
 import { TraductionFormation } from '../models/traduction-formation.model';
+import { InsuranceService } from './insurance.service';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class FormationService {
   private readonly baseUrl = `${environment.apiBaseUrl}/formations`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private insuranceService: InsuranceService,
+    private authService: AuthService
+  ) {}
 
   createFormation(formation: Partial<Formation>): Observable<Formation> {
     return this.http.post<Formation>(this.baseUrl, formation);
@@ -130,7 +136,36 @@ export class FormationService {
   }
 
   updateProgression(userId: number, formationId: number, progression: number): Observable<ProgressionFormation> {
-    return this.http.put<ProgressionFormation>(`${this.baseUrl}/progression/${userId}/${formationId}`, { progression });
+    return this.http.put<ProgressionFormation>(`${this.baseUrl}/progression/${userId}/${formationId}`, { progression }).pipe(
+      tap(updatedProgression => {
+        // Check if formation is completed (progression === 100)
+        if (updatedProgression.progression === 100) {
+          this.handleFormationCompletion(userId, formationId);
+        }
+      })
+    );
+  }
+
+  private handleFormationCompletion(userId: number, formationId: number): void {
+    // Check if formation is paid (prix > 0)
+    this.getFormationById(formationId).subscribe(formation => {
+      if (formation.prix && formation.prix > 0) {
+        // Check if user is eligible for insurance
+        this.insuranceService.isEligibleForInsurance(userId, formationId).subscribe(isEligible => {
+          if (isEligible) {
+            // Create insurance policy
+            this.insuranceService.createInsurance(userId, formationId).subscribe({
+              next: (insurance) => {
+                console.log('Insurance policy created for completed formation:', insurance);
+              },
+              error: (error) => {
+                console.error('Error creating insurance policy:', error);
+              }
+            });
+          }
+        });
+      }
+    });
   }
 
   getTraductions(formationId: number): Observable<TraductionFormation[]> {

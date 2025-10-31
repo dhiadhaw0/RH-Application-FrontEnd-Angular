@@ -82,6 +82,7 @@ import { ForumThreadVersionHistoryComponent } from './components/forum/forum-thr
 import { ForumAnonymousToggleComponent } from './components/forum/forum-anonymous-toggle/forum-anonymous-toggle.component';
 import { ChatbotComponent } from './components/chatbot/chatbot.component';
 import { SkillCreditShowcaseComponent } from './components/skill-credits/skill-credit-showcase/skill-credit-showcase.component';
+import { InsuranceDashboardComponent } from './components/insurance/insurance-dashboard/insurance-dashboard.component';
 
 // Investment Components
 import { InvestmentDashboardComponent } from './components/investments/investment-dashboard/investment-dashboard.component';
@@ -220,7 +221,10 @@ const routes: Routes = [
   // Installment Routes
   { path: 'installments', component: InstallmentPlansComponent, data: { animation: 'InstallmentPlans' } },
   { path: 'installments/calculator', component: InstallmentCalculatorComponent, data: { animation: 'InstallmentCalculator' } },
-  
+
+  // Insurance Routes
+  { path: 'insurance', component: InsuranceDashboardComponent, canActivate: [authGuard], data: { animation: 'InsuranceDashboard' } },
+
   { path: '**', redirectTo: '' }
 ];
 

@@ -137,6 +137,10 @@
               <i class="fas fa-user"></i>
               Mon profil
             </a>
+            <a routerLink="/insurance" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-shield-alt"></i>
+              Assurance emploi
+            </a>
             <a routerLink="/profile/edit" class="dropdown-item" (click)="closeDropdowns()">
               <i class="fas fa-edit"></i>
               Modifier mon profil
@@ -360,6 +364,10 @@
             <i class="fas fa-bell"></i>
             Notifications
           </a>
+          <a routerLink="/insurance" class="dropdown-item">
+            <i class="fas fa-shield-alt"></i>
+            Assurance emploi
+          </a>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item logout-btn" (click)="logout()">
             <i class="fas fa-sign-out-alt"></i>
@@ -458,6 +466,12 @@
         <a routerLink="/chatbot" routerLinkActive="active" class="mobile-nav-link" (click)="closeMobileMenu()">
           <i class="fas fa-robot"></i>
           <span>Chatbot</span>
+        </a>
+      </li>
+      <li class="mobile-nav-item">
+        <a routerLink="/insurance" routerLinkActive="active" class="mobile-nav-link" (click)="closeMobileMenu()">
+          <i class="fas fa-shield-alt"></i>
+          <span>Assurance emploi</span>
         </a>
       </li>
 

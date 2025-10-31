@@ -120,6 +120,7 @@ import { InstallmentCalculatorComponent } from './components/installments/instal
 import { MarketplaceDashboardComponent } from './components/marketplace/marketplace-dashboard/marketplace-dashboard.component';
 import { MarketplaceOffersComponent } from './components/marketplace/marketplace-offers/marketplace-offers.component';
 import { MarketplaceCreateOfferComponent } from './components/marketplace/marketplace-create-offer/marketplace-create-offer.component';
+import { InsuranceDashboardComponent } from './components/insurance/insurance-dashboard/insurance-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -143,6 +144,7 @@ import { MarketplaceCreateOfferComponent } from './components/marketplace/market
     MarketplaceDashboardComponent,
     MarketplaceOffersComponent,
     MarketplaceCreateOfferComponent,
+    InsuranceDashboardComponent,
   ],
   imports: [
     BrowserModule,
