@@ -163,6 +163,27 @@
           </a>
         </li>
         <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle" (click)="toggleAchievementsDropdown()">
+            <i class="fas fa-trophy"></i>
+            <span>Récompenses</span>
+            <i class="fas fa-chevron-down dropdown-icon" [class.rotated]="showAchievementsDropdown"></i>
+          </button>
+          <div class="dropdown-menu" [class.show]="showAchievementsDropdown">
+            <a routerLink="/achievements" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-trophy"></i>
+              Mes Récompenses
+            </a>
+            <a routerLink="/leaderboard" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-list-ol"></i>
+              Classement
+            </a>
+            <a routerLink="/challenges" class="dropdown-item" (click)="closeDropdowns()">
+              <i class="fas fa-fire"></i>
+              Challenges Saisonniers
+            </a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
           <button class="nav-link dropdown-toggle" (click)="toggleMentorshipDropdown()">
             <i class="fas fa-handshake"></i>
             <span>Mentorat</span>

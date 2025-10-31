@@ -1,162 +1,199 @@
-<div class="container-fluid mt-4">
-  <div class="row">
-    <div class="col-12">
-      <h2 class="mb-4">
-        <i class="fas fa-shield-alt text-primary me-2"></i>
-        Assurance Emploi Post-Formation
-      </h2>
+<div class="insurance-dashboard">
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1><i class="fas fa-shield-alt"></i> Assurance Emploi Post-Formation</h1>
+      <p class="dashboard-subtitle">Protection et sécurité après vos formations</p>
+    </div>
+    <div class="header-decoration">
+      <div class="shield-icon">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+    </div>
+  </div>
 
-      <!-- Statistics Cards -->
-      <div class="row mb-4" *ngIf="insuranceStats">
-        <div class="col-md-3">
-          <div class="card bg-primary text-white">
-            <div class="card-body">
-              <h5 class="card-title">
-                <i class="fas fa-file-contract"></i> Total des polices
-              </h5>
-              <h3>{{ insuranceStats.totalPolicies }}</h3>
+  <div class="auth-notice" *ngIf="!currentUser">
+    <div class="notice-card">
+      <div class="notice-icon">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <div class="notice-content">
+        <h4>Découvrez nos assurances</h4>
+        <p>Connectez-vous pour voir vos polices d'assurance personnelles et gérer vos réclamations.</p>
+        <div class="notice-actions">
+          <button class="btn btn-primary" routerLink="/login">Se connecter</button>
+          <button class="btn btn-outline" routerLink="/register">S'inscrire</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-section" *ngIf="insuranceStats">
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-icon">
+          <i class="fas fa-file-contract"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ insuranceStats.totalPolicies }}</h3>
+          <p>Total des polices</p>
+        </div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ insuranceStats.activePolicies }}</h3>
+          <p>Polices actives</p>
+        </div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-icon">
+          <i class="fas fa-hand-holding-usd"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ insuranceStats.claimedPolicies }}</h3>
+          <p>Réclamations</p>
+        </div>
+      </div>
+      <div class="stat-card info">
+        <div class="stat-icon">
+          <i class="fas fa-euro-sign"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ formatCurrency(insuranceStats.totalCoverageAmount) }}</h3>
+          <p>Couverture totale</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Insurances Section -->
+  <div class="insurances-section">
+    <div class="section-header">
+      <h2><i class="fas fa-list"></i> Mes Assurances</h2>
+    </div>
+
+    <div *ngIf="loading" class="loading-state">
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Chargement de vos assurances...</p>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && userInsurances.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <h3>Aucune assurance trouvée</h3>
+      <p>Vous n'avez pas encore d'assurance active. Complétez une formation payante pour être éligible à notre protection emploi.</p>
+      <button class="btn btn-primary" routerLink="/formations">
+        <i class="fas fa-graduation-cap"></i>
+        Découvrir les formations
+      </button>
+    </div>
+
+    <div *ngIf="!loading && userInsurances.length > 0" class="insurances-grid">
+      <div class="insurance-card" *ngFor="let insurance of userInsurances">
+        <div class="card-header">
+          <div class="formation-info">
+            <h4>{{ insurance.formation?.title }}</h4>
+            <p class="formation-price">{{ formatCurrency(insurance.formation?.prix || 0) }}</p>
+          </div>
+          <div class="status-badge" [ngClass]="getStatusClass(insurance.status)">
+            {{ getStatusLabel(insurance.status) }}
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="coverage-amount">
+            <div class="amount-icon">
+              <i class="fas fa-euro-sign"></i>
+            </div>
+            <div class="amount-info">
+              <h3>{{ formatCurrency(insurance.coverageAmount) }}</h3>
+              <p>Montant de couverture</p>
+            </div>
+          </div>
+
+          <div class="dates-info">
+            <div class="date-item">
+              <i class="fas fa-calendar-start"></i>
+              <span>Début: {{ formatDate(insurance.startDate) }}</span>
+            </div>
+            <div class="date-item">
+              <i class="fas fa-calendar-end"></i>
+              <span>Fin: {{ formatDate(insurance.endDate) }}</span>
             </div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card bg-success text-white">
-            <div class="card-body">
-              <h5 class="card-title">
-                <i class="fas fa-check-circle"></i> Polices actives
-              </h5>
-              <h3>{{ insuranceStats.activePolicies }}</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card bg-warning text-white">
-            <div class="card-body">
-              <h5 class="card-title">
-                <i class="fas fa-hand-holding-usd"></i> Réclamations
-              </h5>
-              <h3>{{ insuranceStats.claimedPolicies }}</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card bg-info text-white">
-            <div class="card-body">
-              <h5 class="card-title">
-                <i class="fas fa-euro-sign"></i> Couverture totale
-              </h5>
-              <h3>{{ formatCurrency(insuranceStats.totalCoverageAmount) }}</h3>
-            </div>
+
+        <div class="card-actions">
+          <button
+            *ngIf="canClaimInsurance(insurance)"
+            class="btn btn-warning claim-btn"
+            (click)="claimInsurance(insurance.id)">
+            <i class="fas fa-hand-holding-usd"></i>
+            Réclamer maintenant
+          </button>
+          <div *ngIf="!canClaimInsurance(insurance)" class="waiting-state">
+            <i class="fas fa-clock"></i>
+            <span>En attente de période d'éligibilité</span>
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- User Insurances Table -->
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">
-            <i class="fas fa-list me-2"></i>
-            Mes Assurances
-          </h5>
+  <!-- Information Section -->
+  <div class="how-it-works-section">
+    <div class="section-header">
+      <h2><i class="fas fa-info-circle"></i> Comment ça marche ?</h2>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <div class="step-icon">
+          <i class="fas fa-graduation-cap"></i>
         </div>
-        <div class="card-body">
-          <div *ngIf="loading" class="text-center">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Chargement...</span>
-            </div>
-          </div>
-
-          <div *ngIf="!loading && userInsurances.length === 0" class="text-center py-4">
-            <i class="fas fa-shield-alt fa-3x text-muted mb-3"></i>
-            <h5 class="text-muted">Aucune assurance trouvée</h5>
-            <p class="text-muted">Vous n'avez pas encore d'assurance active. Complétez une formation payante pour être éligible.</p>
-          </div>
-
-          <div *ngIf="!loading && userInsurances.length > 0" class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Formation</th>
-                  <th>Montant de couverture</th>
-                  <th>Date de début</th>
-                  <th>Date de fin</th>
-                  <th>Statut</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let insurance of userInsurances">
-                  <td>
-                    <strong>{{ insurance.formation?.title }}</strong>
-                    <br>
-                    <small class="text-muted">{{ formatCurrency(insurance.formation?.prix || 0) }}</small>
-                  </td>
-                  <td>
-                    <span class="fw-bold text-success">{{ formatCurrency(insurance.coverageAmount) }}</span>
-                  </td>
-                  <td>{{ formatDate(insurance.startDate) }}</td>
-                  <td>{{ formatDate(insurance.endDate) }}</td>
-                  <td>
-                    <span class="badge" [ngClass]="getStatusClass(insurance.status)">
-                      {{ getStatusLabel(insurance.status) }}
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      *ngIf="canClaimInsurance(insurance)"
-                      class="btn btn-warning btn-sm"
-                      (click)="claimInsurance(insurance.id)">
-                      <i class="fas fa-hand-holding-usd me-1"></i>
-                      Réclamer
-                    </button>
-                    <span *ngIf="!canClaimInsurance(insurance)" class="text-muted">
-                      <i class="fas fa-clock me-1"></i>
-                      En attente
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div class="step-content">
+          <h4>Formation payante</h4>
+          <p>Complétez une formation payante pour être éligible à l'assurance emploi.</p>
         </div>
       </div>
 
-      <!-- Information Section -->
-      <div class="card mt-4">
-        <div class="card-header">
-          <h5 class="mb-0">
-            <i class="fas fa-info-circle me-2"></i>
-            Comment ça marche ?
-          </h5>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <div class="step-icon">
+          <i class="fas fa-shield-alt"></i>
         </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-4">
-              <div class="text-center mb-3">
-                <i class="fas fa-graduation-cap fa-2x text-primary mb-2"></i>
-                <h6>1. Formation payante</h6>
-                <p class="small">Complétez une formation payante pour être éligible à l'assurance.</p>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="text-center mb-3">
-                <i class="fas fa-shield-alt fa-2x text-success mb-2"></i>
-                <h6>2. Couverture automatique</h6>
-                <p class="small">Une assurance est automatiquement créée avec une couverture de 6 mois.</p>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="text-center mb-3">
-                <i class="fas fa-hand-holding-usd fa-2x text-warning mb-2"></i>
-                <h6>3. Réclamation</h6>
-                <p class="small">Si vous n'avez pas trouvé d'emploi après 6 mois, vous pouvez réclamer la couverture.</p>
-              </div>
-            </div>
-          </div>
-          <div class="alert alert-info">
-            <i class="fas fa-lightbulb me-2"></i>
-            <strong>Info:</strong> Le montant de couverture est calculé en fonction des statistiques d'embauche des offres d'emploi disponibles sur la plateforme.
-          </div>
+        <div class="step-content">
+          <h4>Couverture automatique</h4>
+          <p>Une assurance est automatiquement créée avec une couverture de 6 mois.</p>
         </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <div class="step-icon">
+          <i class="fas fa-hand-holding-usd"></i>
+        </div>
+        <div class="step-content">
+          <h4>Réclamation</h4>
+          <p>Si vous n'avez pas trouvé d'emploi après 6 mois, vous pouvez réclamer la couverture.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-banner">
+      <div class="banner-icon">
+        <i class="fas fa-lightbulb"></i>
+      </div>
+      <div class="banner-content">
+        <h4>À propos de la couverture</h4>
+        <p>Le montant de couverture est calculé en fonction des statistiques d'embauche des offres d'emploi disponibles sur la plateforme.</p>
       </div>
     </div>
   </div>

@@ -9,6 +9,8 @@ import { ProgressionFormation } from '../models/progression-formation.model';
 import { TraductionFormation } from '../models/traduction-formation.model';
 import { InsuranceService } from './insurance.service';
 import { AuthService } from './auth.service';
+import { AchievementService } from './achievement.service';
+import { AchievementTriggerType } from '../models/achievement.model';
 
 @Injectable({ providedIn: 'root' })
 export class FormationService {
@@ -17,7 +19,8 @@ export class FormationService {
   constructor(
     private http: HttpClient,
     private insuranceService: InsuranceService,
-    private authService: AuthService
+    private authService: AuthService,
+    private achievementService: AchievementService
   ) {}
 
   createFormation(formation: Partial<Formation>): Observable<Formation> {
@@ -141,6 +144,17 @@ export class FormationService {
         // Check if formation is completed (progression === 100)
         if (updatedProgression.progression === 100) {
           this.handleFormationCompletion(userId, formationId);
+          // Trigger achievement check for formation completion
+          this.achievementService.checkAchievementTrigger(userId, AchievementTriggerType.FORMATION_COMPLETED).subscribe({
+            next: (newAchievements) => {
+              if (newAchievements.length > 0) {
+                console.log('New achievements unlocked:', newAchievements);
+                // Award points for formation completion
+                this.achievementService.updateUserPoints(userId, 50).subscribe();
+              }
+            },
+            error: (error) => console.error('Error checking achievements:', error)
+          });
         }
       })
     );

@@ -1,16 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { User } from '../models/user.model';
 import { MentorshipRequest } from '../models/mentorship-request.model';
 import { MentorshipSession } from '../models/mentorship-session.model';
+import { AchievementService } from './achievement.service';
+import { AchievementTriggerType } from '../models/achievement.model';
 
 @Injectable({ providedIn: 'root' })
 export class MentorshipService {
   private readonly baseUrl = `${environment.apiBaseUrl}/mentorship`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private achievementService: AchievementService
+  ) {}
 
   listMentors(): Observable<User[]> {
     return this.http.get<User[]>(`${this.baseUrl}/mentors`);
@@ -37,7 +42,36 @@ export class MentorshipService {
   }
 
   completeSession(sessionId: number): Observable<MentorshipSession> {
-    return this.http.post<MentorshipSession>(`${this.baseUrl}/session/${sessionId}/complete`, null);
+    return this.http.post<MentorshipSession>(`${this.baseUrl}/session/${sessionId}/complete`, null).pipe(
+      tap(completedSession => {
+        // Trigger achievement check for mentorship session completion
+        if (completedSession.mentorshipRequest?.mentee?.id) {
+          this.achievementService.checkAchievementTrigger(completedSession.mentorshipRequest.mentee.id, AchievementTriggerType.MENTORSHIP_SESSION_COMPLETED).subscribe({
+            next: (newAchievements) => {
+              if (newAchievements.length > 0) {
+                console.log('New achievements unlocked:', newAchievements);
+                // Award points for mentorship session completion
+                this.achievementService.updateUserPoints(completedSession.mentorshipRequest.mentee.id, 30).subscribe();
+              }
+            },
+            error: (error) => console.error('Error checking achievements:', error)
+          });
+        }
+        // Also check for mentor achievements
+        if (completedSession.mentorshipRequest?.mentor?.id) {
+          this.achievementService.checkAchievementTrigger(completedSession.mentorshipRequest.mentor.id, AchievementTriggerType.MENTORSHIP_SESSION_COMPLETED).subscribe({
+            next: (newAchievements) => {
+              if (newAchievements.length > 0) {
+                console.log('Mentor achievements unlocked:', newAchievements);
+                // Award points for mentoring
+                this.achievementService.updateUserPoints(completedSession.mentorshipRequest.mentor.id, 35).subscribe();
+              }
+            },
+            error: (error) => console.error('Error checking mentor achievements:', error)
+          });
+        }
+      })
+    );
   }
 
   searchMentors(expertise: string | null, language: string | null): Observable<User[]> {

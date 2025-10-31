@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../../../services/user.service';
 import { BadgeService } from '../../../services/badge.service';
+import { AchievementService } from '../../../services/achievement.service';
 import { User, Role } from '../../../models/user.model';
 import { Badge } from '../../../models/badge.model';
+import { UserAchievement, UserPoints } from '../../../models/user-achievement.model';
 import { NavbarComponent } from '../../navbar/navbar.component';
 
 @Component({
@@ -17,13 +19,16 @@ import { NavbarComponent } from '../../navbar/navbar.component';
 export class UserProfileComponent implements OnInit {
   user: User | null = null;
   badges: Badge[] = [];
+  userAchievements: UserAchievement[] = [];
+  userPoints: UserPoints | null = null;
   loading = false;
   userId: number = 0;
 
   constructor(
     private route: ActivatedRoute,
     private userService: UserService,
-    private badgeService: BadgeService
+    private badgeService: BadgeService,
+    private achievementService: AchievementService
   ) {}
 
   ngOnInit(): void {
@@ -46,6 +51,8 @@ export class UserProfileComponent implements OnInit {
       next: (user) => {
         this.user = user;
         this.loadUserBadges();
+        this.loadUserAchievements();
+        this.loadUserPoints();
       },
       error: (error) => {
         console.error('Error loading user:', error);
@@ -61,13 +68,37 @@ export class UserProfileComponent implements OnInit {
     this.badgeService.getAllBadges().subscribe({
       next: (badges) => {
         this.badges = badges.slice(0, 3); // Mock: take first 3 badges
-        this.loading = false;
       },
       error: (error) => {
         console.error('Error loading badges:', error);
-        this.loading = false;
         // Load mock badges for demo
         this.loadMockBadges();
+      }
+    });
+  }
+
+  loadUserAchievements(): void {
+    this.achievementService.getUserAchievements(this.userId).subscribe({
+      next: (achievements) => {
+        this.userAchievements = achievements;
+      },
+      error: (error) => {
+        console.error('Error loading user achievements:', error);
+        this.loadMockAchievements();
+      }
+    });
+  }
+
+  loadUserPoints(): void {
+    this.achievementService.getUserPoints(this.userId).subscribe({
+      next: (points) => {
+        this.userPoints = points;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading user points:', error);
+        this.loading = false;
+        this.loadMockPoints();
       }
     });
   }
@@ -119,6 +150,56 @@ export class UserProfileComponent implements OnInit {
         imageUrl: '👨‍🏫'
       }
     ];
+  }
+
+  private loadMockAchievements(): void {
+    // Mock achievements data
+    this.userAchievements = [
+      {
+        id: 1,
+        user: this.user!,
+        achievement: {
+          id: 1,
+          name: 'First Formation',
+          description: 'Completed your first training course',
+          iconUrl: 'fas fa-graduation-cap',
+          points: 50,
+          category: 'FORMATION' as any,
+          triggerType: 'FORMATION_COMPLETED' as any,
+          isActive: true,
+          createdAt: new Date()
+        },
+        unlockedAt: new Date('2024-01-15'),
+        isCompleted: true
+      },
+      {
+        id: 2,
+        user: this.user!,
+        achievement: {
+          id: 2,
+          name: 'Job Seeker',
+          description: 'Submitted your first job application',
+          iconUrl: 'fas fa-file-alt',
+          points: 25,
+          category: 'APPLICATION' as any,
+          triggerType: 'APPLICATION_SUBMITTED' as any,
+          isActive: true,
+          createdAt: new Date()
+        },
+        unlockedAt: new Date('2024-01-20'),
+        isCompleted: true
+      }
+    ];
+  }
+
+  private loadMockPoints(): void {
+    this.userPoints = {
+      userId: this.userId,
+      totalPoints: 1250,
+      level: 2,
+      experiencePoints: 250,
+      nextLevelThreshold: 1000
+    };
     this.loading = false;
   }
 

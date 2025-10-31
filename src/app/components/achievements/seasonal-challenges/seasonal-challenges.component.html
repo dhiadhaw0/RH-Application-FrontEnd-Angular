@@ -1,0 +1,117 @@
+<div class="seasonal-challenges">
+  <!-- Active Challenge Section -->
+  <div class="active-challenge" *ngIf="activeChallenge">
+    <div class="challenge-header" [style.background]="getThemeColors().primary">
+      <div class="challenge-icon">
+        <i [class]="getThemeIcon()"></i>
+      </div>
+      <div class="challenge-info">
+        <h1>{{ getThemeName() }}</h1>
+        <p>{{ activeChallenge.description }}</p>
+        <div class="challenge-meta">
+          <span class="days-remaining">
+            <i class="fas fa-clock"></i>
+            {{ getDaysRemaining() }} jours restants
+          </span>
+          <span class="bonus-multiplier">
+            <i class="fas fa-star"></i>
+            Bonus x{{ activeChallenge.bonusMultiplier }}
+          </span>
+        </div>
+      </div>
+      <button class="refresh-btn" (click)="refreshData()" [disabled]="loading">
+        <i class="fas fa-sync-alt" [class.fa-spin]="loading"></i>
+      </button>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="challenge-progress" *ngIf="challengeProgress">
+      <div class="progress-card">
+        <h3>Progression du Challenge</h3>
+        <div class="progress-stats">
+          <div class="stat">
+            <span class="stat-number">{{ challengeProgress.achievementsCompleted }}</span>
+            <span class="stat-label">Réalisés</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">{{ challengeProgress.totalAchievements }}</span>
+            <span class="stat-label">Objectif</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">{{ challengeProgress.bonusPointsEarned }}</span>
+            <span class="stat-label">Points Bonus</span>
+          </div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="getChallengeProgressPercentage()"></div>
+        </div>
+        <p class="progress-text">
+          {{ getChallengeProgressPercentage().toFixed(0) }}% complété
+        </p>
+      </div>
+    </div>
+
+    <!-- Challenge Achievements -->
+    <div class="challenge-achievements">
+      <h3>Objectifs du Challenge</h3>
+      <div class="achievements-grid">
+        <div class="achievement-item"
+             *ngFor="let achievement of activeChallenge.achievements"
+             [class.completed]="isAchievementCompleted(achievement)">
+          <div class="achievement-icon" [class.completed]="isAchievementCompleted(achievement)">
+            <i [class]="achievement.iconUrl || 'fas fa-trophy'"></i>
+          </div>
+          <div class="achievement-info">
+            <h4>{{ achievement.name }}</h4>
+            <p>{{ achievement.description }}</p>
+            <div class="achievement-points">
+              <span class="points">{{ achievement.points * activeChallenge.bonusMultiplier }}</span>
+              <span class="bonus-label">pts (avec bonus)</span>
+            </div>
+          </div>
+          <div class="completion-status" *ngIf="isAchievementCompleted(achievement)">
+            <i class="fas fa-check-circle"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Active Challenge -->
+  <div class="no-active-challenge" *ngIf="!activeChallenge && !loading">
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-calendar-times"></i>
+      </div>
+      <h2>Aucun Challenge Actif</h2>
+      <p>Il n'y a pas de challenge saisonnier en cours pour le moment. Revenez plus tard pour découvrir les nouveaux défis !</p>
+      <button class="refresh-btn" (click)="refreshData()">
+        <i class="fas fa-sync-alt"></i>
+        Actualiser
+      </button>
+    </div>
+  </div>
+
+  <!-- Past Challenges -->
+  <div class="past-challenges" *ngIf="pastChallenges.length > 0">
+    <h2><i class="fas fa-history"></i> Challenges Passés</h2>
+    <div class="challenges-grid">
+      <div class="past-challenge-card" *ngFor="let challenge of pastChallenges">
+        <div class="challenge-header" [style.background]="getChallengeThemeColors(challenge.theme).primary">
+          <div class="challenge-icon">
+            <i [class]="getChallengeIcon(challenge.theme)"></i>
+          </div>
+          <div class="challenge-info">
+            <h4>{{ getChallengeName(challenge.theme) }}</h4>
+            <p>{{ challenge.description }}</p>
+            <small>{{ challenge.startDate | date:'short' }} - {{ challenge.endDate | date:'short' }}</small>
+          </div>
+        </div>
+        <div class="challenge-stats">
+          <span>{{ challenge.achievements.length }} objectifs</span>
+          <span>Bonus x{{ challenge.bonusMultiplier }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

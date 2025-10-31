@@ -84,6 +84,44 @@
         </div>
       </div>
     </div>
+
+    <div class="achievements-section" *ngIf="userAchievements.length > 0">
+      <h2 class="section-title">🎯 Achievements</h2>
+      <div class="achievements-grid">
+        <div class="achievement-card" *ngFor="let userAchievement of userAchievements">
+          <div class="achievement-icon">
+            <i [class]="userAchievement.achievement.iconUrl || 'fas fa-trophy'"></i>
+          </div>
+          <div class="achievement-info">
+            <h4 class="achievement-name">{{ userAchievement.achievement.name }}</h4>
+            <p class="achievement-description">{{ userAchievement.achievement.description }}</p>
+            <div class="achievement-meta">
+              <span class="achievement-points">+{{ userAchievement.achievement.points }} pts</span>
+              <span class="achievement-date">{{ userAchievement.unlockedAt | date:'short' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="points-section" *ngIf="userPoints">
+      <h2 class="section-title">📊 Statistiques de Points</h2>
+      <div class="points-card">
+        <div class="points-summary">
+          <div class="total-points">
+            <h3>{{ userPoints.totalPoints }}</h3>
+            <p>Points Totaux</p>
+          </div>
+          <div class="level-info">
+            <h4>Niveau {{ userPoints.level }}</h4>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="(userPoints.experiencePoints / userPoints.nextLevelThreshold) * 100"></div>
+            </div>
+            <small>{{ userPoints.experiencePoints }} / {{ userPoints.nextLevelThreshold }} XP</small>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="loading-state" *ngIf="loading">

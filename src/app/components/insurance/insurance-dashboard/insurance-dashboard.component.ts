@@ -22,13 +22,16 @@ export class InsuranceDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadCurrentUser();
-    this.loadUserInsurances();
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+      if (user?.id) {
+        this.loadUserInsurances();
+      } else {
+        // Handle case when user is not authenticated
+        this.userInsurances = [];
+      }
+    });
     this.loadInsuranceStats();
-  }
-
-  loadCurrentUser(): void {
-    this.currentUser = this.authService.getCurrentUser();
   }
 
   loadUserInsurances(): void {

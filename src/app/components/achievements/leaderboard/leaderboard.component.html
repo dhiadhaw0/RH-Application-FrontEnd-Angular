@@ -1,0 +1,121 @@
+<div class="leaderboard-container">
+  <div class="leaderboard-header">
+    <h1><i class="fas fa-trophy"></i> Leaderboard</h1>
+    <button class="refresh-btn" (click)="refreshLeaderboard()" [disabled]="loading">
+      <i class="fas fa-sync-alt" [class.fa-spin]="loading"></i>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Current User Rank Card -->
+  <div class="current-user-rank" *ngIf="currentUserRank && currentUserPoints">
+    <div class="rank-card">
+      <div class="rank-info">
+        <div class="rank-number" [style.color]="getRankColor(currentUserRank)">
+          #{{ currentUserRank }}
+        </div>
+        <div class="rank-details">
+          <h3>Your Rank</h3>
+          <p>{{ currentUserPoints.totalPoints }} Points • Level {{ currentUserPoints.level }}</p>
+        </div>
+      </div>
+      <div class="rank-icon">
+        <i [class]="getRankIcon(currentUserRank)" [style.color]="getRankColor(currentUserRank)"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top 3 Podium -->
+  <div class="podium-section" *ngIf="leaderboard.length >= 3">
+    <div class="podium">
+      <!-- 2nd Place -->
+      <div class="podium-position second">
+        <div class="position-card">
+          <div class="position-rank">2</div>
+          <div class="position-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <div class="position-info">
+            <h4>{{ leaderboard[1]?.user?.firstName }} {{ leaderboard[1]?.user?.lastName }}</h4>
+            <p>{{ leaderboard[1]?.totalPoints }} pts</p>
+            <small>Level {{ leaderboard[1]?.level }}</small>
+          </div>
+        </div>
+        <div class="podium-base silver"></div>
+      </div>
+
+      <!-- 1st Place -->
+      <div class="podium-position first">
+        <div class="position-card">
+          <div class="position-rank">1</div>
+          <div class="position-avatar">
+            <i class="fas fa-crown"></i>
+          </div>
+          <div class="position-info">
+            <h4>{{ leaderboard[0]?.user?.firstName }} {{ leaderboard[0]?.user?.lastName }}</h4>
+            <p>{{ leaderboard[0]?.totalPoints }} pts</p>
+            <small>Level {{ leaderboard[0]?.level }}</small>
+          </div>
+        </div>
+        <div class="podium-base gold"></div>
+      </div>
+
+      <!-- 3rd Place -->
+      <div class="podium-position third">
+        <div class="position-card">
+          <div class="position-rank">3</div>
+          <div class="position-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <div class="position-info">
+            <h4>{{ leaderboard[2]?.user?.firstName }} {{ leaderboard[2]?.user?.lastName }}</h4>
+            <p>{{ leaderboard[2]?.totalPoints }} pts</p>
+            <small>Level {{ leaderboard[2]?.level }}</small>
+          </div>
+        </div>
+        <div class="podium-base bronze"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Leaderboard List -->
+  <div class="leaderboard-list">
+    <h2><i class="fas fa-list-ol"></i> Full Rankings</h2>
+    <div class="leaderboard-table">
+      <div class="table-header">
+        <div class="rank-column">Rank</div>
+        <div class="user-column">User</div>
+        <div class="points-column">Points</div>
+        <div class="level-column">Level</div>
+      </div>
+
+      <div class="table-body">
+        <div class="table-row"
+             *ngFor="let userPoints of leaderboard; let i = index"
+             [class.current-user]="currentUserRank === (i + 1)">
+          <div class="rank-column">
+            <div class="rank-number" [style.color]="getRankColor(i + 1)">
+              #{{ i + 1 }}
+            </div>
+            <i [class]="getRankIcon(i + 1)" [style.color]="getRankColor(i + 1)"></i>
+          </div>
+          <div class="user-column">
+            <div class="user-avatar">
+              <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="user-info">
+              <h4>{{ userPoints.user?.firstName }} {{ userPoints.user?.lastName }}</h4>
+              <small *ngIf="userPoints.user?.expertise">{{ userPoints.user?.expertise }}</small>
+            </div>
+          </div>
+          <div class="points-column">
+            <span class="points-value">{{ userPoints.totalPoints }}</span>
+          </div>
+          <div class="level-column">
+            <span class="level-badge">Level {{ userPoints.level }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

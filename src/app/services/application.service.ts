@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { Application, StatutCandidature } from '../models/application.model';
+import { AchievementService } from './achievement.service';
+import { AchievementTriggerType } from '../models/achievement.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApplicationService {
   private readonly baseUrl = `${environment.apiBaseUrl}/applications`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private achievementService: AchievementService
+  ) {}
 
   getAllApplications(): Observable<Application[]> {
     return this.http.get<Application[]>(this.baseUrl);
@@ -19,7 +24,24 @@ export class ApplicationService {
   }
 
   createApplication(jobOfferId: number, application: Partial<Application>): Observable<Application> {
-    return this.http.post<Application>(`${this.baseUrl}/create`, application, { params: { jobOfferId } as any });
+    return this.http.post<Application>(`${this.baseUrl}/create`, application, { params: { jobOfferId } as any }).pipe(
+      tap(createdApplication => {
+        // Trigger achievement check for application submission
+        const userId = typeof createdApplication.user === 'object' ? createdApplication.user.id : createdApplication.user;
+        if (userId) {
+          this.achievementService.checkAchievementTrigger(userId, AchievementTriggerType.APPLICATION_SUBMITTED).subscribe({
+            next: (newAchievements) => {
+              if (newAchievements.length > 0) {
+                console.log('New achievements unlocked:', newAchievements);
+                // Award points for application submission
+                this.achievementService.updateUserPoints(userId, 25).subscribe();
+              }
+            },
+            error: (error) => console.error('Error checking achievements:', error)
+          });
+        }
+      })
+    );
   }
 
   updateApplication(id: number, application: Partial<Application>): Observable<Application> {

@@ -83,6 +83,9 @@ import { ForumAnonymousToggleComponent } from './components/forum/forum-anonymou
 import { ChatbotComponent } from './components/chatbot/chatbot.component';
 import { SkillCreditShowcaseComponent } from './components/skill-credits/skill-credit-showcase/skill-credit-showcase.component';
 import { InsuranceDashboardComponent } from './components/insurance/insurance-dashboard/insurance-dashboard.component';
+import { AchievementsDashboardComponent } from './components/achievements/achievements-dashboard/achievements-dashboard.component';
+import { LeaderboardComponent } from './components/achievements/leaderboard/leaderboard.component';
+import { SeasonalChallengesComponent } from './components/achievements/seasonal-challenges/seasonal-challenges.component';
 
 // Investment Components
 import { InvestmentDashboardComponent } from './components/investments/investment-dashboard/investment-dashboard.component';
@@ -223,7 +226,12 @@ const routes: Routes = [
   { path: 'installments/calculator', component: InstallmentCalculatorComponent, data: { animation: 'InstallmentCalculator' } },
 
   // Insurance Routes
-  { path: 'insurance', component: InsuranceDashboardComponent, canActivate: [authGuard], data: { animation: 'InsuranceDashboard' } },
+  { path: 'insurance', component: InsuranceDashboardComponent, data: { animation: 'InsuranceDashboard' } },
+
+  // Achievement Routes
+  { path: 'achievements', component: AchievementsDashboardComponent, data: { animation: 'AchievementsDashboard' } },
+  { path: 'leaderboard', component: LeaderboardComponent, data: { animation: 'Leaderboard' } },
+  { path: 'challenges', component: SeasonalChallengesComponent, data: { animation: 'SeasonalChallenges' } },
 
   { path: '**', redirectTo: '' }
 ];

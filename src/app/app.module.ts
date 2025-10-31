@@ -121,6 +121,9 @@ import { MarketplaceDashboardComponent } from './components/marketplace/marketpl
 import { MarketplaceOffersComponent } from './components/marketplace/marketplace-offers/marketplace-offers.component';
 import { MarketplaceCreateOfferComponent } from './components/marketplace/marketplace-create-offer/marketplace-create-offer.component';
 import { InsuranceDashboardComponent } from './components/insurance/insurance-dashboard/insurance-dashboard.component';
+import { AchievementsDashboardComponent } from './components/achievements/achievements-dashboard/achievements-dashboard.component';
+import { LeaderboardComponent } from './components/achievements/leaderboard/leaderboard.component';
+import { SeasonalChallengesComponent } from './components/achievements/seasonal-challenges/seasonal-challenges.component';
 
 @NgModule({
   declarations: [
@@ -145,6 +148,9 @@ import { InsuranceDashboardComponent } from './components/insurance/insurance-da
     MarketplaceOffersComponent,
     MarketplaceCreateOfferComponent,
     InsuranceDashboardComponent,
+    AchievementsDashboardComponent,
+    LeaderboardComponent,
+    SeasonalChallengesComponent,
   ],
   imports: [
     BrowserModule,
