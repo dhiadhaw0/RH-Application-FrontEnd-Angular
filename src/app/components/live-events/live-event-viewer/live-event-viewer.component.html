@@ -1,0 +1,139 @@
+<div class="live-event-viewer" *ngIf="event">
+  <div class="event-header">
+    <h1>{{ event.title }}</h1>
+    <div class="event-status" [ngClass]="event.status">
+      <span>{{ event.status | titlecase }}</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" routerLink="/live-events">
+        <i class="fas fa-arrow-left"></i>
+        Back to Events
+      </button>
+      <button class="btn btn-info" routerLink="/live-events/calendar">
+        <i class="fas fa-calendar"></i>
+        View Calendar
+      </button>
+      <button class="btn btn-success" routerLink="/live-events/create">
+        <i class="fas fa-plus"></i>
+        Create Event
+      </button>
+    </div>
+  </div>
+
+  <div class="event-content">
+    <div class="video-section">
+      <div #videoContainer class="video-container">
+        <div class="video-placeholder" *ngIf="!isJoined">
+          <p>Click "Join Event" to start watching</p>
+        </div>
+      </div>
+
+      <div class="controls" *ngIf="isJoined">
+        <button class="control-btn" (click)="toggleMute()" [ngClass]="{'active': !isMuted}">
+          <i class="icon" [ngClass]="isMuted ? 'muted' : 'unmuted'"></i>
+          {{ isMuted ? 'Unmute' : 'Mute' }}
+        </button>
+        <button class="control-btn" (click)="toggleVideo()" [ngClass]="{'active': isVideoOn}">
+          <i class="icon" [ngClass]="isVideoOn ? 'video-on' : 'video-off'"></i>
+          {{ isVideoOn ? 'Turn Off Video' : 'Turn On Video' }}
+        </button>
+        <button class="control-btn" (click)="raiseHand()" [ngClass]="{'active': raisedHand}">
+          <i class="icon hand"></i>
+          {{ raisedHand ? 'Lower Hand' : 'Raise Hand' }}
+        </button>
+        <button class="control-btn leave" (click)="leaveEvent()">
+          <i class="icon leave"></i>
+          Leave Event
+        </button>
+      </div>
+
+      <div class="host-controls" *ngIf="isHost && isJoined">
+        <button class="control-btn" (click)="startRecording()" *ngIf="!recordingResourceId">
+          <i class="fas fa-record-vinyl"></i>
+          Start Recording
+        </button>
+        <button class="control-btn recording-active" (click)="stopRecording()" *ngIf="recordingResourceId">
+          <i class="fas fa-stop-circle"></i>
+          Stop Recording
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="participants-section">
+        <h3>Participants ({{ participants.length }})</h3>
+        <div class="participants-list">
+          <div class="participant" *ngFor="let participant of participants">
+            <div class="participant-info">
+              <span class="participant-name">User {{ participant.userId }}</span>
+              <div class="participant-status">
+                <i class="icon mic" [ngClass]="participant.isMuted ? 'muted' : 'unmuted'"></i>
+                <i class="icon video" [ngClass]="participant.isVideoOn ? 'on' : 'off'"></i>
+                <i class="icon hand raised-hand" *ngIf="participant.raisedHand" (click)="lowerParticipantHand(participant)" title="Lower hand"></i>
+                <span class="host-badge" *ngIf="participant.isHost">Host</span>
+              </div>
+            </div>
+            <div class="participant-controls" *ngIf="isHost && !participant.isHost">
+              <button class="control-btn small" (click)="muteParticipant(participant)" *ngIf="!participant.isMuted">
+                <i class="fas fa-microphone-slash"></i>
+              </button>
+              <button class="control-btn small" (click)="unmuteParticipant(participant)" *ngIf="participant.isMuted">
+                <i class="fas fa-microphone"></i>
+              </button>
+              <button class="control-btn small" (click)="removeParticipant(participant)">
+                <i class="fas fa-user-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-section">
+        <h3>Chat</h3>
+        <div class="chat-messages">
+          <div class="message" *ngFor="let message of chatMessages">
+            <div class="message-header">
+              <span class="sender">User {{ message.userId }}</span>
+              <span class="timestamp">{{ message.timestamp | date:'short' }}</span>
+            </div>
+            <div class="message-content" [ngClass]="{'system': message.isSystemMessage}">
+              {{ message.message }}
+            </div>
+          </div>
+        </div>
+        <div class="chat-input">
+          <input
+            type="text"
+            [(ngModel)]="newMessage"
+            (keyup.enter)="sendMessage()"
+            placeholder="Type a message..."
+            maxlength="500"
+          >
+          <button (click)="sendMessage()" [disabled]="!newMessage.trim()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="join-section" *ngIf="!isJoined && event.status === 'live'">
+    <button class="join-btn" (click)="joinEvent()">Join Event</button>
+  </div>
+
+  <div class="event-info">
+    <p><strong>Description:</strong> {{ event.description }}</p>
+    <p><strong>Host:</strong> User {{ event.hostId }}</p>
+    <p><strong>Start Time:</strong> {{ event.startTime | date:'medium' }}</p>
+    <p><strong>End Time:</strong> {{ event.endTime | date:'medium' }}</p>
+    <p><strong>Capacity:</strong> {{ participants.length }}/{{ event.maxParticipants }}</p>
+    <div class="event-actions">
+      <button class="btn btn-secondary" (click)="viewDiscussion()">
+        <i class="fas fa-comments"></i>
+        View Discussion
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="loading" *ngIf="loading">
+  <p>Loading event...</p>
+</div>

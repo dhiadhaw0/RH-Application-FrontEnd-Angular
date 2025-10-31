@@ -1,0 +1,41 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <h1>Live Events Calendar</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="viewList()">
+        <i class="fas fa-list"></i>
+        View List
+      </button>
+      <button class="btn btn-primary" (click)="createEvent()">
+        <i class="fas fa-plus"></i>
+        Create Event
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <p>Loading calendar...</p>
+  </div>
+
+  <div class="calendar-wrapper" *ngIf="!loading">
+    <full-calendar [options]="calendarOptions"></full-calendar>
+  </div>
+
+  <div class="calendar-legend">
+    <h3>Legend</h3>
+    <div class="legend-items">
+      <div class="legend-item">
+        <span class="legend-color" style="background-color: #dc3545;"></span>
+        <span>Live Events</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background-color: #ffc107;"></span>
+        <span>Scheduled Events</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background-color: #6c757d;"></span>
+        <span>Ended Events</span>
+      </div>
+    </div>
+  </div>
+</div>

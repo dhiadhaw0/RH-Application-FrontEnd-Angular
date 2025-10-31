@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
 import { trigger, transition, style, animate, query, group } from '@angular/animations';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -29,4 +31,17 @@ import { trigger, transition, style, animate, query, group } from '@angular/anim
 })
 export class AppComponent {
   title = 'stage-frontend';
+  currentRoute = '';
+
+  constructor(private router: Router) {
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.currentRoute = event.url;
+      });
+  }
+
+  isLiveEventsRoute(): boolean {
+    return this.currentRoute.startsWith('/live-events');
+  }
 }

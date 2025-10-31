@@ -87,6 +87,12 @@ import { AchievementsDashboardComponent } from './components/achievements/achiev
 import { LeaderboardComponent } from './components/achievements/leaderboard/leaderboard.component';
 import { SeasonalChallengesComponent } from './components/achievements/seasonal-challenges/seasonal-challenges.component';
 
+// Live Events Components
+import { LiveEventsListComponent } from './components/live-events/live-events-list/live-events-list.component';
+import { LiveEventViewerComponent } from './components/live-events/live-event-viewer/live-event-viewer.component';
+import { LiveEventCreateComponent } from './components/live-events/live-event-create/live-event-create.component';
+import { LiveEventsCalendarComponent } from './components/live-events/live-events-calendar/live-events-calendar.component';
+
 // Investment Components
 import { InvestmentDashboardComponent } from './components/investments/investment-dashboard/investment-dashboard.component';
 import { InvestmentFundListComponent } from './components/investments/investment-fund-list/investment-fund-list.component';
@@ -232,6 +238,12 @@ const routes: Routes = [
   { path: 'achievements', component: AchievementsDashboardComponent, data: { animation: 'AchievementsDashboard' } },
   { path: 'leaderboard', component: LeaderboardComponent, data: { animation: 'Leaderboard' } },
   { path: 'challenges', component: SeasonalChallengesComponent, data: { animation: 'SeasonalChallenges' } },
+
+  // Live Events Routes
+  { path: 'live-events', component: LiveEventsListComponent, data: { animation: 'LiveEventsList' } },
+  { path: 'live-events/calendar', component: LiveEventsCalendarComponent, data: { animation: 'LiveEventsCalendar' } },
+  { path: 'live-events/create', component: LiveEventCreateComponent, data: { animation: 'LiveEventCreate' } },
+  { path: 'live-events/:id', component: LiveEventViewerComponent, data: { animation: 'LiveEventViewer' } },
 
   { path: '**', redirectTo: '' }
 ];

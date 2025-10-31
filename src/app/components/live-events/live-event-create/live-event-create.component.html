@@ -1,0 +1,129 @@
+<div class="create-event-container">
+  <div class="header">
+    <h1>Create Live Career Event</h1>
+    <p>Schedule a new live streaming event for career workshops, networking, or Q&A sessions</p>
+    <div class="header-actions">
+      <button class="btn btn-outline" routerLink="/live-events">
+        <i class="fas fa-arrow-left"></i>
+        Back to Events
+      </button>
+      <button class="btn btn-info" routerLink="/live-events/calendar">
+        <i class="fas fa-calendar"></i>
+        View Calendar
+      </button>
+    </div>
+  </div>
+
+  <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="event-form">
+    <div class="form-section">
+      <h2>Event Details</h2>
+
+      <div class="form-group">
+        <label for="title">Event Title *</label>
+        <input
+          type="text"
+          id="title"
+          formControlName="title"
+          placeholder="Enter event title"
+          class="form-control"
+          [class.error]="eventForm.get('title')?.invalid && eventForm.get('title')?.touched"
+        >
+        <div class="error-message" *ngIf="eventForm.get('title')?.invalid && eventForm.get('title')?.touched">
+          {{ getErrorMessage('title') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          placeholder="Describe the event, its purpose, and what participants can expect"
+          rows="4"
+          class="form-control"
+          [class.error]="eventForm.get('description')?.invalid && eventForm.get('description')?.touched"
+        ></textarea>
+        <div class="error-message" *ngIf="eventForm.get('description')?.invalid && eventForm.get('description')?.touched">
+          {{ getErrorMessage('description') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>Schedule</h2>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startTime">Start Time *</label>
+          <input
+            type="datetime-local"
+            id="startTime"
+            formControlName="startTime"
+            class="form-control"
+            [class.error]="eventForm.get('startTime')?.invalid && eventForm.get('startTime')?.touched"
+          >
+          <div class="error-message" *ngIf="eventForm.get('startTime')?.invalid && eventForm.get('startTime')?.touched">
+            {{ getErrorMessage('startTime') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="endTime">End Time *</label>
+          <input
+            type="datetime-local"
+            id="endTime"
+            formControlName="endTime"
+            class="form-control"
+            [class.error]="eventForm.get('endTime')?.invalid && eventForm.get('endTime')?.touched"
+          >
+          <div class="error-message" *ngIf="eventForm.get('endTime')?.invalid && eventForm.get('endTime')?.touched">
+            {{ getErrorMessage('endTime') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>Settings</h2>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="maxParticipants">Maximum Participants *</label>
+          <input
+            type="number"
+            id="maxParticipants"
+            formControlName="maxParticipants"
+            min="1"
+            max="1000"
+            class="form-control"
+            [class.error]="eventForm.get('maxParticipants')?.invalid && eventForm.get('maxParticipants')?.touched"
+          >
+          <div class="error-message" *ngIf="eventForm.get('maxParticipants')?.invalid && eventForm.get('maxParticipants')?.touched">
+            {{ getErrorMessage('maxParticipants') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              formControlName="isRecording"
+              class="checkbox"
+            >
+            <span class="checkmark"></span>
+            Enable Recording
+          </label>
+          <small class="help-text">Record the session for later viewing</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary" [disabled]="submitting">
+        <span *ngIf="submitting">Creating...</span>
+        <span *ngIf="!submitting">Create Event</span>
+      </button>
+    </div>
+  </form>
+</div>

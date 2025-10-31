@@ -1,0 +1,80 @@
+<div class="live-events-container">
+  <div class="header">
+    <h1>Live Career Events</h1>
+    <div class="header-actions">
+      <button class="btn btn-outline" routerLink="/live-events/calendar">
+        <i class="fas fa-calendar"></i>
+        Calendar View
+      </button>
+      <button class="btn btn-info" routerLink="/live-events/create">
+        <i class="fas fa-plus"></i>
+        Create New Event
+      </button>
+      <button class="btn btn-success" routerLink="/live-events">
+        <i class="fas fa-list"></i>
+        Events List
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <p>Loading events...</p>
+  </div>
+
+  <div class="events-section" *ngIf="!loading">
+    <div class="upcoming-events">
+      <h2>Upcoming Events</h2>
+      <div class="events-grid">
+        <div class="event-card" *ngFor="let event of upcomingEvents" (click)="viewEvent(event)">
+          <div class="event-header">
+            <h3>{{ event.title }}</h3>
+            <span class="event-status" [ngClass]="event.status">{{ event.status }}</span>
+          </div>
+          <p class="event-description">{{ event.description }}</p>
+          <div class="event-details">
+            <p><strong>Start:</strong> {{ event.startTime | date:'medium' }}</p>
+            <p><strong>End:</strong> {{ event.endTime | date:'medium' }}</p>
+            <p><strong>Host:</strong> {{ event.hostId }}</p>
+            <p><strong>Capacity:</strong> {{ event.maxParticipants }}</p>
+          </div>
+          <div class="event-actions">
+            <button
+              class="btn"
+              [ngClass]="event.status === 'live' ? 'btn-success' : 'btn-secondary'"
+              (click)="registerForEvent(event); $event.stopPropagation()"
+              [disabled]="participantsCount >= event.maxParticipants"
+            >
+              {{ participantsCount >= event.maxParticipants ? 'Full' : event.status === 'live' ? 'Join Live' : 'Register' }}
+            </button>
+            <small class="capacity-info" *ngIf="event.status !== 'ended'">
+              {{ participantsCount || 0 }}/{{ event.maxParticipants }} registered
+            </small>
+          </div>
+        </div>
+        <div class="no-events" *ngIf="upcomingEvents.length === 0">
+          <p>No upcoming events scheduled.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="past-events">
+      <h2>Past Events</h2>
+      <div class="events-grid">
+        <div class="event-card" *ngFor="let event of pastEvents" (click)="viewEvent(event)">
+          <div class="event-header">
+            <h3>{{ event.title }}</h3>
+            <span class="event-status ended">{{ event.status }}</span>
+          </div>
+          <p class="event-description">{{ event.description }}</p>
+          <div class="event-details">
+            <p><strong>Ended:</strong> {{ event.endTime | date:'medium' }}</p>
+            <p *ngIf="event.recordingUrl"><strong>Recording:</strong> <a href="{{ event.recordingUrl }}" target="_blank">Watch Recording</a></p>
+          </div>
+        </div>
+        <div class="no-events" *ngIf="pastEvents.length === 0">
+          <p>No past events.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

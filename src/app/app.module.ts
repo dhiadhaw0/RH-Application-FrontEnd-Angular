@@ -124,6 +124,10 @@ import { InsuranceDashboardComponent } from './components/insurance/insurance-da
 import { AchievementsDashboardComponent } from './components/achievements/achievements-dashboard/achievements-dashboard.component';
 import { LeaderboardComponent } from './components/achievements/leaderboard/leaderboard.component';
 import { SeasonalChallengesComponent } from './components/achievements/seasonal-challenges/seasonal-challenges.component';
+import { LiveEventsListComponent } from './components/live-events/live-events-list/live-events-list.component';
+import { LiveEventViewerComponent } from './components/live-events/live-event-viewer/live-event-viewer.component';
+import { LiveEventCreateComponent } from './components/live-events/live-event-create/live-event-create.component';
+import { LiveEventsCalendarComponent } from './components/live-events/live-events-calendar/live-events-calendar.component';
 
 @NgModule({
   declarations: [
@@ -151,6 +155,10 @@ import { SeasonalChallengesComponent } from './components/achievements/seasonal-
     AchievementsDashboardComponent,
     LeaderboardComponent,
     SeasonalChallengesComponent,
+    LiveEventsListComponent,
+    LiveEventViewerComponent,
+    LiveEventCreateComponent,
+    LiveEventsCalendarComponent,
   ],
   imports: [
     BrowserModule,
