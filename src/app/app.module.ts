@@ -126,7 +126,7 @@ import { TransactionsComponent } from './components/wallet/transactions/transact
     WalletDashboardComponent,
     PaymentMethodsComponent,
     SubscriptionsComponent,
-    TransactionsComponent
+    TransactionsComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { SkillCreditShowcaseComponent } from '../skill-credits/skill-credit-showcase/skill-credit-showcase.component';
 //import { AuthService } from '../../services/auth.service';
 
 interface Activity {
@@ -22,7 +24,7 @@ interface Testimonial {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule, SkillCreditShowcaseComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })

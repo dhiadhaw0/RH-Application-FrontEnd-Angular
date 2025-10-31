@@ -1,0 +1,102 @@
+<section class="skill-credits-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>
+        <i class="fas fa-coins"></i>
+        Crédits de Compétences
+      </h2>
+      <p>Gagnez des micro-crédits en développant vos compétences et convertissez-les en avantages concrets</p>
+    </div>
+
+    <!-- Credit Stats -->
+    <div class="credit-stats">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{creditStats.totalEarned}}</div>
+          <div class="stat-label">Crédits Gagnés</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{creditStats.availableCredits}}</div>
+          <div class="stat-label">Crédits Disponibles</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-exchange-alt"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{creditStats.conversionRate * 100}}%</div>
+          <div class="stat-label">Taux de Conversion</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Credit Sources -->
+    <div class="credit-sources">
+      <h3>Comment gagner des crédits ?</h3>
+      <div class="sources-grid">
+        <div class="source-card" *ngFor="let source of creditSources">
+          <div class="source-icon" [style.color]="source.color">
+            <i [class]="source.icon"></i>
+          </div>
+          <h4>{{source.title}}</h4>
+          <p>{{source.description}}</p>
+          <div class="credit-amount">
+            <span class="amount">+{{source.creditAmount}}</span>
+            <span class="label">crédits</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversion Calculator -->
+    <div class="conversion-calculator">
+      <h3>Convertir vos crédits</h3>
+      <div class="calculator-card">
+        <div class="calculator-input">
+          <label>Nombre de crédits à convertir :</label>
+          <input type="number" [(ngModel)]="conversionAmount" min="100" max="10000" placeholder="Ex: 1000">
+        </div>
+        <div class="calculator-result" *ngIf="conversionAmount">
+          <div class="result-item">
+            <span class="label">Crédits utilisés :</span>
+            <span class="value">{{conversionAmount}}</span>
+          </div>
+          <div class="result-item">
+            <span class="label">Valeur en € :</span>
+            <span class="value">{{getConversionValue(conversionAmount) | number:'1.2-2'}}€</span>
+          </div>
+          <button class="btn btn-primary">Convertir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sample Credits -->
+    <div class="recent-credits" *ngIf="creditStats.sampleCredits.length > 0">
+      <h3>Vos derniers crédits gagnés</h3>
+      <div class="credits-list">
+        <div class="credit-item" *ngFor="let credit of creditStats.sampleCredits">
+          <div class="credit-icon">
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          <div class="credit-content">
+            <h4>{{credit.description}}</h4>
+            <p>{{credit.amount}} crédits gagnés</p>
+            <span class="credit-date">{{credit.earnedDate | date:'dd/MM/yyyy'}}</span>
+          </div>
+          <div class="credit-amount">
+            +{{credit.amount}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -80,6 +80,7 @@ import { ForumPostVersionHistoryComponent } from './components/forum/forum-post-
 import { ForumThreadVersionHistoryComponent } from './components/forum/forum-thread-version-history/forum-thread-version-history.component';
 import { ForumAnonymousToggleComponent } from './components/forum/forum-anonymous-toggle/forum-anonymous-toggle.component';
 import { ChatbotComponent } from './components/chatbot/chatbot.component';
+import { SkillCreditShowcaseComponent } from './components/skill-credits/skill-credit-showcase/skill-credit-showcase.component';
 
 // Fintech Components
 import { InvoiceCreateComponent } from './components/fintech/invoice-create/invoice-create.component';
@@ -172,10 +173,6 @@ const routes: Routes = [
   { path: 'forum/post/:postId/versions', component: ForumPostVersionHistoryComponent, data: { animation: 'ForumPostVersionHistory' } },
   { path: 'forum/thread/:threadId/versions', component: ForumThreadVersionHistoryComponent, data: { animation: 'ForumThreadVersionHistory' } },
 
-
-  // Chatbot Routes
-  { path: 'chatbot', component: ChatbotComponent, data: { animation: 'Chatbot' } },
-
   // Fintech Routes
   { path: 'fintech', component: PaymentDashboardComponent, data: { animation: 'FintechDashboard' } },
   { path: 'fintech/invoices', component: InvoiceListComponent, data: { animation: 'InvoiceList' } },
@@ -189,6 +186,9 @@ const routes: Routes = [
   { path: 'wallet/payment-methods', component: PaymentMethodsComponent, data: { animation: 'PaymentMethods' } },
   { path: 'wallet/subscriptions', component: SubscriptionsComponent, data: { animation: 'Subscriptions' } },
   { path: 'wallet/transactions', component: TransactionsComponent, data: { animation: 'Transactions' } },
+
+  // Skill Credit Routes
+  { path: 'skill-credits', component: SkillCreditShowcaseComponent, data: { animation: 'SkillCreditShowcase' } },
 
   { path: '**', redirectTo: '' }
 ];

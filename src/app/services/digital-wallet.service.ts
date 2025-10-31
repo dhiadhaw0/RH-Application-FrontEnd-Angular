@@ -9,12 +9,13 @@ import {
   TransactionStatus,
   Currency
 } from '../models/digital-wallet.model';
+import { SkillCreditService } from './skill-credit.service';
 
 @Injectable({ providedIn: 'root' })
 export class DigitalWalletService {
   private readonly baseUrl = `${environment.apiBaseUrl}/wallets`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private skillCreditService: SkillCreditService) {}
 
   // Wallet Management
   getUserWallets(userId: number): Observable<DigitalWallet[]> {
@@ -108,5 +109,34 @@ export class DigitalWalletService {
 
   getTransactionSummary(walletId: number, startDate: string, endDate: string): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/${walletId}/transaction-summary?start=${startDate}&end=${endDate}`);
+  }
+
+  // Skill Credit Integration
+  convertCreditsToCash(userId: number, creditAmount: number, cashAmount: number, description: string): Observable<Transaction> {
+    return this.http.post<Transaction>(`${this.baseUrl}/convert-credits`, {
+      userId,
+      creditAmount,
+      cashAmount,
+      description
+    });
+  }
+
+  getCreditConversionRate(): Observable<{ rate: number; minCredits: number; maxCredits: number }> {
+    return this.http.get<{ rate: number; minCredits: number; maxCredits: number }>(`${this.baseUrl}/credit-conversion-rate`);
+  }
+
+  // Combined Balance
+  getCombinedBalance(userId: number): Observable<{
+    walletBalance: number;
+    creditBalance: number;
+    totalValue: number;
+    currency: Currency
+  }> {
+    return this.http.get<{
+      walletBalance: number;
+      creditBalance: number;
+      totalValue: number;
+      currency: Currency
+    }>(`${this.baseUrl}/combined-balance/${userId}`);
   }
 }
