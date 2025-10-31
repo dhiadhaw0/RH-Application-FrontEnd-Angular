@@ -157,7 +157,8 @@
               <div class="offer-meta">
                 <div class="meta-item">
                   <i class="fas fa-building"></i>
-                  <span>Entreprise {{offer.user}}</span>
+                  <span *ngIf="offer.companyProfile">{{offer.companyProfile.name}}</span>
+                  <span *ngIf="!offer.companyProfile">Entreprise {{offer.user}}</span>
                 </div>
                 <div class="meta-item">
                   <i class="fas fa-calendar"></i>
@@ -185,6 +186,13 @@
               </button>
               <button class="btn btn-outline btn-sm" (click)="toggleFavorite(offer)">
                 <i class="fas fa-heart" [class.filled]="isFavorite(offer)"></i>
+              </button>
+              <button
+                class="btn btn-info btn-sm"
+                routerLink="/companies/{{offer.companyProfile?.id}}"
+                *ngIf="offer.companyProfile">
+                <i class="fas fa-building"></i>
+                <span>Profil Entreprise</span>
               </button>
             </div>
           </div>
@@ -282,6 +290,13 @@
               *ngIf="canApply(offer)">
               <i class="fas fa-paper-plane"></i>
               <span>Postuler maintenant</span>
+            </button>
+            <button
+              class="overlay-btn tertiary"
+              routerLink="/companies/{{offer.companyProfile?.id}}"
+              *ngIf="offer.companyProfile">
+              <i class="fas fa-building"></i>
+              <span>Profil Entreprise</span>
             </button>
           </div>
         </div>

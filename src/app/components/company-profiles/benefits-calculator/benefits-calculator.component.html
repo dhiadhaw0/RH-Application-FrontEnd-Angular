@@ -1,0 +1,155 @@
+<div class="benefits-calculator" *ngIf="companyProfile">
+  <div class="calculator-header">
+    <h3><i class="fas fa-calculator"></i> Calculateur de Rémunération</h3>
+    <p>Découvrez la valeur totale de votre package chez {{companyProfile.name}}</p>
+  </div>
+
+  <div class="calculator-content">
+    <div class="calculator-form">
+      <form [formGroup]="calculatorForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Salaire de base annuel</label>
+            <select formControlName="baseSalary" class="form-control">
+              <option *ngFor="let option of salaryOptions" [value]="option.value">
+                {{option.label}}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Niveau d'expérience</label>
+            <select formControlName="experienceLevel" class="form-control">
+              <option *ngFor="let level of experienceLevels" [value]="level.value">
+                {{level.label}}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Localisation</label>
+            <select formControlName="location" class="form-control">
+              <option value="paris">Paris (Île-de-France)</option>
+              <option value="province">Province</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="includeBenefits">
+              Inclure les avantages
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="includeBonuses">
+              Inclure les primes estimées
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="resetCalculator()">
+            <i class="fas fa-undo"></i>
+            Réinitialiser
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="calculator-results" *ngIf="showResults && calculationResult">
+      <div class="results-header">
+        <h4>Résultats de votre simulation</h4>
+        <div class="total-compensation">
+          <div class="total-amount">{{formatCurrency(calculationResult.totalCompensation)}}</div>
+          <div class="total-label">Rémunération totale annuelle</div>
+        </div>
+      </div>
+
+      <div class="results-breakdown">
+        <div class="breakdown-item">
+          <div class="breakdown-label">
+            <i class="fas fa-euro-sign"></i>
+            Salaire de base ajusté
+          </div>
+          <div class="breakdown-value">{{formatCurrency(calculationResult.baseSalary)}}</div>
+        </div>
+
+        <div class="breakdown-item" *ngIf="calculationResult.benefitsValue > 0">
+          <div class="breakdown-label">
+            <i class="fas fa-gift"></i>
+            Valeur des avantages
+          </div>
+          <div class="breakdown-value">{{formatCurrency(calculationResult.benefitsValue)}}</div>
+        </div>
+
+        <div class="breakdown-item" *ngIf="calculationResult.estimatedBonuses > 0">
+          <div class="breakdown-label">
+            <i class="fas fa-chart-line"></i>
+            Primes estimées
+          </div>
+          <div class="breakdown-value">{{formatCurrency(calculationResult.estimatedBonuses)}}</div>
+        </div>
+
+        <div class="breakdown-item" *ngIf="calculationResult.locationAdjustment > 1">
+          <div class="breakdown-label">
+            <i class="fas fa-map-marker-alt"></i>
+            Ajustement localisation
+          </div>
+          <div class="breakdown-value">+{{formatCurrency((calculationResult.locationAdjustment - 1) * calculationResult.baseSalary)}}</div>
+        </div>
+      </div>
+
+      <div class="monthly-breakdown">
+        <h5>Rémunération mensuelle</h5>
+        <div class="monthly-grid">
+          <div class="monthly-item">
+            <div class="monthly-label">Brut mensuel</div>
+            <div class="monthly-value">{{formatCurrency(calculationResult.monthlyGross)}}</div>
+          </div>
+          <div class="monthly-item">
+            <div class="monthly-label">Net estimé mensuel</div>
+            <div class="monthly-value">{{formatCurrency(calculationResult.monthlyNet)}}</div>
+          </div>
+          <div class="monthly-item">
+            <div class="monthly-label">Net annuel estimé</div>
+            <div class="monthly-value">{{formatCurrency(calculationResult.annualNet)}}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="benefits-details" *ngIf="calculationResult.benefitsBreakdown.length > 0">
+        <h5>Détail des avantages inclus</h5>
+        <div class="benefits-list">
+          <div class="benefit-detail" *ngFor="let benefit of calculationResult.benefitsBreakdown">
+            <div class="benefit-info">
+              <i [class]="getCategoryIcon(benefit.category)"></i>
+              <span>{{benefit.name}}</span>
+              <small>{{getCategoryName(benefit.category)}}</small>
+            </div>
+            <div class="benefit-value">{{formatCurrency(benefit.value)}}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-footer">
+        <p class="disclaimer">
+          <i class="fas fa-info-circle"></i>
+          Ces calculs sont estimatifs et basés sur des moyennes. Les montants réels peuvent varier selon votre situation fiscale et les politiques de l'entreprise.
+        </p>
+        <button class="btn btn-primary" (click)="showResults = false">
+          <i class="fas fa-edit"></i>
+          Modifier les paramètres
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="no-company" *ngIf="!companyProfile">
+  <div class="no-company-content">
+    <i class="fas fa-building"></i>
+    <h3>Aucune entreprise sélectionnée</h3>
+    <p>Sélectionnez une entreprise pour utiliser le calculateur de rémunération.</p>
+  </div>
+</div>

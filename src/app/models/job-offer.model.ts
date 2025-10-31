@@ -14,6 +14,8 @@ export enum WorkflowStatus {
   REFUSE = 'REFUSE'
 }
 
+import { CompanyProfile } from './company-profile.model';
+
 export interface JobOffer {
   idJobOffer: number;
   title: string;
@@ -28,6 +30,7 @@ export interface JobOffer {
   status: StatutOffre;
   workflowStatus: WorkflowStatus;
   user?: { id: number } | number | null;
+  companyProfile?: CompanyProfile;
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }

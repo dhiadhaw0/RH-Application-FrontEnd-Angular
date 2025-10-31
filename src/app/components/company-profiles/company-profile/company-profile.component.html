@@ -1,0 +1,267 @@
+<div class="company-profile-container" *ngIf="companyProfile; else loadingTemplate">
+  <!-- Company Header -->
+  <div class="company-header">
+    <div class="company-header-content">
+      <div class="company-logo-section">
+        <img [src]="companyProfile.logo || '/assets/images/default-company-logo.png'"
+             [alt]="companyProfile.name"
+             class="company-logo">
+      </div>
+      <div class="company-info">
+        <h1 class="company-name">{{companyProfile.name}}</h1>
+        <div class="company-meta">
+          <span class="company-industry">{{companyProfile.industry}}</span>
+          <span class="company-size">{{companyProfile.size}} employés</span>
+          <span class="company-location">{{companyProfile.headquarters}}</span>
+        </div>
+        <div class="company-stats">
+          <div class="stat-item">
+            <span class="stat-value">{{companyProfile.followersCount}}</span>
+            <span class="stat-label">Abonnés</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{testimonials.length}}</span>
+            <span class="stat-label">Témoignages</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{getAverageRating()}}</span>
+            <span class="stat-label">Note moyenne</span>
+          </div>
+        </div>
+      </div>
+      <div class="company-actions">
+        <button class="btn btn-primary" (click)="toggleFollow()">
+          <i class="fas" [class.fa-plus]="!isFollowing" [class.fa-check]="isFollowing"></i>
+          {{isFollowing ? 'Suivi' : 'Suivre'}}
+        </button>
+        <button class="btn btn-outline" (click)="navigateToJobOffers()">
+          <i class="fas fa-briefcase"></i>
+          Voir les offres
+        </button>
+        <button class="btn btn-secondary" (click)="shareProfile()">
+          <i class="fas fa-share"></i>
+          Partager
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="profile-tabs">
+    <button class="tab-button" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">
+      <i class="fas fa-building"></i>
+      Vue d'ensemble
+    </button>
+    <button class="tab-button" [class.active]="activeTab === 'testimonials'" (click)="setActiveTab('testimonials')">
+      <i class="fas fa-comments"></i>
+      Témoignages ({{testimonials.length}})
+    </button>
+    <button class="tab-button" [class.active]="activeTab === 'benefits'" (click)="setActiveTab('benefits')">
+      <i class="fas fa-gift"></i>
+      Avantages ({{getActiveBenefitsCount()}})
+    </button>
+    <button class="tab-button" [class.active]="activeTab === 'gallery'" (click)="setActiveTab('gallery')">
+      <i class="fas fa-images"></i>
+      Galerie
+    </button>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <!-- Overview Tab -->
+    <div *ngIf="activeTab === 'overview'" class="overview-section">
+      <div class="overview-grid">
+        <div class="overview-card">
+          <h3>À propos</h3>
+          <p>{{companyProfile.description}}</p>
+          <div class="company-details">
+            <div class="detail-item" *ngIf="companyProfile.foundedYear">
+              <i class="fas fa-calendar"></i>
+              <span>Fondée en {{companyProfile.foundedYear}}</span>
+            </div>
+            <div class="detail-item" *ngIf="companyProfile.website">
+              <i class="fas fa-globe"></i>
+              <a [href]="companyProfile.website" target="_blank">{{companyProfile.website}}</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="overview-card">
+          <h3>Culture d'entreprise</h3>
+          <div class="culture-highlights">
+            <div class="highlight-item" *ngFor="let video of companyProfile.cultureVideos?.slice(0, 2)">
+              <i class="fas fa-video"></i>
+              <span>Vidéo culturelle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Testimonials Tab -->
+    <div *ngIf="activeTab === 'testimonials'" class="testimonials-section">
+      <div class="testimonials-header">
+        <h3>Témoignages d'employés</h3>
+        <button class="btn btn-primary" (click)="showTestimonialForm = !showTestimonialForm">
+          <i class="fas fa-plus"></i>
+          Ajouter un témoignage
+        </button>
+      </div>
+
+      <!-- Add Testimonial Form -->
+      <div *ngIf="showTestimonialForm" class="testimonial-form">
+        <h4>Partagez votre expérience</h4>
+        <form (ngSubmit)="submitTestimonial()">
+          <div class="form-group">
+            <label>Note (1-5 étoiles)</label>
+            <div class="rating-input">
+              <i class="fas fa-star" *ngFor="let star of getRatingStars(newTestimonial.rating || 5); let i = index"
+                 [class.filled]="i < (newTestimonial.rating || 5)"
+                 (click)="newTestimonial.rating = i + 1"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Titre</label>
+            <input type="text" [(ngModel)]="newTestimonial.title" name="title" required>
+          </div>
+          <div class="form-group">
+            <label>Votre témoignage</label>
+            <textarea [(ngModel)]="newTestimonial.content" name="content" rows="4" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Publier</button>
+            <button type="button" class="btn btn-outline" (click)="showTestimonialForm = false">Annuler</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Testimonials List -->
+      <div class="testimonials-list">
+        <div class="testimonial-card" *ngFor="let testimonial of testimonials">
+          <div class="testimonial-header">
+            <div class="testimonial-author">
+              <img [src]="testimonial.employeeAvatar || '/assets/images/default-avatar.png'"
+                   [alt]="testimonial.employeeName"
+                   class="author-avatar">
+              <div class="author-info">
+                <h4>{{testimonial.employeeName}}</h4>
+                <span>{{testimonial.employeePosition}}</span>
+              </div>
+            </div>
+            <div class="testimonial-rating">
+              <i class="fas fa-star" *ngFor="let star of getRatingStars(5); let i = index"
+                 [class.filled]="i < testimonial.rating"></i>
+            </div>
+          </div>
+          <h5>{{testimonial.title}}</h5>
+          <p>{{testimonial.content}}</p>
+          <div class="testimonial-footer">
+            <span class="testimonial-date">{{testimonial.createdAt | date:'dd/MM/yyyy'}}</span>
+            <span class="testimonial-verified" *ngIf="testimonial.isVerified">
+              <i class="fas fa-check-circle"></i>
+              Vérifié
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Benefits Tab -->
+    <div *ngIf="activeTab === 'benefits'" class="benefits-section">
+      <h3>Avantages et prestations</h3>
+      <div class="benefits-grid">
+        <div class="benefits-category" *ngIf="getBenefitsByCategory('HEALTH').length > 0">
+          <h4><i class="fas fa-heartbeat"></i> Santé & Bien-être</h4>
+          <div class="benefit-item" *ngFor="let benefit of getBenefitsByCategory('HEALTH')">
+            <div class="benefit-icon">
+              <i class="fas fa-plus-circle"></i>
+            </div>
+            <div class="benefit-content">
+              <h5>{{benefit.name}}</h5>
+              <p>{{benefit.description}}</p>
+              <span class="benefit-value" *ngIf="benefit.value">{{benefit.value}}€/an</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="benefits-category" *ngIf="getBenefitsByCategory('FINANCIAL').length > 0">
+          <h4><i class="fas fa-money-bill-wave"></i> Avantages Financiers</h4>
+          <div class="benefit-item" *ngFor="let benefit of getBenefitsByCategory('FINANCIAL')">
+            <div class="benefit-icon">
+              <i class="fas fa-euro-sign"></i>
+            </div>
+            <div class="benefit-content">
+              <h5>{{benefit.name}}</h5>
+              <p>{{benefit.description}}</p>
+              <span class="benefit-value" *ngIf="benefit.value">{{benefit.value}}€</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="benefits-category" *ngIf="getBenefitsByCategory('PROFESSIONAL_DEVELOPMENT').length > 0">
+          <h4><i class="fas fa-graduation-cap"></i> Développement Professionnel</h4>
+          <div class="benefit-item" *ngFor="let benefit of getBenefitsByCategory('PROFESSIONAL_DEVELOPMENT')">
+            <div class="benefit-icon">
+              <i class="fas fa-book"></i>
+            </div>
+            <div class="benefit-content">
+              <h5>{{benefit.name}}</h5>
+              <p>{{benefit.description}}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="benefits-category" *ngIf="getBenefitsByCategory('WORK_LIFE_BALANCE').length > 0">
+          <h4><i class="fas fa-balance-scale"></i> Équilibre Vie Privée/Professionnelle</h4>
+          <div class="benefit-item" *ngFor="let benefit of getBenefitsByCategory('WORK_LIFE_BALANCE')">
+            <div class="benefit-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="benefit-content">
+              <h5>{{benefit.name}}</h5>
+              <p>{{benefit.description}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gallery Tab -->
+    <div *ngIf="activeTab === 'gallery'" class="gallery-section">
+      <h3>Galerie d'images</h3>
+      <div class="gallery-grid">
+        <div class="gallery-item" *ngFor="let photo of companyProfile.photos">
+          <img [src]="photo" [alt]="companyProfile.name" class="gallery-image">
+        </div>
+      </div>
+      <div class="culture-videos" *ngIf="companyProfile.cultureVideos?.length">
+        <h4>Vidéos culturelles</h4>
+        <div class="video-grid">
+          <div class="video-item" *ngFor="let video of companyProfile.cultureVideos">
+            <video [src]="video" controls class="culture-video"></video>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Chargement du profil entreprise...</p>
+  </div>
+</ng-template>
+
+<!-- Error Template -->
+<div class="error-container" *ngIf="error && !loading">
+  <div class="error-message">
+    <i class="fas fa-exclamation-triangle"></i>
+    <h3>Erreur</h3>
+    <p>{{error}}</p>
+    <button class="btn btn-primary" (click)="loadCompanyProfile(+route.snapshot.params['id'])">
+      Réessayer
+    </button>
+  </div>
+</div>

@@ -1,0 +1,208 @@
+<div class="comparison-container">
+  <div class="comparison-header">
+    <h1>Comparaison d'Entreprises</h1>
+    <p>Comparez jusqu'à 4 entreprises selon vos critères</p>
+
+    <div class="comparison-actions">
+      <button class="btn btn-outline" (click)="shareComparison()">
+        <i class="fas fa-share"></i>
+        Partager
+      </button>
+      <button class="btn btn-primary" (click)="exportComparison()">
+        <i class="fas fa-download"></i>
+        Exporter
+      </button>
+    </div>
+  </div>
+
+  <!-- Criteria Selection -->
+  <div class="criteria-section">
+    <h3>Critères de comparaison</h3>
+    <div class="criteria-buttons">
+      <button
+        class="criteria-btn"
+        [class.active]="isCriteriaSelected('rating')"
+        (click)="toggleCriteria('rating')">
+        <i class="fas fa-star"></i>
+        Note moyenne
+      </button>
+      <button
+        class="criteria-btn"
+        [class.active]="isCriteriaSelected('followers')"
+        (click)="toggleCriteria('followers')">
+        <i class="fas fa-users"></i>
+        Popularité
+      </button>
+      <button
+        class="criteria-btn"
+        [class.active]="isCriteriaSelected('benefits')"
+        (click)="toggleCriteria('benefits')">
+        <i class="fas fa-gift"></i>
+        Avantages
+      </button>
+      <button
+        class="criteria-btn"
+        [class.active]="isCriteriaSelected('size')"
+        (click)="toggleCriteria('size')">
+        <i class="fas fa-building"></i>
+        Taille
+      </button>
+      <button
+        class="criteria-btn"
+        [class.active]="isCriteriaSelected('industry')"
+        (click)="toggleCriteria('industry')">
+        <i class="fas fa-industry"></i>
+        Secteur
+      </button>
+      <button
+        class="criteria-btn"
+        [class.active]="isCriteriaSelected('location')"
+        (click)="toggleCriteria('location')">
+        <i class="fas fa-map-marker-alt"></i>
+        Localisation
+      </button>
+    </div>
+  </div>
+
+  <!-- Companies Comparison Table -->
+  <div class="comparison-table" *ngIf="companies.length > 0; else noCompanies">
+    <div class="table-header">
+      <div class="table-cell header-cell">Entreprise</div>
+      <div class="table-cell header-cell" *ngFor="let company of companies">
+        <div class="company-header-info">
+          <img [src]="company.logo || '/assets/images/default-company-logo.png'"
+               [alt]="company.name"
+               class="company-mini-logo">
+          <div class="company-header-details">
+            <h4>{{company.name}}</h4>
+            <button class="remove-btn" (click)="removeCompanyFromComparison(company.id)">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rating Row -->
+    <div class="table-row" *ngIf="isCriteriaSelected('rating')">
+      <div class="table-cell label-cell">
+        <i class="fas fa-star"></i>
+        Note moyenne
+      </div>
+      <div class="table-cell data-cell" *ngFor="let company of companies">
+        <div class="rating-display">
+          <div class="stars">
+            <i class="fas fa-star" *ngFor="let star of [1,2,3,4,5]; let i = index"
+               [class.filled]="i < getAverageRating(company)"></i>
+          </div>
+          <span class="rating-value">{{getAverageRating(company)}}/5</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Followers Row -->
+    <div class="table-row" *ngIf="isCriteriaSelected('followers')">
+      <div class="table-cell label-cell">
+        <i class="fas fa-users"></i>
+        Abonnés
+      </div>
+      <div class="table-cell data-cell" *ngFor="let company of companies">
+        <span class="follower-count">{{company.followersCount}}</span>
+      </div>
+    </div>
+
+    <!-- Benefits Row -->
+    <div class="table-row" *ngIf="isCriteriaSelected('benefits')">
+      <div class="table-cell label-cell">
+        <i class="fas fa-gift"></i>
+        Avantages
+      </div>
+      <div class="table-cell data-cell" *ngFor="let company of companies">
+        <div class="benefits-preview">
+          <span class="benefit-count">{{getBenefitsCount(company)}} avantages</span>
+          <div class="benefit-tags">
+            <span class="benefit-tag" *ngFor="let benefit of getTopBenefits(company)">
+              {{benefit}}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Size Row -->
+    <div class="table-row" *ngIf="isCriteriaSelected('size')">
+      <div class="table-cell label-cell">
+        <i class="fas fa-building"></i>
+        Taille
+      </div>
+      <div class="table-cell data-cell" *ngFor="let company of companies">
+        <span class="company-size">{{company.size}} employés</span>
+      </div>
+    </div>
+
+    <!-- Industry Row -->
+    <div class="table-row" *ngIf="isCriteriaSelected('industry')">
+      <div class="table-cell label-cell">
+        <i class="fas fa-industry"></i>
+        Secteur
+      </div>
+      <div class="table-cell data-cell" *ngFor="let company of companies">
+        <span class="company-industry">{{company.industry}}</span>
+      </div>
+    </div>
+
+    <!-- Location Row -->
+    <div class="table-row" *ngIf="isCriteriaSelected('location')">
+      <div class="table-cell label-cell">
+        <i class="fas fa-map-marker-alt"></i>
+        Localisation
+      </div>
+      <div class="table-cell data-cell" *ngFor="let company of companies">
+        <span class="company-location">{{company.headquarters}}</span>
+      </div>
+    </div>
+
+    <!-- Actions Row -->
+    <div class="table-row actions-row">
+      <div class="table-cell label-cell">Actions</div>
+      <div class="table-cell data-cell" *ngFor="let company of companies">
+        <button class="btn btn-primary btn-sm" (click)="navigateToCompany(company.id)">
+          <i class="fas fa-eye"></i>
+          Voir le profil
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Companies Message -->
+  <ng-template #noCompanies>
+    <div class="no-companies">
+      <div class="no-companies-icon">
+        <i class="fas fa-balance-scale"></i>
+      </div>
+      <h3>Aucune entreprise à comparer</h3>
+      <p>Sélectionnez des entreprises depuis leurs profils pour les comparer.</p>
+      <button class="btn btn-primary" routerLink="/companies">
+        Explorer les entreprises
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Chargement des entreprises...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="error">
+    <div class="error-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h3>Erreur</h3>
+    <p>{{error}}</p>
+    <button class="btn btn-primary" (click)="ngOnInit()">
+      Réessayer
+    </button>
+  </div>
+</div>

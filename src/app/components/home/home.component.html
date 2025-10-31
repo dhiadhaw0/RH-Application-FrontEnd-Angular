@@ -32,6 +32,14 @@
           <i class="fas fa-hand-holding-heart"></i>
           Crowdfunding
         </button>
+        <button class="btn btn-warning btn-lg" routerLink="/companies">
+          <i class="fas fa-building"></i>
+          Profils Entreprises
+        </button>
+        <button class="btn btn-danger btn-lg" routerLink="/companies/compare">
+          <i class="fas fa-balance-scale"></i>
+          Comparer Entreprises
+        </button>
         <!-- Fintech Section -->
         <div class="fintech-section">
           <h3 class="section-title">
@@ -182,6 +190,50 @@
         <h3>Crowdfunding</h3>
         <p>Plateforme de financement participatif pour soutenir les objectifs de carrière de la communauté.</p>
       </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-building"></i>
+        </div>
+        <h3>Profils d'Entreprises</h3>
+        <p>Découvrez la culture, les avantages et les témoignages des entreprises qui recrutent.</p>
+        <div class="feature-status">
+          <span class="status-badge status-available">Disponible</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-balance-scale"></i>
+        </div>
+        <h3>Comparateur d'Entreprises</h3>
+        <p>Comparez jusqu'à 4 entreprises selon vos critères pour trouver le meilleur fit.</p>
+        <div class="feature-status">
+          <span class="status-badge status-available">Disponible</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <h3>Calculateur d'Avantages</h3>
+        <p>Comparez les packages salariaux et avantages entre différentes offres d'emploi.</p>
+        <div class="feature-status">
+          <span class="status-badge status-available">Disponible</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-images"></i>
+        </div>
+        <h3>Galerie d'Entreprises</h3>
+        <p>Explorez les photos et vidéos culturelles des entreprises pour mieux les connaître.</p>
+        <div class="feature-status">
+          <span class="status-badge status-available">Disponible</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -283,6 +335,28 @@
           <span class="status-badge status-available">Disponible</span>
         </div>
       </div>
+
+      <div class="feature-showcase-card">
+        <div class="feature-showcase-icon">
+          <i class="fas fa-building"></i>
+        </div>
+        <h3>Profils d'Entreprises Rich</h3>
+        <p>Explorez les cultures d'entreprise, témoignages employés et avantages sociaux détaillés.</p>
+        <div class="feature-status">
+          <span class="status-badge status-available">Disponible</span>
+        </div>
+      </div>
+
+      <div class="feature-showcase-card">
+        <div class="feature-showcase-icon">
+          <i class="fas fa-balance-scale"></i>
+        </div>
+        <h3>Outil de Comparaison</h3>
+        <p>Comparez les entreprises selon vos critères prioritaires pour trouver le meilleur fit professionnel.</p>
+        <div class="feature-status">
+          <span class="status-badge status-available">Disponible</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -371,6 +445,67 @@
       <button class="btn btn-outline btn-xl" routerLink="/live-events/calendar">
         <i class="fas fa-calendar"></i>
         Voir le Calendrier
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Company Profiles Section -->
+<section class="company-profiles-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Profils d'Entreprises</h2>
+      <p>Découvrez les entreprises qui recrutent et leurs cultures uniques</p>
+    </div>
+
+    <div class="company-profiles-grid">
+      <div class="company-profile-card" *ngFor="let company of featuredCompanies">
+        <div class="company-header">
+          <img [src]="company.logo || '/assets/images/default-company-logo.png'"
+               [alt]="company.name"
+               class="company-logo">
+          <div class="company-info">
+            <h3>{{company.name}}</h3>
+            <p class="company-industry">{{company.industry}}</p>
+            <div class="company-stats">
+              <span class="stat">{{company.followersCount}} abonnés</span>
+              <span class="rating">★ {{getAverageRating(company)}}</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="company-description">{{company.description}}</p>
+
+        <div class="company-actions">
+          <button class="btn btn-primary btn-lg" routerLink="/companies/{{company.id}}">
+            <i class="fas fa-building"></i>
+            Voir le profil
+          </button>
+          <button class="btn btn-outline btn-lg" (click)="followCompany(company)">
+            <i class="fas" [class.fa-plus]="!company.isFollowing" [class.fa-check]="company.isFollowing"></i>
+            {{company.isFollowing ? 'Suivi' : 'Suivre'}}
+          </button>
+        </div>
+
+        <div class="company-benefits-preview" *ngIf="company.benefits?.length">
+          <h4>Avantages clés</h4>
+          <div class="benefits-list">
+            <span class="benefit-tag" *ngFor="let benefit of company.benefits.slice(0, 3)">
+              {{benefit.name}}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-cta">
+      <button class="btn btn-primary btn-xl" routerLink="/companies">
+        <i class="fas fa-search"></i>
+        Explorer toutes les entreprises
+      </button>
+      <button class="btn btn-outline btn-xl" routerLink="/companies/compare">
+        <i class="fas fa-balance-scale"></i>
+        Comparer les entreprises
       </button>
     </div>
   </div>
@@ -470,6 +605,14 @@
         <button class="btn btn-success btn-xl" routerLink="/crowdfunding">
           <i class="fas fa-hand-holding-heart"></i>
           Crowdfunding
+        </button>
+        <button class="btn btn-warning btn-xl" routerLink="/companies">
+          <i class="fas fa-building"></i>
+          Profils Entreprises
+        </button>
+        <button class="btn btn-danger btn-xl" routerLink="/companies/compare">
+          <i class="fas fa-balance-scale"></i>
+          Comparer Entreprises
         </button>
         <!-- Fintech Section -->
         <div class="fintech-section">

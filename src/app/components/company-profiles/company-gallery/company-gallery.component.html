@@ -1,0 +1,73 @@
+<div class="company-gallery" *ngIf="companyProfile">
+  <div class="gallery-header">
+    <h3><i class="fas fa-images"></i> Galerie {{companyProfile.name}}</h3>
+    <p>Découvrez l'ambiance et la culture de l'entreprise</p>
+  </div>
+
+  <!-- Photos Section -->
+  <div class="gallery-section" *ngIf="companyProfile.photos && companyProfile.photos.length > 0">
+    <h4><i class="fas fa-camera"></i> Photos de l'entreprise</h4>
+    <div class="photos-grid">
+      <div class="photo-item" *ngFor="let photo of companyProfile.photos; let i = index"
+           (click)="openImageModal(photo)">
+        <img [src]="photo" [alt]="'Photo ' + (i + 1) + ' de ' + companyProfile.name" class="gallery-photo">
+        <div class="photo-overlay">
+          <i class="fas fa-expand"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Culture Videos Section -->
+  <div class="gallery-section" *ngIf="companyProfile.cultureVideos && companyProfile.cultureVideos.length > 0">
+    <h4><i class="fas fa-video"></i> Vidéos culturelles</h4>
+    <div class="videos-grid">
+      <div class="video-item" *ngFor="let video of companyProfile.cultureVideos; let i = index">
+        <video [src]="video" controls class="gallery-video"
+               [poster]="'/assets/images/video-poster-' + (i + 1) + '.jpg'"
+               preload="metadata">
+          Votre navigateur ne supporte pas la lecture de vidéos.
+        </video>
+        <div class="video-info">
+          <h5>Vidéo culturelle {{i + 1}}</h5>
+          <button class="btn btn-outline btn-sm" (click)="openVideoModal(video)">
+            <i class="fas fa-expand"></i>
+            Voir en plein écran
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-gallery" *ngIf="(!companyProfile.photos || companyProfile.photos.length === 0) &&
+                                   (!companyProfile.cultureVideos || companyProfile.cultureVideos.length === 0)">
+    <div class="empty-content">
+      <i class="fas fa-images"></i>
+      <h4>Aucune image disponible</h4>
+      <p>{{companyProfile.name}} n'a pas encore ajouté de photos ou vidéos à sa galerie.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for full screen view -->
+<div class="gallery-modal" *ngIf="showModal" (keydown)="onKeyDown($event)" tabindex="0">
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="modal-content">
+    <button class="modal-close" (click)="closeModal()" aria-label="Fermer">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <!-- Image Modal -->
+    <div class="modal-image" *ngIf="selectedImage">
+      <img [src]="selectedImage" [alt]="companyProfile?.name" class="full-image">
+    </div>
+
+    <!-- Video Modal -->
+    <div class="modal-video" *ngIf="selectedVideo">
+      <video [src]="selectedVideo" controls autoplay class="full-video">
+        Votre navigateur ne supporte pas la lecture de vidéos.
+      </video>
+    </div>
+  </div>
+</div>

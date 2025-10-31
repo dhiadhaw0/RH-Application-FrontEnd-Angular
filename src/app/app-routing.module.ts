@@ -17,6 +17,9 @@ import { MyJobOffersComponent } from './components/job-offers/my-job-offers/my-j
 import { JobOfferWorkflowComponent } from './components/job-offers/job-offer-workflow/job-offer-workflow.component';
 import { JobOfferVersionsComponent } from './components/job-offers/job-offer-versions/job-offer-versions.component';
 import { JobOfferSuggestionsComponent } from './components/job-offers/job-offer-suggestions/job-offer-suggestions.component';
+import { CompanyProfileComponent } from './components/company-profiles/company-profile/company-profile.component';
+import { CompanyListComponent } from './components/company-profiles/company-list/company-list.component';
+import { CompanyComparisonComponent } from './components/company-profiles/company-comparison/company-comparison.component';
 import { ApplicationsListComponent } from './components/applications/applications-list/applications-list.component';
 import { ApplicationDetailComponent } from './components/applications/application-detail/application-detail.component';
 import { ApplicationCreateComponent } from './components/applications/application-create/application-create.component';
@@ -144,6 +147,9 @@ const routes: Routes = [
   { path: 'job-offers/workflow/:id', component: JobOfferWorkflowComponent, data: { animation: 'JobOfferWorkflow' } },
   { path: 'job-offers/versions/:id', component: JobOfferVersionsComponent, data: { animation: 'JobOfferVersions' } },
   { path: 'job-offers/suggestions/:id', component: JobOfferSuggestionsComponent, data: { animation: 'JobOfferSuggestions' } },
+  { path: 'companies', component: CompanyListComponent, data: { animation: 'CompanyProfiles' } },
+  { path: 'companies/:id', component: CompanyProfileComponent, data: { animation: 'CompanyProfile' } },
+  { path: 'companies/compare', component: CompanyComparisonComponent, data: { animation: 'CompanyComparison' } },
   { path: 'applications', component: ApplicationsListComponent, data: { animation: 'Applications' } },
   { path: 'applications/create', component: ApplicationCreateComponent, data: { animation: 'ApplicationCreate' } },
   { path: 'applications/:id', component: ApplicationDetailComponent, data: { animation: 'ApplicationDetail' } },

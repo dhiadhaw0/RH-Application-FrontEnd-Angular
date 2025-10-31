@@ -106,6 +106,40 @@
     </div>
 
     <div class="sidebar">
+      <!-- Company Profile Section -->
+      <div class="sidebar-card" *ngIf="offer?.companyProfile">
+        <h3>Profil de l'entreprise</h3>
+        <div class="company-profile-preview">
+          <div class="company-logo" *ngIf="offer.companyProfile.logo">
+            <img [src]="offer.companyProfile.logo" [alt]="offer.companyProfile.name">
+          </div>
+          <div class="company-info">
+            <h4>{{offer.companyProfile.name}}</h4>
+            <p class="company-industry">{{offer.companyProfile.industry}}</p>
+            <div class="company-stats">
+              <span class="stat">{{offer.companyProfile.followersCount}} abonnés</span>
+              <span class="rating">★ {{getAverageRating(offer.companyProfile)}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="company-actions">
+          <button class="btn btn-info btn-block" routerLink="/companies/{{offer.companyProfile.id}}">
+            <i class="fas fa-building"></i> Voir le profil complet
+          </button>
+          <button class="btn btn-outline btn-block" (click)="toggleFollowCompany(offer.companyProfile)">
+            <i class="fas" [class.fa-plus]="!isFollowingCompany(offer.companyProfile)" [class.fa-check]="isFollowingCompany(offer.companyProfile)"></i>
+            {{isFollowingCompany(offer.companyProfile) ? 'Suivi' : 'Suivre'}}
+          </button>
+        </div>
+      </div>
+
+      <!-- Benefits Calculator Section -->
+      <div class="sidebar-card" *ngIf="offer?.companyProfile">
+        <h3>Calculateur de Rémunération</h3>
+        <p>Découvrez la valeur totale de votre package.</p>
+        <app-benefits-calculator [companyProfile]="offer.companyProfile"></app-benefits-calculator>
+      </div>
+
       <!-- Apply Section -->
       <div class="sidebar-card">
         <h3>Postuler à cette offre</h3>

@@ -131,6 +131,11 @@ import { LiveEventsCalendarComponent } from './components/live-events/live-event
 import { CrowdfundingListComponent } from './components/crowdfunding/crowdfunding-list/crowdfunding-list.component';
 import { CrowdfundingCreateComponent } from './components/crowdfunding/crowdfunding-create/crowdfunding-create.component';
 import { CrowdfundingDetailComponent } from './components/crowdfunding/crowdfunding-detail/crowdfunding-detail.component';
+import { CompanyProfileComponent } from './components/company-profiles/company-profile/company-profile.component';
+import { BenefitsCalculatorComponent } from './components/company-profiles/benefits-calculator/benefits-calculator.component';
+import { CompanyGalleryComponent } from './components/company-profiles/company-gallery/company-gallery.component';
+import { CompanyComparisonComponent } from './components/company-profiles/company-comparison/company-comparison.component';
+import { CompanyListComponent } from './components/company-profiles/company-list/company-list.component';
 
 @NgModule({
   declarations: [
@@ -165,6 +170,11 @@ import { CrowdfundingDetailComponent } from './components/crowdfunding/crowdfund
     CrowdfundingListComponent,
     CrowdfundingCreateComponent,
     CrowdfundingDetailComponent,
+    CompanyProfileComponent,
+    BenefitsCalculatorComponent,
+    CompanyGalleryComponent,
+    CompanyComparisonComponent,
+    CompanyListComponent,
   ],
   imports: [
     BrowserModule,

@@ -7,9 +7,12 @@ import { NavbarComponent } from '../../navbar/navbar.component';
 import { JobOfferService } from '../../../services/job-offer.service';
 import { UserService } from '../../../services/user.service';
 import { ApplicationService } from '../../../services/application.service';
+import { CompanyProfileService } from '../../../services/company-profile.service';
 import { JobOffer } from '../../../models/job-offer.model';
 import { User, Role } from '../../../models/user.model';
 import { Application, StatutCandidature } from '../../../models/application.model';
+import { CompanyProfile } from '../../../models/company-profile.model';
+import { BenefitsCalculatorComponent } from '../../company-profiles/benefits-calculator/benefits-calculator.component';
 
 @Component({
   selector: 'app-job-offer-detail',
@@ -31,7 +34,8 @@ export class JobOfferDetailComponent implements OnInit {
     private router: Router,
     private jobOfferService: JobOfferService,
     private userService: UserService,
-    private applicationService: ApplicationService
+    private applicationService: ApplicationService,
+    private companyProfileService: CompanyProfileService
   ) {}
 
   ngOnInit(): void {
@@ -292,5 +296,27 @@ export class JobOfferDetailComponent implements OnInit {
 
   isExpired(date: string | Date): boolean {
     return new Date(date) < new Date();
+  }
+
+  toggleFollowCompany(company: CompanyProfile): void {
+    this.companyProfileService.followCompany(company.id).subscribe({
+      next: () => {
+        company.isFollowing = true;
+        company.followersCount++;
+      },
+      error: (error) => {
+        console.error('Error following company:', error);
+      }
+    });
+  }
+
+  isFollowingCompany(company: CompanyProfile): boolean {
+    return company.isFollowing || false;
+  }
+
+  getAverageRating(company: CompanyProfile): number {
+    if (!company.testimonials || company.testimonials.length === 0) return 0;
+    const sum = company.testimonials.reduce((acc, t) => acc + t.rating, 0);
+    return Math.round((sum / company.testimonials.length) * 10) / 10;
   }
 }
