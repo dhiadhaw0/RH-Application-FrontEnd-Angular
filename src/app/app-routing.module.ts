@@ -30,6 +30,7 @@ import { FormationFavoritesComponent } from './components/formations/formations-
 import { FormationRatingComponent } from './components/formations/formations-rating/formations-rating.component';
 import { FormationStatsComponent } from './components/formations/formations-stats/formations-stats.component';
 import { FormationTranslationComponent } from './components/formations/formations-translation/formations-translation.component';
+import { ProgressionDashboardComponent } from './components/progressions/progression-dashboard/progression-dashboard.component';
 
 // Mentorship Components
 import { MentorAvailabilityListComponent } from './components/mentorship/mentor-availability/mentor-availability-list.component';
@@ -140,6 +141,7 @@ const routes: Routes = [
   { path: 'formations/:id/rating', component: FormationRatingComponent, data: { animation: 'FormationRating' } },
   { path: 'formations/stats', component: FormationStatsComponent, data: { animation: 'FormationStats' } },
   { path: 'formations/:id/translation', component: FormationTranslationComponent, data: { animation: 'FormationTranslation' } },
+  { path: 'progression', component: ProgressionDashboardComponent, data: { animation: 'ProgressionDashboard' } },
 
   // Mentorship Routes
   { path: 'mentor-availability', component: MentorAvailabilityListComponent, data: { animation: 'MentorAvailabilityList' } },

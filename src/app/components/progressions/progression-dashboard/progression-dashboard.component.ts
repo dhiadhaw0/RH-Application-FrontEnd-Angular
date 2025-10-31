@@ -2,15 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressionFormationService } from '../../../services/progression-formation.service';
 import { FormationService } from '../../../services/formation.service';
+import { WearableHealthService, WearableHealthData, MentalHealthRisk } from '../../../services/wearable-health.service';
 import { ProgressionFormation } from '../../../models/progression-formation.model';
 import { Formation } from '../../../models/formation.model';
+import { MentalHealthMonitorComponent } from '../mental-health-monitor/mental-health-monitor.component';
 
 @Component({
   selector: 'app-progression-dashboard',
   templateUrl: './progression-dashboard.component.html',
   styleUrls: ['./progression-dashboard.component.scss'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, MentalHealthMonitorComponent]
 })
 export class ProgressionDashboardComponent implements OnInit {
   progressions: ProgressionFormation[] = [];
@@ -24,13 +26,20 @@ export class ProgressionDashboardComponent implements OnInit {
   averageProgress = 0;
   totalTimeSpent = 0;
 
+  // Health and bonus data
+  healthData: WearableHealthData | null = null;
+  healthRisk: MentalHealthRisk | null = null;
+  calculatedBonus = 0;
+
   constructor(
     private progressionService: ProgressionFormationService,
-    private formationService: FormationService
+    private formationService: FormationService,
+    private healthService: WearableHealthService
   ) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
+    this.loadHealthData();
   }
 
   loadDashboardData(): void {
@@ -70,6 +79,28 @@ export class ProgressionDashboardComponent implements OnInit {
       : 0;
     // Mock time calculation - in real app, this would come from backend
     this.totalTimeSpent = this.progressions.length * 45; // Mock 45 minutes per formation
+
+    // Calculate bonus based on health and progression
+    this.calculateBonus();
+  }
+
+  private loadHealthData(): void {
+    this.healthService.getCurrentHealthData(this.userId).subscribe({
+      next: (data) => {
+        this.healthData = data;
+        this.healthRisk = this.healthService.assessMentalHealthRisk(data, this.averageProgress);
+        this.calculateBonus();
+      },
+      error: (error) => {
+        console.error('Error loading health data:', error);
+      }
+    });
+  }
+
+  private calculateBonus(): void {
+    if (this.healthRisk) {
+      this.calculatedBonus = this.healthService.calculateBonusAdjustment(this.averageProgress, this.healthRisk);
+    }
   }
 
   getProgressColor(progress: number): string {

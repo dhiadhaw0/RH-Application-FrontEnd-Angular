@@ -1,7 +1,7 @@
 <div class="progression-dashboard">
   <div class="dashboard-header">
-    <h1 class="main-title">📊 Tableau de Bord de Progression</h1>
-    <p class="subtitle">Suivez votre avancement dans les formations</p>
+    <h1 class="main-title">🌟 Tableau de Bord de Progression</h1>
+    <p class="subtitle">Suivez votre avancement avec soin pour votre bien-être 💝</p>
   </div>
 
   <div class="stats-overview" *ngIf="!loading">
@@ -33,10 +33,25 @@
         <p>Temps total passé</p>
       </div>
     </div>
+    <div class="stat-card bonus-card" *ngIf="calculatedBonus > 0">
+      <div class="stat-icon">🎁</div>
+      <div class="stat-content">
+        <h3>+{{ calculatedBonus.toFixed(1) }}€</h3>
+        <p>Prime santé mentale</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mental Health Monitor Section -->
+  <div class="mental-health-section" *ngIf="!loading">
+    <app-mental-health-monitor
+      [userId]="userId"
+      [progression]="averageProgress">
+    </app-mental-health-monitor>
   </div>
 
   <div class="formations-progress" *ngIf="!loading">
-    <h2 class="section-title">Progression par Formation</h2>
+    <h2 class="section-title">🌱 Progression par Formation</h2>
     <div class="formations-grid">
       <div class="formation-card" *ngFor="let formation of formations">
         <div class="card-header">
@@ -68,7 +83,7 @@
   </div>
 
   <div class="loading-state" *ngIf="loading">
-    <div class="loading-spinner"></div>
-    <p>Chargement de vos statistiques...</p>
+    <div class="loading-spinner">✨</div>
+    <p>Chargement de vos statistiques magiques... 🪄</p>
   </div>
 </div>

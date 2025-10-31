@@ -1,0 +1,74 @@
+<div class="mental-health-monitor" *ngIf="!loading">
+  <div class="monitor-header">
+    <h3 class="monitor-title">🩺 Moniteur Santé Mentale</h3>
+    <div class="risk-indicator" [style.background-color]="getRiskColor()">
+      <span class="risk-emoji">{{ getRiskEmoji() }}</span>
+      <span class="risk-label">{{ getRiskLabel() }}</span>
+    </div>
+  </div>
+
+  <div class="health-metrics">
+    <div class="metric-card stress-card">
+      <div class="metric-icon">{{ getStressEmoji() }}</div>
+      <div class="metric-content">
+        <h4>Stress</h4>
+        <div class="metric-value">{{ healthData?.stressLevel }}%</div>
+        <div class="metric-bar">
+          <div class="metric-fill stress-fill" [style.width.%]="healthData?.stressLevel"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="metric-card sleep-card">
+      <div class="metric-icon">{{ getSleepEmoji() }}</div>
+      <div class="metric-content">
+        <h4>Sommeil</h4>
+        <div class="metric-value">{{ healthData?.sleepQuality }}%</div>
+        <div class="metric-bar">
+          <div class="metric-fill sleep-fill" [style.width.%]="healthData?.sleepQuality"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="metric-card wellness-card">
+      <div class="metric-icon">{{ getWellnessEmoji() }}</div>
+      <div class="metric-content">
+        <h4>Bien-être</h4>
+        <div class="metric-value">{{ healthData?.mentalWellnessScore }}%</div>
+        <div class="metric-bar">
+          <div class="metric-fill wellness-fill" [style.width.%]="healthData?.mentalWellnessScore"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="health-insights" *ngIf="healthRisk">
+    <div class="insight-card" [ngClass]="healthRisk.level">
+      <div class="insight-header">
+        <span class="insight-icon">💡</span>
+        <h4>Recommandations</h4>
+      </div>
+      <p class="insight-message">{{ healthRisk.message }}</p>
+      <ul class="recommendations-list">
+        <li *ngFor="let rec of healthRisk.recommendations" class="recommendation-item">
+          ✨ {{ rec }}
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="wearable-status">
+    <div class="status-indicator connected">
+      <span class="status-dot"></span>
+      <span class="status-text">Wearable connecté</span>
+    </div>
+    <div class="last-update">
+      Dernière mise à jour: {{ healthData?.timestamp | date:'short' }}
+    </div>
+  </div>
+</div>
+
+<div class="loading-monitor" *ngIf="loading">
+  <div class="loading-heart">💖</div>
+  <p>Synchronisation avec votre wearable...</p>
+</div>
