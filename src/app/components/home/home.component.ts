@@ -5,7 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { SkillCreditShowcaseComponent } from '../skill-credits/skill-credit-showcase/skill-credit-showcase.component';
 import { CompanyProfileService } from '../../services/company-profile.service';
 import { CompanyProfile } from '../../models/company-profile.model';
-//import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
+import { Recommendation } from '../../models/recommendation.model';
 
 interface Activity {
   type: 'formation' | 'job' | 'user';
@@ -39,6 +41,8 @@ export class HomeComponent implements OnInit {
   };
 
   featuredCompanies: CompanyProfile[] = [];
+  currentUser: any = null;
+  userRecommendations: Recommendation[] = [];
 
   recentActivities: Activity[] = [
     {
@@ -116,11 +120,19 @@ export class HomeComponent implements OnInit {
     }
   ];
 
- constructor(private companyProfileService: CompanyProfileService) {}
+ constructor(
+   private companyProfileService: CompanyProfileService,
+   private authService: AuthService,
+   private userService: UserService
+ ) {}
 
  ngOnInit(): void {
    this.loadStats();
    this.loadFeaturedCompanies();
+   this.currentUser = this.authService.getCurrentUser();
+   if (this.currentUser?.id) {
+     this.loadUserRecommendations();
+   }
  }
 
   private loadStats(): void {
@@ -306,5 +318,29 @@ export class HomeComponent implements OnInit {
     if (!company.testimonials || company.testimonials.length === 0) return 0;
     const sum = company.testimonials.reduce((acc, t) => acc + t.rating, 0);
     return Math.round((sum / company.testimonials.length) * 10) / 10;
+  }
+
+  private loadCurrentUser(): void {
+    this.currentUser = this.authService.getCurrentUser();
+    if (this.currentUser?.id) {
+      this.loadUserRecommendations();
+    }
+  }
+
+  private loadUserRecommendations(): void {
+    if (!this.currentUser?.id) return;
+    this.userService.getRecommendations(this.currentUser.id).subscribe({
+      next: (recommendations) => {
+        this.userRecommendations = recommendations;
+      },
+      error: (error) => {
+        console.error('Error loading user recommendations:', error);
+        this.userRecommendations = [];
+      }
+    });
+  }
+
+  getRecommendationsCount(type: string): number {
+    return this.userRecommendations.filter(rec => rec.type === type).length;
   }
 }

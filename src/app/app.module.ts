@@ -136,6 +136,9 @@ import { BenefitsCalculatorComponent } from './components/company-profiles/benef
 import { CompanyGalleryComponent } from './components/company-profiles/company-gallery/company-gallery.component';
 import { CompanyComparisonComponent } from './components/company-profiles/company-comparison/company-comparison.component';
 import { CompanyListComponent } from './components/company-profiles/company-list/company-list.component';
+import { RecommendationsListComponent } from './components/recommendations/recommendations-list/recommendations-list.component';
+import { RecommendationCreateComponent } from './components/recommendations/recommendation-create/recommendation-create.component';
+import { RecommendationEditComponent } from './components/recommendations/recommendation-edit/recommendation-edit.component';
 
 @NgModule({
   declarations: [
@@ -175,6 +178,9 @@ import { CompanyListComponent } from './components/company-profiles/company-list
     CompanyGalleryComponent,
     CompanyComparisonComponent,
     CompanyListComponent,
+    RecommendationsListComponent,
+    RecommendationCreateComponent,
+    RecommendationEditComponent,
   ],
   imports: [
     BrowserModule,

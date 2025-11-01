@@ -1,0 +1,40 @@
+<div class="create-recommendation-container">
+  <div class="header">
+    <h2>Create Recommendation</h2>
+    <button class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+  </div>
+
+  <form [formGroup]="recommendationForm" (ngSubmit)="onSubmit()" class="recommendation-form">
+    <div class="form-group">
+      <label for="type">Recommendation Type</label>
+      <select id="type" formControlName="type" class="form-control">
+        <option *ngFor="let type of recommendationTypes" [value]="type">{{ type }}</option>
+      </select>
+      <div class="error-message" *ngIf="type?.invalid && type?.touched">
+        <span *ngIf="type?.errors?.['required']">Recommendation type is required.</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="comment">Comment</label>
+      <textarea
+        id="comment"
+        formControlName="comment"
+        class="form-control"
+        rows="6"
+        placeholder="Write your recommendation here..."
+      ></textarea>
+      <div class="error-message" *ngIf="comment?.invalid && comment?.touched">
+        <span *ngIf="comment?.errors?.['required']">Comment is required.</span>
+        <span *ngIf="comment?.errors?.['minlength']">Comment must be at least 10 characters long.</span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="recommendationForm.invalid || loading">
+        <span *ngIf="loading">Creating...</span>
+        <span *ngIf="!loading">Create Recommendation</span>
+      </button>
+    </div>
+  </form>
+</div>

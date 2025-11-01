@@ -1,0 +1,41 @@
+<div class="recommendations-container">
+  <div class="header">
+    <h2>My Recommendations</h2>
+    <button class="btn btn-primary" (click)="createRecommendation()">Add Recommendation</button>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    Loading recommendations...
+  </div>
+
+  <div class="no-recommendations" *ngIf="!loading && recommendations.length === 0">
+    <p>You don't have any recommendations yet.</p>
+    <button class="btn btn-secondary" (click)="createRecommendation()">Create Your First Recommendation</button>
+  </div>
+
+  <div class="recommendations-list" *ngIf="!loading && recommendations.length > 0">
+    <div class="recommendation-card" *ngFor="let recommendation of recommendations">
+      <div class="recommendation-header">
+        <div class="recommendation-type" [ngClass]="recommendation.type.toLowerCase()">
+          {{ recommendation.type }}
+        </div>
+        <div class="recommendation-date">
+          {{ recommendation.createdAt | date:'mediumDate' }}
+        </div>
+      </div>
+
+      <div class="recommendation-content">
+        <p class="comment">{{ recommendation.comment }}</p>
+        <p class="user-info" *ngIf="recommendation.user">
+          <strong>From:</strong> {{ recommendation.user.firstName }} {{ recommendation.user.lastName }}
+        </p>
+      </div>
+
+      <div class="recommendation-actions">
+        <button class="btn btn-sm btn-info" (click)="viewRecommendation(recommendation)">View</button>
+        <button class="btn btn-sm btn-warning" (click)="editRecommendation(recommendation)">Edit</button>
+        <button class="btn btn-sm btn-danger" (click)="deleteRecommendation(recommendation)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

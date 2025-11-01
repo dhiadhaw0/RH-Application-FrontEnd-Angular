@@ -71,6 +71,18 @@ export class UserService {
   getRecommendations(userId: number): Observable<Recommendation[]> {
     return this.http.get<Recommendation[]>(`${this.baseUrl}/${userId}/recommendations`);
   }
+
+  createRecommendation(userId: number, recommendation: Partial<Recommendation>): Observable<Recommendation> {
+    return this.http.post<Recommendation>(`${this.baseUrl}/${userId}/recommendations`, recommendation);
+  }
+
+  updateRecommendation(userId: number, recommendationId: number, recommendation: Partial<Recommendation>): Observable<Recommendation> {
+    return this.http.put<Recommendation>(`${this.baseUrl}/${userId}/recommendations/${recommendationId}`, recommendation);
+  }
+
+  deleteRecommendation(userId: number, recommendationId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${userId}/recommendations/${recommendationId}`);
+  }
 }
 
 

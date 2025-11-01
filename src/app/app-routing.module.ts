@@ -127,6 +127,11 @@ import { CrowdfundingListComponent } from './components/crowdfunding/crowdfundin
 import { CrowdfundingCreateComponent } from './components/crowdfunding/crowdfunding-create/crowdfunding-create.component';
 import { CrowdfundingDetailComponent } from './components/crowdfunding/crowdfunding-detail/crowdfunding-detail.component';
 
+// Recommendation Components
+import { RecommendationsListComponent } from './components/recommendations/recommendations-list/recommendations-list.component';
+import { RecommendationCreateComponent } from './components/recommendations/recommendation-create/recommendation-create.component';
+import { RecommendationEditComponent } from './components/recommendations/recommendation-edit/recommendation-edit.component';
+
 const routes: Routes = [
   { path: '', component: HomeComponent, data: { animation: 'Home' } },
   { path: 'login', component: LoginComponent, canActivate: [guestGuard], data: { animation: 'Login' } },
@@ -260,6 +265,11 @@ const routes: Routes = [
   { path: 'crowdfunding', component: CrowdfundingListComponent, data: { animation: 'CrowdfundingList' } },
   { path: 'crowdfunding/create', component: CrowdfundingCreateComponent, data: { animation: 'CrowdfundingCreate' } },
   { path: 'crowdfunding/:id', component: CrowdfundingDetailComponent, data: { animation: 'CrowdfundingDetail' } },
+
+  // Recommendation Routes
+  { path: 'recommendations', component: RecommendationsListComponent, data: { animation: 'RecommendationsList' } },
+  { path: 'recommendations/create', component: RecommendationCreateComponent, data: { animation: 'RecommendationCreate' } },
+  { path: 'recommendations/edit/:id', component: RecommendationEditComponent, data: { animation: 'RecommendationEdit' } },
 
   { path: '**', redirectTo: '' }
 ];

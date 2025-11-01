@@ -518,6 +518,177 @@
   </div>
 </section>
 
+<!-- Recommendations Section -->
+<section class="recommendations-section" *ngIf="currentUser">
+  <div class="container">
+    <div class="section-header">
+      <h2>Mes Recommandations</h2>
+      <p>Gérez vos recommandations professionnelles</p>
+    </div>
+
+    <div class="recommendations-overview">
+      <div class="recommendations-stats">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{userRecommendations?.length || 0}}</div>
+            <div class="stat-label">Total Recommandations</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon positive">
+            <i class="fas fa-thumbs-up"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{getRecommendationsCount('POSITIVE')}}</div>
+            <div class="stat-label">Recommandations Positives</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon neutral">
+            <i class="fas fa-minus"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{getRecommendationsCount('NEUTRAL')}}</div>
+            <div class="stat-label">Recommandations Neutres</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon negative">
+            <i class="fas fa-thumbs-down"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{getRecommendationsCount('NEGATIVE')}}</div>
+            <div class="stat-label">Recommandations Négatives</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="recent-recommendations" *ngIf="userRecommendations?.length > 0">
+        <h3>Dernières Recommandations</h3>
+        <div class="recommendations-preview">
+          <div class="recommendation-preview-card" *ngFor="let rec of userRecommendations.slice(0, 3)">
+            <div class="recommendation-type" [ngClass]="rec.type.toLowerCase()">
+              {{ rec.type }}
+            </div>
+            <div class="recommendation-content">
+              <p class="comment">{{ rec.comment | slice:0:100 }}...</p>
+              <div class="recommendation-meta">
+                <span class="date">{{ rec.createdAt | date:'short' }}</span>
+                <span class="user" *ngIf="rec.user">{{ rec.user.firstName }} {{ rec.user.lastName }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="recommendations-actions">
+        <button class="btn btn-primary btn-lg" routerLink="/recommendations">
+          <i class="fas fa-list"></i>
+          Voir Toutes les Recommandations
+        </button>
+        <button class="btn btn-success btn-lg" routerLink="/recommendations/create">
+          <i class="fas fa-plus"></i>
+          Ajouter une Recommandation
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Recommendations Management Section -->
+<section class="recommendations-management-section" *ngIf="currentUser">
+  <div class="container">
+    <div class="section-header">
+      <h2>Gestion des Recommandations</h2>
+      <p>Créez, modifiez et supprimez vos recommandations professionnelles</p>
+    </div>
+
+    <div class="recommendations-management-grid">
+      <div class="management-card">
+        <div class="management-icon">
+          <i class="fas fa-plus-circle"></i>
+        </div>
+        <h3>Créer une Recommandation</h3>
+        <p>Ajoutez une nouvelle recommandation pour partager votre expérience professionnelle.</p>
+        <button class="btn btn-primary" routerLink="/recommendations/create">
+          <i class="fas fa-plus"></i>
+          Créer
+        </button>
+      </div>
+
+      <div class="management-card">
+        <div class="management-icon">
+          <i class="fas fa-list"></i>
+        </div>
+        <h3>Voir Toutes les Recommandations</h3>
+        <p>Consultez et gérez l'ensemble de vos recommandations existantes.</p>
+        <button class="btn btn-secondary" routerLink="/recommendations">
+          <i class="fas fa-eye"></i>
+          Voir Tout
+        </button>
+      </div>
+
+      <div class="management-card">
+        <div class="management-icon">
+          <i class="fas fa-edit"></i>
+        </div>
+        <h3>Modifier une Recommandation</h3>
+        <p>Mettez à jour le contenu ou le type de vos recommandations existantes.</p>
+        <button class="btn btn-warning" routerLink="/recommendations" *ngIf="userRecommendations?.length > 0; else noRecommendations">
+          <i class="fas fa-edit"></i>
+          Modifier
+        </button>
+        <ng-template #noRecommendations>
+          <button class="btn btn-warning" disabled>
+            <i class="fas fa-edit"></i>
+            Aucune Recommandation
+          </button>
+        </ng-template>
+      </div>
+
+      <div class="management-card">
+        <div class="management-icon">
+          <i class="fas fa-trash-alt"></i>
+        </div>
+        <h3>Supprimer une Recommandation</h3>
+        <p>Retirez définitivement une recommandation de votre profil.</p>
+        <button class="btn btn-danger" routerLink="/recommendations" *ngIf="userRecommendations?.length > 0; else noRecommendationsDelete">
+          <i class="fas fa-trash"></i>
+          Supprimer
+        </button>
+        <ng-template #noRecommendationsDelete>
+          <button class="btn btn-danger" disabled>
+            <i class="fas fa-trash"></i>
+            Aucune Recommandation
+          </button>
+        </ng-template>
+      </div>
+    </div>
+
+    <div class="recommendations-quick-stats" *ngIf="userRecommendations?.length > 0">
+      <div class="quick-stat">
+        <span class="quick-stat-number">{{userRecommendations.length}}</span>
+        <span class="quick-stat-label">Total</span>
+      </div>
+      <div class="quick-stat">
+        <span class="quick-stat-number">{{getRecommendationsCount('POSITIVE')}}</span>
+        <span class="quick-stat-label">Positives</span>
+      </div>
+      <div class="quick-stat">
+        <span class="quick-stat-number">{{getRecommendationsCount('NEUTRAL')}}</span>
+        <span class="quick-stat-label">Neutres</span>
+      </div>
+      <div class="quick-stat">
+        <span class="quick-stat-number">{{getRecommendationsCount('NEGATIVE')}}</span>
+        <span class="quick-stat-label">Négatives</span>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Testimonials Section -->
 <section class="testimonials-section">
   <div class="container">
